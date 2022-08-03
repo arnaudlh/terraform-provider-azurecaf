@@ -304,6 +304,10 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_data_lake_store | ✔ |
 |azurerm_data_lake_store_file | ❌ |
 |azurerm_data_lake_store_firewall_rule | ✔ |
+|azurerm_data_protection_backup_vault | ✔ |
+|azurerm_data_protection_backup_policy_blob_storage | ✔ |
+|azurerm_data_protection_backup_policy_disk | ✔ |
+|azurerm_data_protection_backup_policy_postgresql | ✔ |
 |azurerm_data_share | ❌ |
 |azurerm_data_share_account | ❌ |
 |azurerm_data_share_dataset_blob_storage | ❌ |
@@ -360,7 +364,7 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_firewall_application_rule_collection | ❌ |
 |azurerm_firewall_nat_rule_collection | ❌ |
 |azurerm_firewall_network_rule_collection | ❌ |
-|azurerm_firewall_policy | ❌ |
+|azurerm_firewall_policy | ✔ |
 |azurerm_firewall_policy_rule_collection_group | ❌ |
 |azurerm_frontdoor | ✔ |
 |azurerm_frontdoor_custom_https_configuration | ❌ |
@@ -389,6 +393,7 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_iot_time_series_insights_standard_environment | ❌ |
 |azurerm_iotcentral_application | ✔ |
 |azurerm_iothub | ✔ |
+|azurerm_iothub_certificate | ✔ |
 |azurerm_iothub_consumer_group | ✔ |
 |azurerm_iothub_dps | ✔ |
 |azurerm_iothub_dps_certificate | ✔ |
@@ -440,7 +445,7 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_log_analytics_linked_storage_account | ❌ |
 |azurerm_log_analytics_saved_search | ❌ |
 |azurerm_log_analytics_solution | ❌ |
-|azurerm_log_analytics_storage_insights | ❌ |
+|azurerm_log_analytics_storage_insights | ✔ |
 |azurerm_log_analytics_workspace | ✔ |
 |azurerm_logic_app_action_custom | ✔ |
 |azurerm_logic_app_action_http | ✔ |
@@ -560,6 +565,7 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_public_ip | ✔ |
 |azurerm_public_ip_prefix | ✔ |
 |azurerm_public_ips | ❌ |
+|azurerm_purview_account | ✔ |
 |azurerm_recovery_services_vault | ✔ |
 |azurerm_redis_cache | ✔ |
 |azurerm_redis_firewall_rule | ✔ |
@@ -657,9 +663,17 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_subscription_template_deployment | ❌ |
 |azurerm_subscriptions | ❌ |
 |azurerm_synapse_firewall_rule | ✔ |
+|azurerm_synapse_integration_runtime_azure | ✔ |
+|azurerm_synapse_integration_runtime_self_hosted | ✔ |
+|azurerm_synapse_linked_service | ✔ |
+|azurerm_synapse_managed_private_endpoint | ✔ |
+|azurerm_synapse_private_link_hub | ✔ |
+|azurerm_synapse_sql_pool | ✔ |
+|azurerm_synapse_sql_pool_vulnerability_assessment_baseline | ✔ |
+|azurerm_synapse_sql_pool_workload_classifier | ✔ |
+|azurerm_synapse_sql_pool_workload_group | ✔ |
 |azurerm_synapse_role_assignment | ❌ |
 |azurerm_synapse_spark_pool | ✔ |
-|azurerm_synapse_sql_pool | ❌ |
 |azurerm_synapse_workspace | ✔ |
 |azurerm_template_deployment | ✔ |
 |azurerm_traffic_manager_endpoint | ❌ |
@@ -672,7 +686,7 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_virtual_desktop_workspace_application_group_association | ❌ |
 |azurerm_virtual_hub | ✔ |
 |azurerm_virtual_hub_bgp_connection | ❌ |
-|azurerm_virtual_hub_connection | ❌ |
+|azurerm_virtual_hub_connection | ✔ |
 |azurerm_virtual_hub_ip | ❌ |
 |azurerm_virtual_hub_route_table | ❌ |
 |azurerm_virtual_hub_security_partner_provider | ❌ |
