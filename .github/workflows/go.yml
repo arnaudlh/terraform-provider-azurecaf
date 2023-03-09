@@ -23,13 +23,6 @@ jobs:
           go-version-file: './go.mod'
         id: go
 
-      # - name: Get dependencies
-      #   run: |
-      #     go get -v -t -d ./...
-      #     if [ -f Gopkg.toml ]; then
-      #         curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-      #         dep ensure
-      #     fi
 
       - name: Build
         run: go build -v ./...
@@ -37,10 +30,10 @@ jobs:
       - name: Test
         run: go test -v ./...
 
-      - name: lint
-        uses: golangci/golangci-lint-action@v3
-        # with:
-        #   version: 'v3.4.0'
+      # - name: lint
+      #   uses: golangci/golangci-lint-action@v3
+      #   # with:
+      #   #   version: 'v3.4.0'
 
       - name: Import GPG key
         id: import_gpg
