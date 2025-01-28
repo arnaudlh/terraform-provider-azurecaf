@@ -37,12 +37,17 @@ jobs:
             go.mod
       - name: Run Unit Tests
         run: |
-          go test -v -parallel 8 -coverprofile=coverage.txt -covermode=atomic -tags=unit ./...
+          go test -v -parallel 8 -coverprofile=coverage.txt -covermode=atomic -tags=unit ./... || exit 1
           go tool cover -func=coverage.txt | tee coverage.out
-          if [[ $(grep "total:" coverage.out | awk '{print $3}' | sed 's/%//') < 75 ]]; then
+          COVERAGE=$(grep "total:" coverage.out | awk '{print $3}' | sed 's/%//')
+          echo "Code coverage: $COVERAGE%"
+          if (( $(echo "$COVERAGE < 75" | bc -l) )); then
             echo "Code coverage is below 75%"
             exit 1
           fi
+          
+          # Remove integration test files to ensure they're not included in coverage
+          rm -f azurecaf/*_integration_test.go
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:

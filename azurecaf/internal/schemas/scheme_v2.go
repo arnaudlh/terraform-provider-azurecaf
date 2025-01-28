@@ -101,7 +101,7 @@ func ResourceNameStateUpgradeV2(ctx context.Context, rawState map[string]interfa
 	}
 	rawState["use_slug"] = true
 	if _, exists := rawState["result"]; !exists {
-		rawState["result"] = nil
+		rawState["result"] = ""
 	}
 	return rawState, nil
 }
