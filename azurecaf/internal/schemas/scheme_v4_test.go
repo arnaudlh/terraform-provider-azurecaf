@@ -114,10 +114,6 @@ func TestV4(t *testing.T) {
     if resourceType.ValidateFunc == nil {
         t.Error("resource_type field should have a validation function")
     }
-    // Test validation function behavior
-    if resourceType.ValidateFunc == nil {
-        t.Error("resource_type field should have a validation function")
-    }
 
     // Test description fields
     expectedDescriptions := map[string]string{

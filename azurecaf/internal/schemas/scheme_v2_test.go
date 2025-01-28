@@ -93,7 +93,6 @@ func TestV2(t *testing.T) {
 		t.Fatal("V2() schema is nil")
 	}
 
-
 	tests := []struct {
 		name     string
 		field    string
