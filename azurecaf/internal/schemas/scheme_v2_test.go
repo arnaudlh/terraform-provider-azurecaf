@@ -97,8 +97,8 @@ func TestV2(t *testing.T) {
 		typ      string
 		computed bool
 	}{
-		{"name", "name", true, "TypeString", false},
-		{"resource_type", "resource_type", true, "TypeString", false},
+		{"name", "name", false, "TypeString", false},
+		{"resource_type", "resource_type", false, "TypeString", false},
 		{"prefixes", "prefixes", false, "TypeList", false},
 		{"suffixes", "suffixes", false, "TypeList", false},
 		{"result", "result", false, "TypeString", true},
