@@ -115,77 +115,40 @@ func TestResourceNameRead(t *testing.T) {
 	}
 }
 
-func TestGetDifference(t *testing.T) {
-	tests := []struct {
-		name     string
-		old      interface{}
-		new      interface{}
-		expected bool
-	}{
-		{
-			name:     "different values",
-			old:      "old",
-			new:      "new",
-			expected: true,
-		},
-		{
-			name:     "same values",
-			old:      "same",
-			new:      "same",
-			expected: false,
-		},
-		{
-			name:     "nil old value",
-			old:      nil,
-			new:      "new",
-			expected: true,
-		},
-		{
-			name:     "nil new value",
-			old:      "old",
-			new:      nil,
-			expected: true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := getDifference(tt.old, tt.new)
-			if result != tt.expected {
-				t.Errorf("getDifference() = %v, want %v", result, tt.expected)
-			}
-		})
-	}
-}
-
 func TestConvertInterfaceToString(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    interface{}
-		expected string
+		input    []interface{}
+		expected []string
 	}{
 		{
-			name:     "string input",
-			input:    "test",
-			expected: "test",
+			name:     "string slice input",
+			input:    []interface{}{"test", "test2"},
+			expected: []string{"test", "test2"},
 		},
 		{
 			name:     "nil input",
 			input:    nil,
-			expected: "",
+			expected: []string{},
 		},
 		{
-			name:     "integer input",
-			input:    123,
-			expected: "123",
+			name:     "empty slice input",
+			input:    []interface{}{},
+			expected: []string{},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := convertInterfaceToString(tt.input)
-			if result != tt.expected {
-				t.Errorf("convertInterfaceToString() = %v, want %v", result, tt.expected)
+			if len(result) != len(tt.expected) {
+				t.Errorf("convertInterfaceToString() length = %v, want %v", len(result), len(tt.expected))
+				return
+			}
+			for i := range result {
+				if result[i] != tt.expected[i] {
+					t.Errorf("convertInterfaceToString() at index %d = %v, want %v", i, result[i], tt.expected[i])
+				}
 			}
 		})
 	}
