@@ -5,6 +5,8 @@ package schemas
 import (
 	"context"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func TestResourceNameStateUpgradeV2(t *testing.T) {
@@ -97,14 +99,17 @@ func TestV2(t *testing.T) {
 		name     string
 		field    string
 		required bool
-		typ      string
+		typ      schema.ValueType
 		computed bool
+		default_ interface{}
 	}{
-		{"name", "name", false, "TypeString", false},
-		{"resource_type", "resource_type", false, "TypeString", false},
-		{"prefixes", "prefixes", false, "TypeList", false},
-		{"suffixes", "suffixes", false, "TypeList", false},
-		{"result", "result", false, "TypeString", true},
+		{"name", "name", false, schema.TypeString, false, ""},
+		{"resource_type", "resource_type", false, schema.TypeString, false, nil},
+		{"prefixes", "prefixes", false, schema.TypeList, false, nil},
+		{"suffixes", "suffixes", false, schema.TypeList, false, nil},
+		{"result", "result", false, schema.TypeString, true, nil},
+		{"clean_input", "clean_input", false, schema.TypeBool, false, true},
+		{"separator", "separator", false, schema.TypeString, false, "-"},
 	}
 
 	for _, tt := range tests {
@@ -117,11 +122,14 @@ func TestV2(t *testing.T) {
 			if field.Required != tt.required {
 				t.Errorf("V2() field %s Required = %v, want %v", tt.field, field.Required, tt.required)
 			}
-			if field.Type.String() != tt.typ {
+			if field.Type != tt.typ {
 				t.Errorf("V2() field %s Type = %v, want %v", tt.field, field.Type, tt.typ)
 			}
 			if field.Computed != tt.computed {
 				t.Errorf("V2() field %s Computed = %v, want %v", tt.field, field.Computed, tt.computed)
+			}
+			if tt.default_ != nil && field.Default != tt.default_ {
+				t.Errorf("V2() field %s Default = %v, want %v", tt.field, field.Default, tt.default_)
 			}
 		})
 	}
