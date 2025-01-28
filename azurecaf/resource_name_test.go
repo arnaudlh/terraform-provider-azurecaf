@@ -236,7 +236,7 @@ func testResourceNameStateDataV3() map[string]interface{} {
 func TestResourceExampleInstanceStateUpgradeV2(t *testing.T) {
 	expected := map[string]interface{}{
 		"use_slug": true,
-		"result":   "",
+		"result":   nil,
 	}
 
 	actual, err := schemas.ResourceNameStateUpgradeV2(context.Background(), nil, nil)
