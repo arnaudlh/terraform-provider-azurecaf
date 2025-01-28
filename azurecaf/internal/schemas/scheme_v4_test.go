@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func TestV4_Schema(t *testing.T) {
@@ -115,11 +116,13 @@ func TestV4(t *testing.T) {
         t.Error("resource_type field should have a validation function")
     }
     // Test validation function behavior
-    _, errs := resourceType.ValidateFunc("azurerm_resource_group", "resource_type")
+    resourceMapsKeys := getResourceMaps()
+    validateFunc := validation.StringInSlice(resourceMapsKeys, false)
+    _, errs := validateFunc("azurerm_resource_group", "resource_type")
     if len(errs) > 0 {
         t.Errorf("ValidateFunc failed for valid resource type: %v", errs)
     }
-    _, errs = resourceType.ValidateFunc("invalid_resource", "resource_type")
+    _, errs = validateFunc("invalid_resource", "resource_type")
     if len(errs) == 0 {
         t.Error("ValidateFunc should fail for invalid resource type")
     }

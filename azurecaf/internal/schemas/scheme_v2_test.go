@@ -92,8 +92,8 @@ func TestV2(t *testing.T) {
 	if v2Resource.Schema == nil {
 		t.Fatal("V2() schema is nil")
 	}
-	v2Schema := v2Resource.Schema
 
+	schemaMap := v2Resource.Schema
 	tests := []struct {
 		name     string
 		field    string
@@ -110,7 +110,7 @@ func TestV2(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			field, ok := v2Schema[tt.field]
+			field, ok := schemaMap[tt.field]
 			if !ok {
 				t.Errorf("V2() schema missing field %s", tt.field)
 				return
