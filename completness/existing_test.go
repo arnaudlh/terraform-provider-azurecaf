@@ -4,12 +4,9 @@
 package completness
 
 import (
-	"bytes"
 	"fmt"
-	"io"
 	"os"
 	"path"
-	"strings"
 	"testing"
 )
 
