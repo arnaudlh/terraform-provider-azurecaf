@@ -113,14 +113,18 @@ func getNameResult(d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 
 	if randomSeed == 0 {
 		randomSeed = time.Now().UnixMicro()
-		d.Set("random_seed", randomSeed)
+		if err := d.Set("random_seed", randomSeed); err != nil {
+			return diag.FromErr(err)
+		}
 	}
 	randomString := d.Get("random_string").(string)
 	randomSuffix := randSeq(randomLength, randomSeed)
 	if len(randomString) > 0 {
 		randomSuffix = randomString
 	} else {
-		d.Set("random_string", randomSuffix)
+		if err := d.Set("random_string", randomSuffix); err != nil {
+			return diag.FromErr(err)
+		}
 	}
 
 	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
@@ -139,7 +143,9 @@ func getNameResult(d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 			return diag.FromErr(err)
 		}
 	}
-	d.SetId(id)
+	if err := d.SetId(id); err != nil {
+		return diag.FromErr(err)
+	}
 	return diags
 }
 

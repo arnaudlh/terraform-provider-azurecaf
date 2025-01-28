@@ -19,7 +19,5 @@ func dataSourceName() *schema.Resource {
 
 func dataSourceNameRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 
-	var diags diag.Diagnostics
-	getNameResult(d, meta)
-	return diags
+	return getNameResult(d, meta)
 }
