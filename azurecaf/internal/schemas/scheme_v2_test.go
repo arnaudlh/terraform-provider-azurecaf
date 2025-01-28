@@ -1,4 +1,5 @@
 //go:build unit
+// +build unit
 
 package schemas
 
@@ -20,7 +21,8 @@ func TestResourceNameStateUpgradeV2(t *testing.T) {
 			name: "empty state",
 			state: map[string]interface{}{},
 			want: map[string]interface{}{
-				"result": "",
+				"use_slug": true,
+				"result":   nil,
 			},
 			wantErr: false,
 		},

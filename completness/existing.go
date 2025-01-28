@@ -1,4 +1,4 @@
-package main
+package completness
 
 import (
 	"bufio"
@@ -44,7 +44,7 @@ func ValidateResourceDefinition(resources []string) error {
 	if err != nil {
 		return fmt.Errorf("failed to get working directory: %v", err)
 	}
-	sourceDefinitions, err := os.ReadFile(path.Join(wd, "../resourceDefinition.json"))
+	sourceDefinitions, err := os.ReadFile(path.Join(wd, "resourceDefinition.json"))
 	if err != nil {
 		return fmt.Errorf("failed to read resource definition file: %v", err)
 	}
@@ -95,7 +95,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	sourceDefinitions, err := os.ReadFile(path.Join(wd, "../resourceDefinition.json"))
+	sourceDefinitions, err := os.ReadFile(path.Join(wd, "resourceDefinition.json"))
 	if err != nil {
 		log.Fatal(err)
 	}

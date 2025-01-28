@@ -100,8 +100,5 @@ func ResourceNameStateUpgradeV2(ctx context.Context, rawState map[string]interfa
 		rawState = make(map[string]interface{})
 	}
 	rawState["use_slug"] = true
-	if _, exists := rawState["result"]; !exists {
-		rawState["result"] = ""
-	}
 	return rawState, nil
 }
