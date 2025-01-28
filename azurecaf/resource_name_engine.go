@@ -11,6 +11,10 @@ import (
 func cleanSlice(names []string, resourceDefinition *models.ResourceStructure) []string {
 	result := make([]string, len(names))
 	for i, name := range names {
+		if name == "" {
+			result[i] = name
+			continue
+		}
 		result[i] = cleanString(name, resourceDefinition)
 	}
 	return result

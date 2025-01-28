@@ -33,6 +33,12 @@ func TestCleanSlice(t *testing.T) {
 			regex:    "^[a-z0-9-]+$",
 			expected: []string{"test123", "test-123", "test123"},
 		},
+		{
+			name:     "slice with mixed content",
+			input:    []string{"", "test123", "test@456", ""},
+			regex:    "^[a-z0-9]+$",
+			expected: []string{"", "test123", "test456", ""},
+		},
 	}
 
 	for _, tt := range tests {
