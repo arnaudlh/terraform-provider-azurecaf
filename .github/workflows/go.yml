@@ -49,46 +49,11 @@ jobs:
           name: unit-coverage-${{ matrix.go-version }}
           path: coverage.txt
 
-  integration-tests:
-    name: Integration Tests
-    needs: unit-tests
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        go-version: ['1.21', '1.22']
-      fail-fast: false
-    permissions:
-      contents: read
-      checks: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v4
-        with:
-          go-version: ${{ matrix.go-version }}
-          cache: true
-          cache-dependency-path: |
-            go.sum
-            go.mod
-      - name: Run Integration Tests
-        run: |
-          # Skip integration tests for now as they require additional setup
-          echo "Integration tests temporarily skipped - will be enabled in a future PR"
-          # Create empty coverage file to satisfy artifact upload
-          echo "mode: atomic" > coverage.txt
-          # Temporarily disable coverage threshold check while improving test coverage
-          # if [[ $(grep "total:" coverage.out | awk '{print $3}' | sed 's/%//') < 70 ]]; then
-          #   echo "Code coverage is below 70%"
-          #   exit 1
-          # fi
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v4
-        with:
-          name: integration-coverage-${{ matrix.go-version }}
-          path: coverage.txt
+
 
   coverage:
     name: Combined Coverage Report
-    needs: [unit-tests, integration-tests]
+    needs: [unit-tests]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -100,7 +65,7 @@ jobs:
       - name: Merge coverage reports
         run: |
           echo "mode: atomic" > coverage.txt
-          for report in unit-coverage-*/coverage.txt integration-coverage-*/coverage.txt; do
+          for report in unit-coverage-*/coverage.txt; do
             tail -n +2 "$report" >> coverage.txt
           done
           go tool cover -func=coverage.txt | tee coverage.out
@@ -114,7 +79,7 @@ jobs:
 
   build:
     name: Build
-    needs: [unit-tests, integration-tests]
+    needs: [unit-tests]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -149,11 +114,7 @@ jobs:
           go test -v -parallel 8 -coverprofile=coverage.txt -covermode=atomic -tags=unit ./...
           go tool cover -func=coverage.txt
 
-      - name: Run Integration Tests
-        if: ${{ github.job == 'integration-tests' }}
-        run: |
-          go test -v -parallel 4 -coverprofile=coverage.txt -covermode=atomic -tags=integration ./...
-          go tool cover -func=coverage.txt
+
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
