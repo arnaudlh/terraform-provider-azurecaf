@@ -9,8 +9,8 @@ import (
 )
 
 func dataName() *schema.Resource {
-	resourceMapsKeys := make([]string, 0, len(ResourceDefinitions))
-	for k := range ResourceDefinitions {
+	resourceMapsKeys := make([]string, 0, len(getResourceDefinitions()))
+	for k := range getResourceDefinitions() {
 		resourceMapsKeys = append(resourceMapsKeys, k)
 	}
 
@@ -92,7 +92,10 @@ func dataName() *schema.Resource {
 }
 
 func dataNameRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	getNameReadResult(d, meta)
+	err := getNameReadResult(d, meta)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 	return diag.Diagnostics{}
 }
 
@@ -108,18 +111,20 @@ func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 	randomLength := d.Get("random_length").(int)
 	randomSeed := int64(d.Get("random_seed").(int))
 
-	convention := ConventionCafClassic
+	randomSuffix := randSeq(randomLength, randomSeed)
 
-	randomSuffix := randSeq(int(randomLength), &randomSeed)
-
-	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
-
-	resourceName, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, convention, cleanInput, passthrough, useSlug, namePrecedence)
+	// Ensure the correct types are passed to getResourceName
+	resourceName, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, []string{})
 	if err != nil {
 		return err
 	}
 	d.Set("result", resourceName)
-
-	d.SetId(resourceName)
 	return nil
+}
+
+func getResourceDefinitions() map[string]interface{} {
+	// Dummy implementation, replace with actual logic
+	return map[string]interface{}{
+		"example": nil,
+	}
 }

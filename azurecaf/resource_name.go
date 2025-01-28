@@ -52,7 +52,7 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 	randomLength := d.Get("random_length").(int)
 	randomSeed := int64(d.Get("random_seed").(int))
 	randomString := d.Get("random_string").(string)
-	randomSuffix := randSeq(int(randomLength), randomSeed)
+	randomSuffix := randSeq(randomLength, randomSeed)
 	if len(randomString) > 0 {
 		randomSuffix = randomString
 	} else {
@@ -67,10 +67,7 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 		d.SetNew("result", result)
 		d.SetNew("results", results)
 	}
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func resourceNameCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
@@ -113,7 +110,7 @@ func getNameResult(d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 		d.Set("random_seed", randomSeed)
 	}
 	randomString := d.Get("random_string").(string)
-	randomSuffix := randSeq(int(randomLength), randomSeed)
+	randomSuffix := randSeq(randomLength, randomSeed)
 	if len(randomString) > 0 {
 		randomSuffix = randomString
 	} else {

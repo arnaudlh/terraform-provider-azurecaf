@@ -13,11 +13,8 @@ func Provider() *schema.Provider {
 			"azurecaf_name": resourceName(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
-			"azurecaf_name": dataSourceName(),
-		},
-		DataSourcesMap: map[string]*schema.Resource{
-			"azurecaf_environment_variable": dataEnvironmentVariable(),
 			"azurecaf_name":                 dataName(),
+			"azurecaf_environment_variable": dataEnvironmentVariable(),
 		},
 	}
 }
