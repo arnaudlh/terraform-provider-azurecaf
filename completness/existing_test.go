@@ -202,29 +202,35 @@ func TestMainFunction(t *testing.T) {
 	defer os.RemoveAll(tmpDir)
 
 	// Create a minimal resourceDefinition.json for testing
-	minimalJson := []byte(`{
-		"azurerm_resource_group": {
+	minimalJson := []byte(`[
+		{
+			"name": "azurerm_resource_group",
 			"min_length": 1,
 			"max_length": 90,
 			"validation_regex": "^[a-zA-Z0-9-_()]+$",
 			"scope": "resourceGroup",
-			"slug": "rg"
+			"slug": "rg",
+			"dashes": true
 		},
-		"azurerm_storage_account": {
+		{
+			"name": "azurerm_storage_account",
 			"min_length": 3,
 			"max_length": 24,
 			"validation_regex": "^[a-z0-9]+$",
 			"scope": "global",
-			"slug": "st"
+			"slug": "st",
+			"dashes": false
 		},
-		"azurerm_virtual_network": {
+		{
+			"name": "azurerm_virtual_network",
 			"min_length": 2,
 			"max_length": 64,
 			"validation_regex": "^[a-zA-Z0-9][a-zA-Z0-9-._]+[a-zA-Z0-9]$",
 			"scope": "resourceGroup",
-			"slug": "vnet"
+			"slug": "vnet",
+			"dashes": true
 		}
-	}`)
+	]`)
 	if err := os.WriteFile(path.Join(tmpDir, "resourceDefinition.json"), minimalJson, 0644); err != nil {
 		t.Fatalf("Failed to write resourceDefinition.json to temp dir: %v", err)
 	}
