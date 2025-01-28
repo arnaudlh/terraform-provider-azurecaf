@@ -61,7 +61,7 @@ func ValidateResourceDefinition(resources []string) error {
 	return nil
 }
 
-func GetResourceDefinition() (map[string]interface{}, error) {
+func GetResourceDefinition() ([]ResourceStructure, error) {
 	wd, err := os.Getwd()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get working directory: %v", err)
@@ -70,7 +70,7 @@ func GetResourceDefinition() (map[string]interface{}, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to read resource definition file: %v", err)
 	}
-	var result map[string]interface{}
+	var result []ResourceStructure
 	err = json.Unmarshal(sourceDefinitions, &result)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal resource definitions: %v", err)
@@ -78,12 +78,16 @@ func GetResourceDefinition() (map[string]interface{}, error) {
 	return result, nil
 }
 
-func GetResourceMap() (map[string]interface{}, error) {
-	resourceDef, err := GetResourceDefinition()
+func GetResourceMap() (map[string]ResourceStructure, error) {
+	resourceDefs, err := GetResourceDefinition()
 	if err != nil {
 		return nil, err
 	}
-	return resourceDef, nil
+	result := make(map[string]ResourceStructure)
+	for _, def := range resourceDefs {
+		result[def.ResourceTypeName] = def
+	}
+	return result, nil
 }
 
 func main() {

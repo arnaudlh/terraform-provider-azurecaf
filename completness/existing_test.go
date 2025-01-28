@@ -54,7 +54,6 @@ func TestValidateResourceDefinition(t *testing.T) {
 func TestGetResourceDefinition(t *testing.T) {
 	tests := []struct {
 		name    string
-		want    map[string]interface{}
 		wantErr bool
 	}{
 		{
@@ -70,8 +69,13 @@ func TestGetResourceDefinition(t *testing.T) {
 				t.Errorf("GetResourceDefinition() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !tt.wantErr && got == nil {
-				t.Error("GetResourceDefinition() returned nil map")
+			if !tt.wantErr {
+				if got == nil {
+					t.Error("GetResourceDefinition() returned nil slice")
+				}
+				if len(got) == 0 {
+					t.Error("GetResourceDefinition() returned empty slice")
+				}
 			}
 		})
 	}
@@ -80,7 +84,6 @@ func TestGetResourceDefinition(t *testing.T) {
 func TestGetResourceMap(t *testing.T) {
 	tests := []struct {
 		name    string
-		want    map[string]interface{}
 		wantErr bool
 	}{
 		{
@@ -96,8 +99,13 @@ func TestGetResourceMap(t *testing.T) {
 				t.Errorf("GetResourceMap() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !tt.wantErr && got == nil {
-				t.Error("GetResourceMap() returned nil map")
+			if !tt.wantErr {
+				if got == nil {
+					t.Error("GetResourceMap() returned nil map")
+				}
+				if len(got) == 0 {
+					t.Error("GetResourceMap() returned empty map")
+				}
 			}
 		})
 	}

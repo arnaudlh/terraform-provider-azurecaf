@@ -105,6 +105,19 @@ func V3() *schema.Resource {
 }
 
 func ResourceNameStateUpgradeV3(ctx context.Context, rawState map[string]interface{}, meta interface{}) (map[string]interface{}, error) {
+	if rawState == nil {
+		rawState = make(map[string]interface{})
+	}
+	if rawState["result"] == nil {
+		rawState["result"] = ""
+	}
+	if rawState["results"] == nil {
+		rawState["results"] = make(map[string]interface{})
+	}
+	if rawState["resource_type"] == nil {
+		rawState["resource_type"] = ""
+	}
+
 	results := rawState["results"]
 	resourceType := rawState["resource_type"].(string)
 	result := rawState["result"].(string)
@@ -115,15 +128,21 @@ func ResourceNameStateUpgradeV3(ctx context.Context, rawState map[string]interfa
 	case map[string]interface{}:
 		content = v
 	}
-	if _, ok := content[resourceType]; !ok {
-		content[resourceType] = result
+	if resourceType != "" && result != "" {
+		if _, ok := content[resourceType]; !ok {
+			content[resourceType] = result
+		}
 	}
 	rawState["results"] = content
 	ids := []string{}
 	for k, v := range content {
 		ids = append(ids, fmt.Sprintf("%s\t%s", k, v))
 	}
-	rawState["id"] = b64.StdEncoding.EncodeToString([]byte(strings.Join(ids, "\n")))
+	if len(ids) > 0 {
+		rawState["id"] = b64.StdEncoding.EncodeToString([]byte(strings.Join(ids, "\n")))
+	} else {
+		rawState["id"] = ""
+	}
 
 	return rawState, nil
 }
