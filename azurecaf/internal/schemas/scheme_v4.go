@@ -11,9 +11,10 @@ func V4_Schema() map[string]*schema.Schema {
 	resourceMapsKeys := getResourceMaps()
 	return map[string]*schema.Schema{
 		"name": {
-			Type:     schema.TypeString,
-			Required: true,
-			ForceNew: false,
+			Type:        schema.TypeString,
+			Required:    true,
+			ForceNew:    false,
+			Description: "The name to be transformed according to the resource type naming rules",
 		},
 		"prefixes": {
 			Type: schema.TypeList,
@@ -21,8 +22,9 @@ func V4_Schema() map[string]*schema.Schema {
 				Type:         schema.TypeString,
 				ValidateFunc: validation.NoZeroValues,
 			},
-			Optional: true,
-			ForceNew: false,
+			Optional:    true,
+			ForceNew:    false,
+			Description: "A list of prefixes to be used in the name",
 		},
 		"suffixes": {
 			Type: schema.TypeList,
@@ -30,8 +32,9 @@ func V4_Schema() map[string]*schema.Schema {
 				Type:         schema.TypeString,
 				ValidateFunc: validation.NoZeroValues,
 			},
-			Optional: true,
-			ForceNew: false,
+			Optional:    true,
+			ForceNew:    false,
+			Description: "A list of suffixes to be used in the name",
 		},
 		"random_length": {
 			Type:         schema.TypeInt,
@@ -41,8 +44,9 @@ func V4_Schema() map[string]*schema.Schema {
 			Default:      0,
 		},
 		"result": {
-			Type:     schema.TypeString,
-			Computed: true,
+			Type:        schema.TypeString,
+			Computed:    true,
+			Description: "The computed name for the resource",
 		},
 		"results": {
 			Type: schema.TypeMap,
@@ -61,7 +65,7 @@ func V4_Schema() map[string]*schema.Schema {
 			Type:     schema.TypeBool,
 			Optional: true,
 			ForceNew: false,
-			Default:  true,
+			Default:  false,
 		},
 		"passthrough": {
 			Type:     schema.TypeBool,
@@ -112,7 +116,7 @@ func V4_Schema() map[string]*schema.Schema {
 			Type:     schema.TypeBool,
 			Optional: true,
 			ForceNew: false,
-			Default:  true,
+			Default:  false,
 		},
 	}
 }
