@@ -106,7 +106,7 @@ func TestV2(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			field, ok := v2Schema[tt.field]
+			field, ok := v2Schema.Schema[tt.field]
 			if !ok {
 				t.Errorf("V2() schema missing field %s", tt.field)
 				return
