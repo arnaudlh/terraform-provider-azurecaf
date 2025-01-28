@@ -92,6 +92,7 @@ func TestV2(t *testing.T) {
 	if v2Resource.Schema == nil {
 		t.Fatal("V2() schema is nil")
 	}
+	v2Schema := v2Resource.Schema
 
 	tests := []struct {
 		name     string
