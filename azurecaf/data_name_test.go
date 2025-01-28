@@ -19,7 +19,7 @@ func TestDataNameRead(t *testing.T) {
 		{
 			name: "valid resource group name with special characters",
 			data: map[string]interface{}{
-				"name":          "rg-123",
+				"name":          "rg123",
 				"resource_type": "azurerm_resource_group",
 				"prefixes":      []interface{}{"dev"},
 				"suffixes":      []interface{}{"001"},
@@ -34,7 +34,7 @@ func TestDataNameRead(t *testing.T) {
 		{
 			name: "resource group name with all allowed characters",
 			data: map[string]interface{}{
-				"name":          "rg-test.123",
+				"name":          "rgtest123",
 				"resource_type": "azurerm_resource_group",
 				"prefixes":      []interface{}{"dev"},
 				"suffixes":      []interface{}{"001"},

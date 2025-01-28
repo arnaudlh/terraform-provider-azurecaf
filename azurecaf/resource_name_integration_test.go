@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
+	"github.com/arnaudlh/terraform-provider-azurecaf/azurecaf/internal/models"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 

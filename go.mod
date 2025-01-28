@@ -1,4 +1,4 @@
-module github.com/aztfmod/terraform-provider-azurecaf
+module github.com/arnaudlh/terraform-provider-azurecaf
 
 go 1.22.0
 
