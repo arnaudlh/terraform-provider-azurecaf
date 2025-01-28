@@ -110,7 +110,7 @@ func TestV2(t *testing.T) {
 			if v2Schema == nil {
 				t.Fatal("V2() schema is nil")
 			}
-			field, ok := v2Schema.Schema[tt.field]
+			field, ok := v2Schema[tt.field]
 			if !ok {
 				t.Errorf("V2() schema missing field %s", tt.field)
 				return
