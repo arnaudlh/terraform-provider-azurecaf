@@ -107,8 +107,21 @@ func TestV4(t *testing.T) {
 	}
 
     // Test validation functions
-    if v4Schema.Schema["resource_type"].ValidateFunc == nil {
-        t.Error("V4() resource_type field should have a validation function")
+    resourceType := v4Schema.Schema["resource_type"]
+    if resourceType == nil {
+        t.Fatal("resource_type field is missing")
+    }
+    if resourceType.ValidateFunc == nil {
+        t.Error("resource_type field should have a validation function")
+    }
+    // Test validation function behavior
+    _, errs := resourceType.ValidateFunc("azurerm_resource_group", "")
+    if len(errs) > 0 {
+        t.Errorf("ValidateFunc failed for valid resource type: %v", errs)
+    }
+    _, errs = resourceType.ValidateFunc("invalid_resource", "")
+    if len(errs) == 0 {
+        t.Error("ValidateFunc should fail for invalid resource type")
     }
 
     // Test description fields
