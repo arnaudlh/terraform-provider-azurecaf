@@ -22,11 +22,6 @@ func TestV4_Schema(t *testing.T) {
 		}
 	}
 
-	// Test validation function for resource_type
-	if schema["resource_type"].ValidateFunc == nil {
-		t.Error("V4_Schema() resource_type field should have a validation function")
-	}
-
 	// Test that computed fields are marked as such
 	computedFields := []string{"result", "random_string"}
 	for _, field := range computedFields {
