@@ -140,10 +140,10 @@ func getNameResult(d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	}
 	if len(results) > 0 {
 		if err := d.Set("results", results); err != nil {
-			return diag.FromErr(err)
+			return append(diags, diag.FromErr(err)...)
 		}
 	}
-	_ = d.SetId(id)
+	d.SetId(id)
 	return diags
 }
 
