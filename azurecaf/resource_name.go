@@ -143,7 +143,7 @@ func getNameResult(d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 			return diag.FromErr(err)
 		}
 	}
-	d.SetId(id)
+	_ = d.SetId(id)
 	return diags
 }
 

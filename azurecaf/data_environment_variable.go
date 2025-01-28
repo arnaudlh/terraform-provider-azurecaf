@@ -42,7 +42,7 @@ func resourceAction(ctx context.Context, d *schema.ResourceData, meta interface{
 		return diag.Errorf("Value is not set for environment variable: %s", name)
 	}
 
-	d.SetId(name)
+	_ = d.SetId(name)
 	if err := d.Set("value", value); err != nil {
 		return diag.FromErr(err)
 	}
