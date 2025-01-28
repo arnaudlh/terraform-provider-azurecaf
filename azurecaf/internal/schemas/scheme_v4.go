@@ -12,9 +12,8 @@ func V4_Schema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"name": {
 			Type:     schema.TypeString,
-			Optional: true,
+			Required: true,
 			ForceNew: false,
-			Default:  "",
 		},
 		"prefixes": {
 			Type: schema.TypeList,
@@ -73,7 +72,7 @@ func V4_Schema() map[string]*schema.Schema {
 		"resource_type": {
 			Type:         schema.TypeString,
 			Description:  "The resource type to generate a name for",
-			Optional:     true,
+			Required:     true,
 			ValidateFunc: validation.StringInSlice(resourceMapsKeys, false),
 			ForceNew:     false,
 		},
