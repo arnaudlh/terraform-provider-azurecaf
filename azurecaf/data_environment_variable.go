@@ -46,6 +46,7 @@ func resourceAction(ctx context.Context, d *schema.ResourceData, meta interface{
 		return append(diags, diag.FromErr(err)...)
 	}
 	
+	// Set the ID after all other operations are successful
 	d.SetId(name)
-	return diags
+	return nil
 }
