@@ -17,14 +17,32 @@ func TestDataNameRead(t *testing.T) {
 		errCount int
 	}{
 		{
-			name: "valid resource type",
+			name: "valid resource group name with special characters",
 			data: map[string]interface{}{
-				"name":          "test",
+				"name":          "testrg",
 				"resource_type": "azurerm_resource_group",
-				"prefixes":      []interface{}{"rg"},
-				"suffixes":      []interface{}{"prod"},
+				"prefixes":      []interface{}{"dev"},
+				"suffixes":      []interface{}{"prod", "001"},
 				"random_length": 5,
 				"clean_input":   true,
+				"separator":     "-",
+				"use_slug":     false,
+				"passthrough":  false,
+			},
+			wantErr: false,
+		},
+		{
+			name: "resource group name with all allowed characters",
+			data: map[string]interface{}{
+				"name":          "rg1",
+				"resource_type": "azurerm_resource_group",
+				"prefixes":      []interface{}{"dev"},
+				"suffixes":      []interface{}{"prod"},
+				"random_length": 0,
+				"clean_input":   true,
+				"separator":     "-",
+				"use_slug":     false,
+				"passthrough":  false,
 			},
 			wantErr: false,
 		},
@@ -61,16 +79,34 @@ func TestGetNameReadResult(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "valid input",
+			name: "valid resource group name with maximum length",
 			data: map[string]interface{}{
-				"name":          "test",
+				"name":          "resourcegroup",
 				"resource_type": "azurerm_resource_group",
-				"prefixes":      []interface{}{"rg"},
+				"prefixes":      []interface{}{"dev"},
 				"suffixes":      []interface{}{"prod"},
-				"random_length": 5,
+				"random_length": 10,
 				"clean_input":   true,
+				"separator":     "-",
+				"use_slug":     false,
+				"passthrough":  false,
 			},
 			wantErr: false,
+		},
+		{
+			name: "resource group name with invalid character",
+			data: map[string]interface{}{
+				"name":          "test/rg",
+				"resource_type": "azurerm_resource_group",
+				"prefixes":      []interface{}{"dev"},
+				"suffixes":      []interface{}{"prod"},
+				"random_length": 0,
+				"clean_input":   false,
+				"separator":     "-",
+				"use_slug":     false,
+				"passthrough":  false,
+			},
+			wantErr: true,
 		},
 	}
 
