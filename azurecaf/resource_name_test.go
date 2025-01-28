@@ -157,7 +157,7 @@ func TestAccResourceName_CafClassic(t *testing.T) {
 						"ca-myinvalidcaname",
 						24,
 						""),
-					regexMatch("azurecaf_name.classic_ca_invalid", regexp.MustCompile(ResourceDefinitions["azurerm_container_app"].ValidationRegExp), 1),
+					regexMatch("azurecaf_name.classic_ca_invalid", regexp.MustCompile(models.ResourceDefinitions["azurerm_container_app"].ValidationRegExp), 1),
 				),
 			},
 			{
@@ -169,7 +169,7 @@ func TestAccResourceName_CafClassic(t *testing.T) {
 						"passthrough",
 						11,
 						""),
-					regexMatch("azurecaf_name.passthrough", regexp.MustCompile(ResourceDefinitions["azurerm_container_app"].ValidationRegExp), 1),
+					regexMatch("azurecaf_name.passthrough", regexp.MustCompile(models.ResourceDefinitions["azurerm_container_app"].ValidationRegExp), 1),
 				),
 			},
 			{
@@ -181,7 +181,7 @@ func TestAccResourceName_CafClassic(t *testing.T) {
 						"cae-myinvalidcaename",
 						26,
 						""),
-					regexMatch("azurecaf_name.classic_cae_invalid", regexp.MustCompile(ResourceDefinitions["azurerm_container_app_environment"].ValidationRegExp), 1),
+					regexMatch("azurecaf_name.classic_cae_invalid", regexp.MustCompile(models.ResourceDefinitions["azurerm_container_app_environment"].ValidationRegExp), 1),
 				),
 			},
 			{
@@ -193,7 +193,7 @@ func TestAccResourceName_CafClassic(t *testing.T) {
 						"passthrough",
 						11,
 						""),
-					regexMatch("azurecaf_name.passthrough", regexp.MustCompile(ResourceDefinitions["azurerm_container_app_environment"].ValidationRegExp), 1),
+					regexMatch("azurecaf_name.passthrough", regexp.MustCompile(models.ResourceDefinitions["azurerm_container_app_environment"].ValidationRegExp), 1),
 				),
 			},
 			{
