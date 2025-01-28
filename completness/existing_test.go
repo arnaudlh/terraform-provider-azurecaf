@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path"
 	"strings"
