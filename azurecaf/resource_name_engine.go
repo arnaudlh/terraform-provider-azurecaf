@@ -15,14 +15,40 @@ func cleanSlice(names []string, resourceDefinition *models.ResourceStructure) []
 			result[i] = name
 			continue
 		}
-		result[i] = cleanString(name, resourceDefinition)
+		cleaned := cleanString(name, resourceDefinition)
+		if cleaned == "" {
+			result[i] = name
+		} else {
+			result[i] = cleaned
+		}
 	}
 	return result
 }
 
 func cleanString(name string, resourceDefinition *models.ResourceStructure) string {
-	myRegex, _ := regexp.Compile(resourceDefinition.RegEx)
-	return myRegex.ReplaceAllString(name, "")
+	if name == "" || resourceDefinition == nil || resourceDefinition.RegEx == "" {
+		return name
+	}
+
+	pattern := resourceDefinition.RegEx
+	start := strings.Index(pattern, "[")
+	end := strings.Index(pattern, "]")
+	if start == -1 || end == -1 || start >= end {
+		return name
+	}
+
+	allowedChars := pattern[start+1 : end]
+	invalidCharsPattern := fmt.Sprintf("[^%s]", allowedChars)
+	re, err := regexp.Compile(invalidCharsPattern)
+	if err != nil {
+		return name
+	}
+
+	cleaned := re.ReplaceAllString(name, "")
+	if cleaned == "" {
+		return name
+	}
+	return cleaned
 }
 
 func concatenateParameters(separator string, parameters ...[]string) string {
