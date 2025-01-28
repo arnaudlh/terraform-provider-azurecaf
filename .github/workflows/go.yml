@@ -29,12 +29,18 @@ jobs:
       - name: Test
         run: go test -v ./...
 
-      # Linting disabled as it does not work with Go 1.18
-      # To be updated when compatibility is resolved
-      # - name: lint
-      #   uses: golangci/golangci-lint-action@v3
-      #   with:
-      #     version: 'v3.4.0'
+      - name: Install golangci-lint
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.54.2
+
+      - name: Run golangci-lint
+        run: |
+          export PATH=$PATH:$(go env GOPATH)/bin
+          golangci-lint run --timeout=5m
+
+      - name: Build Provider
+        run: |
+          go build -v .
 
       - name: Import GPG key
         id: import_gpg
