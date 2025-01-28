@@ -90,47 +90,6 @@ func GetResourceMap() (map[string]ResourceStructure, error) {
 	return result, nil
 }
 
-func main() {
-	wd, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
-	}
-	sourceDefinitions, err := os.ReadFile(path.Join(wd, "resourceDefinition.json"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	s, err := readLines(path.Join(wd, "/existing_tf_resources.txt"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	sort.Strings(s)
-	var data []ResourceStructure
-	err = json.Unmarshal(sourceDefinitions, &data)
-	if err != nil {
-		log.Fatal(err)
-	}
-	implemented := make(map[string]bool)
-	for _, name := range s {
-		_, found := findByName(data, name)
-		implemented[name] = found
-	}
-	fmt.Println("|resource | status |")
-	fmt.Println("|---|---|")
-	current := ""
-	for _, name := range s {
-		if name == current {
-			continue
-		} else {
-			current = name
-		}
-		status := "❌"
-		if implemented[name] {
-			status = "✔"
-		}
-		fmt.Printf("|%s | %s |\n", name, status)
-	}
-}
-
 func findByName(slice []ResourceStructure, name string) (int, bool) {
 	for i, item := range slice {
 		if item.ResourceTypeName == name {
