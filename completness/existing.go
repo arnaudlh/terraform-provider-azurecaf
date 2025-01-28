@@ -4,10 +4,8 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"path"
-	"sort"
 )
 
 // The idea of this package it is to check for package completness

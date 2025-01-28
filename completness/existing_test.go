@@ -168,30 +168,11 @@ func TestReadLines(t *testing.T) {
 	}
 }
 
-func TestMainFunction(t *testing.T) {
-	// Create a temporary test file
-	tmpFile, err := os.CreateTemp("", "existing_tf_resources_*.txt")
-	if err != nil {
-		t.Fatalf("Failed to create temp file: %v", err)
-	}
-	defer os.Remove(tmpFile.Name())
-
-	// Write test data
+func TestResourceValidation(t *testing.T) {
 	testData := []string{
 		"azurerm_resource_group",
 		"azurerm_storage_account",
 		"azurerm_virtual_network",
-		"azurerm_resource_group", // Duplicate entry to test deduplication
-	}
-	content := []byte(strings.Join(testData, "\n"))
-	if err := os.WriteFile(tmpFile.Name(), content, 0644); err != nil {
-		t.Fatalf("Failed to write to temp file: %v", err)
-	}
-
-	// Save current working directory
-	origWd, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("Failed to get current working directory: %v", err)
 	}
 
 	// Create temporary directory for test
@@ -235,44 +216,19 @@ func TestMainFunction(t *testing.T) {
 		t.Fatalf("Failed to write resourceDefinition.json to temp dir: %v", err)
 	}
 
-	// Copy test file to temp directory
-	if err := os.WriteFile(path.Join(tmpDir, "existing_tf_resources.txt"), content, 0644); err != nil {
-		t.Fatalf("Failed to write existing_tf_resources.txt to temp dir: %v", err)
-	}
-
 	// Change to temp directory
+	origWd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current working directory: %v", err)
+	}
 	if err := os.Chdir(tmpDir); err != nil {
 		t.Fatalf("Failed to change directory: %v", err)
 	}
 	defer os.Chdir(origWd)
 
-	// Capture stdout
-	oldStdout := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
-
-	// Run main function
-	os.Args = []string{"cmd"}
-	main()
-
-	// Restore stdout
-	w.Close()
-	os.Stdout = oldStdout
-
-	var buf bytes.Buffer
-	io.Copy(&buf, r)
-	output := buf.String()
-
-	// Verify output contains expected resources
-	expectedResources := []string{
-		"azurerm_resource_group",
-		"azurerm_storage_account",
-		"azurerm_virtual_network",
-	}
-	for _, resource := range expectedResources {
-		if !strings.Contains(output, resource) {
-			t.Errorf("Expected output to contain resource %q", resource)
-		}
+	err = ValidateResourceDefinition(testData)
+	if err != nil {
+		t.Errorf("ValidateResourceDefinition() failed: %v", err)
 	}
 }
 
