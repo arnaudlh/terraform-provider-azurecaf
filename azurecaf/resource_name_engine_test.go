@@ -36,14 +36,17 @@ func TestCleanSlice(t *testing.T) {
 			resource := &models.ResourceStructure{
 				MinLength: 1,
 				MaxLength: 63,
+				RegEx:     "^[a-z0-9]+$",
 			}
 			result := cleanSlice(tt.input, resource)
 			if len(result) != len(tt.expected) {
 				t.Errorf("cleanSlice() got %v, want %v", result, tt.expected)
+				return
 			}
-			for i := range result {
-				if result[i] != tt.expected[i] {
+			for i := range tt.expected {
+				if i >= len(result) || result[i] != tt.expected[i] {
 					t.Errorf("cleanSlice() got %v, want %v", result, tt.expected)
+					return
 				}
 			}
 		})
