@@ -39,6 +39,53 @@ type ResourceStructure struct {
 	Scope string `json:"scope,omitempty"`
 }
 
+func ValidateResourceDefinition(resources []string) error {
+	wd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("failed to get working directory: %v", err)
+	}
+	sourceDefinitions, err := os.ReadFile(path.Join(wd, "../resourceDefinition.json"))
+	if err != nil {
+		return fmt.Errorf("failed to read resource definition file: %v", err)
+	}
+	var data []ResourceStructure
+	err = json.Unmarshal(sourceDefinitions, &data)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal resource definitions: %v", err)
+	}
+	for _, name := range resources {
+		if _, found := findByName(data, name); !found {
+			return fmt.Errorf("resource type %s not found in the resource definition file", name)
+		}
+	}
+	return nil
+}
+
+func GetResourceDefinition() (map[string]interface{}, error) {
+	wd, err := os.Getwd()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get working directory: %v", err)
+	}
+	sourceDefinitions, err := os.ReadFile(path.Join(wd, "../resourceDefinition.json"))
+	if err != nil {
+		return nil, fmt.Errorf("failed to read resource definition file: %v", err)
+	}
+	var result map[string]interface{}
+	err = json.Unmarshal(sourceDefinitions, &result)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal resource definitions: %v", err)
+	}
+	return result, nil
+}
+
+func GetResourceMap() (map[string]interface{}, error) {
+	resourceDef, err := GetResourceDefinition()
+	if err != nil {
+		return nil, err
+	}
+	return resourceDef, nil
+}
+
 func main() {
 	wd, err := os.Getwd()
 	if err != nil {
@@ -78,7 +125,6 @@ func main() {
 		}
 		fmt.Printf("|%s | %s |\n", name, status)
 	}
-
 }
 
 func findByName(slice []ResourceStructure, name string) (int, bool) {
