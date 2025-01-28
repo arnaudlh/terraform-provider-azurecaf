@@ -12,31 +12,36 @@ func TestCleanSlice(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    []string
+		regex    string
 		expected []string
 	}{
 		{
 			name:     "empty slice",
 			input:    []string{},
+			regex:    "^[a-z0-9]+$",
 			expected: []string{},
 		},
 		{
 			name:     "slice with empty strings",
-			input:    []string{"", "test", ""},
-			expected: []string{"", "test", ""},
+			input:    []string{"", "test123", ""},
+			regex:    "^[a-z0-9]+$",
+			expected: []string{"", "test123", ""},
 		},
 		{
-			name:     "slice with spaces",
-			input:    []string{" ", "test", " space "},
-			expected: []string{" ", "test", " space "},
+			name:     "slice with invalid chars",
+			input:    []string{"test@123", "test-123", "test_123"},
+			regex:    "^[a-z0-9-]+$",
+			expected: []string{"test123", "test-123", "test123"},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			resource := &models.ResourceStructure{
-				MinLength: 1,
-				MaxLength: 63,
-				RegEx:     "^[a-z0-9]+$",
+				MinLength:        1,
+				MaxLength:        63,
+				RegEx:           tt.regex,
+				ValidationRegExp: tt.regex,
 			}
 			result := cleanSlice(tt.input, resource)
 			if len(result) != len(tt.expected) {
@@ -45,7 +50,7 @@ func TestCleanSlice(t *testing.T) {
 			}
 			for i := range tt.expected {
 				if result[i] != tt.expected[i] {
-					t.Errorf("cleanSlice() got %v, want %v", result, tt.expected)
+					t.Errorf("cleanSlice() index %d got %v, want %v", i, result[i], tt.expected[i])
 					return
 				}
 			}
@@ -82,20 +87,40 @@ func TestCleanString(t *testing.T) {
 
 func TestConcatenateParameters(t *testing.T) {
 	tests := []struct {
-		name      string
-		input     string
-		params    []string
-		expected  string
+		name       string
+		separator  string
+		params     [][]string
+		expected   string
 	}{
-		{"empty params", "", []string{}, ""},
-		{"single param", "test", []string{"-"}, "-"},
-		{"multiple params", "a", []string{"-", "b", "-", "c"}, "-b-c"},
-		{"custom separator", "x", []string{"_", "y"}, "_y"},
+		{
+			name:      "empty params",
+			separator: "-",
+			params:    [][]string{},
+			expected:  "",
+		},
+		{
+			name:      "single param array",
+			separator: "-",
+			params:    [][]string{{"test"}},
+			expected:  "test",
+		},
+		{
+			name:      "multiple param arrays",
+			separator: "-",
+			params:    [][]string{{"a", "b", "c"}},
+			expected:  "a-b-c",
+		},
+		{
+			name:      "empty strings in array",
+			separator: "-",
+			params:    [][]string{{"", "test", ""}},
+			expected:  "test",
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := concatenateParameters(tt.input, tt.params)
+			result := concatenateParameters(tt.separator, tt.params...)
 			if result != tt.expected {
 				t.Errorf("concatenateParameters() = %v, want %v", result, tt.expected)
 			}
@@ -128,7 +153,7 @@ func TestGetResource(t *testing.T) {
 			resourceType: "",
 			wantErr:     false,
 			wantMinLen:  1,
-			wantMaxLen:  63,
+			wantMaxLen:  250,
 		},
 	}
 
@@ -153,20 +178,30 @@ func TestGetResource(t *testing.T) {
 
 func TestGetSlug(t *testing.T) {
 	tests := []struct {
-		name     string
-		input    string
-		expected string
+		name         string
+		resourceType string
+		expected     string
 	}{
-		{"empty string", "", ""},
-		{"simple string", "test", "test"},
-		{"mixed case", "TestString", "teststring"},
-		{"with spaces", "test string", "test-string"},
-		{"with special chars", "test@#$%string", "teststring"},
+		{
+			name:         "empty resource type",
+			resourceType: "",
+			expected:     "",
+		},
+		{
+			name:         "valid resource type",
+			resourceType: "azurerm_resource_group",
+			expected:     "rg",
+		},
+		{
+			name:         "invalid resource type",
+			resourceType: "invalid_resource",
+			expected:     "",
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := getSlug(tt.input)
+			result := getSlug(tt.resourceType)
 			if result != tt.expected {
 				t.Errorf("getSlug() = %v, want %v", result, tt.expected)
 			}

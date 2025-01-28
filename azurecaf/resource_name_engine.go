@@ -9,10 +9,11 @@ import (
 )
 
 func cleanSlice(names []string, resourceDefinition *models.ResourceStructure) []string {
+	result := make([]string, len(names))
 	for i, name := range names {
-		names[i] = cleanString(name, resourceDefinition)
+		result[i] = cleanString(name, resourceDefinition)
 	}
-	return names
+	return result
 }
 
 func cleanString(name string, resourceDefinition *models.ResourceStructure) string {
