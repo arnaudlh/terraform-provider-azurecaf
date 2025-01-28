@@ -56,7 +56,9 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 	if len(randomString) > 0 {
 		randomSuffix = randomString
 	} else {
-		d.SetNew("random_string", randomSuffix)
+		if err := d.SetNew("random_string", randomSuffix); err != nil {
+			return err
+		}
 	}
 	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
 	result, results, _, err :=
@@ -64,8 +66,12 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 			prefixes, name, suffixes, randomSuffix,
 			cleanInput, passthrough, useSlug, namePrecedence)
 	if !d.GetRawState().IsNull() {
-		d.SetNew("result", result)
-		d.SetNew("results", results)
+		if err := d.SetNew("result", result); err != nil {
+			return err
+		}
+		if err := d.SetNew("results", results); err != nil {
+			return err
+		}
 	}
 	return err
 }
@@ -124,10 +130,14 @@ func getNameResult(d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 		return diag.FromErr(err)
 	}
 	if len(result) > 0 {
-		d.Set("result", result)
+		if err := d.Set("result", result); err != nil {
+			return diag.FromErr(err)
+		}
 	}
 	if len(results) > 0 {
-		d.Set("results", results)
+		if err := d.Set("results", results); err != nil {
+			return diag.FromErr(err)
+		}
 	}
 	d.SetId(id)
 	return diags
