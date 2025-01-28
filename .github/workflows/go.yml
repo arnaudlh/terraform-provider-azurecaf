@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go-version: ['1.21', '1.20']
+        go-version: ['1.21', '1.22', '1.23']
       fail-fast: false
     permissions:
       contents: read
@@ -35,27 +35,16 @@ jobs:
           go-version: ${{ matrix.go-version }}
         id: go
 
-      - name: Go Cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-${{ matrix.go-version }}-
-            ${{ runner.os }}-go-
+
 
       - name: Build
         run: |
-          mkdir -p $HOME/.cache/go-build
-          chmod -R 777 $HOME/.cache/go-build
+
           go build -v ./...
 
       - name: Test with Coverage
         run: |
-          mkdir -p $HOME/go/pkg/mod
-          chmod -R 777 $HOME/go/pkg/mod
+
           go test -v -parallel 4 -coverprofile=coverage.txt -covermode=atomic ./...
           go tool cover -func=coverage.txt
 
