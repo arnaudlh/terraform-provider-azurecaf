@@ -234,8 +234,11 @@ func testResourceNameStateDataV3() map[string]interface{} {
 }
 
 func TestResourceExampleInstanceStateUpgradeV2(t *testing.T) {
-	expected := testResourceNameStateDataV3()
-	actual, err := schemas.ResourceNameStateUpgradeV2(context.Background(), testResourceNameStateDataV2(), nil)
+	expected := map[string]interface{}{
+		"use_slug": true,
+	}
+
+	actual, err := schemas.ResourceNameStateUpgradeV2(context.Background(), nil, nil)
 	if err != nil {
 		t.Fatalf("error migrating state: %s", err)
 	}
