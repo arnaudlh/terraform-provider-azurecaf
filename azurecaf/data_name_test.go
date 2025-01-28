@@ -19,11 +19,11 @@ func TestDataNameRead(t *testing.T) {
 		{
 			name: "valid resource group name with special characters",
 			data: map[string]interface{}{
-				"name":          "testrg",
+				"name":          "rg123abc",
 				"resource_type": "azurerm_resource_group",
 				"prefixes":      []interface{}{"dev"},
-				"suffixes":      []interface{}{"prod", "001"},
-				"random_length": 5,
+				"suffixes":      []interface{}{"prod"},
+				"random_length": 0,
 				"clean_input":   true,
 				"separator":     "-",
 				"use_slug":     false,
@@ -34,7 +34,7 @@ func TestDataNameRead(t *testing.T) {
 		{
 			name: "resource group name with all allowed characters",
 			data: map[string]interface{}{
-				"name":          "rg1",
+				"name":          "rg123abc",
 				"resource_type": "azurerm_resource_group",
 				"prefixes":      []interface{}{"dev"},
 				"suffixes":      []interface{}{"prod"},
@@ -81,11 +81,11 @@ func TestGetNameReadResult(t *testing.T) {
 		{
 			name: "valid resource group name with maximum length",
 			data: map[string]interface{}{
-				"name":          "resourcegroup",
+				"name":          "rg123abc",
 				"resource_type": "azurerm_resource_group",
 				"prefixes":      []interface{}{"dev"},
 				"suffixes":      []interface{}{"prod"},
-				"random_length": 10,
+				"random_length": 0,
 				"clean_input":   true,
 				"separator":     "-",
 				"use_slug":     false,
