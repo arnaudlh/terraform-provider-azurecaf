@@ -11,4 +11,6 @@ terraform
 **/*.log
 main
 __debug_bin
-**/.terraform.lock.hcl
+**/.terraform.lock.hclcoverage.out
+coverage.txt
+test_output.txt
