@@ -85,10 +85,11 @@ func TestResourceNameStateUpgradeV2(t *testing.T) {
 }
 
 func TestV2(t *testing.T) {
-	v2Schema := V2()
-	if v2Schema == nil {
-		t.Fatal("V2() returned nil schema")
+	v2Resource := V2()
+	if v2Resource == nil {
+		t.Fatal("V2() returned nil resource")
 	}
+	v2Schema := v2Resource.Schema
 
 	tests := []struct {
 		name     string
@@ -107,7 +108,7 @@ func TestV2(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if v2Schema == nil {
-				t.Fatal("V2() returned nil schema")
+				t.Fatal("V2() schema is nil")
 			}
 			field, ok := v2Schema.Schema[tt.field]
 			if !ok {
