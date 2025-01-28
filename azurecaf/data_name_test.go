@@ -19,10 +19,10 @@ func TestDataNameRead(t *testing.T) {
 		{
 			name: "valid resource type",
 			data: map[string]interface{}{
-				"name":          "test-rg123",
+				"name":          "test",
 				"resource_type": "azurerm_resource_group",
-				"prefixes":      []interface{}{"prefix"},
-				"suffixes":      []interface{}{"suffix"},
+				"prefixes":      []interface{}{"rg"},
+				"suffixes":      []interface{}{"prod"},
 				"random_length": 5,
 				"clean_input":   true,
 			},
@@ -63,10 +63,10 @@ func TestGetNameReadResult(t *testing.T) {
 		{
 			name: "valid input",
 			data: map[string]interface{}{
-				"name":          "test-123",
+				"name":          "test",
 				"resource_type": "azurerm_resource_group",
-				"prefixes":      []interface{}{"prefix"},
-				"suffixes":      []interface{}{"suffix"},
+				"prefixes":      []interface{}{"rg"},
+				"suffixes":      []interface{}{"prod"},
 				"random_length": 5,
 				"clean_input":   true,
 			},
