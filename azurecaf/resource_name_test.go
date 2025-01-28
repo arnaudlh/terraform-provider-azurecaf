@@ -1,4 +1,4 @@
-//go:build integration
+//go:build unit
 
 package azurecaf
 
@@ -62,43 +62,109 @@ func regexMatch(id string, exp *regexp.Regexp, requiredMatches int) resource.Tes
 	}
 }
 
-func TestCleanInput_no_changes(t *testing.T) {
-	data := "testdata"
-	resource := models.ResourceDefinitions["azurerm_resource_group"]
-	result := cleanString(data, &resource)
-	if data != result {
-		t.Errorf("Expected %s but received %s", data, result)
+func TestCleanInput(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		resource string
+		expected string
+	}{
+		{
+			name:     "no changes needed",
+			input:    "testdata",
+			resource: "azurerm_resource_group",
+			expected: "testdata",
+		},
+		{
+			name:     "remove emojis",
+			input:    "😀testdata😊",
+			resource: "azurerm_resource_group",
+			expected: "testdata",
+		},
+		{
+			name:     "keep allowed special chars",
+			input:    "testdata()",
+			resource: "azurerm_resource_group",
+			expected: "testdata()",
+		},
+		{
+			name:     "empty string",
+			input:    "",
+			resource: "azurerm_resource_group",
+			expected: "",
+		},
+		{
+			name:     "only special chars",
+			input:    "@#$%",
+			resource: "azurerm_resource_group",
+			expected: "",
+		},
+		{
+			name:     "mixed case with numbers",
+			input:    "Test123Data",
+			resource: "azurerm_resource_group",
+			expected: "Test123Data",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			resource := models.ResourceDefinitions[tt.resource]
+			result := cleanString(tt.input, &resource)
+			if result != tt.expected {
+				t.Errorf("cleanString() = %v, want %v", result, tt.expected)
+			}
+		})
 	}
 }
 
-func TestCleanInput_remove_always(t *testing.T) {
-	data := "😀testdata😊"
-	expected := "testdata"
-	resource := models.ResourceDefinitions["azurerm_resource_group"]
-	result := cleanString(data, &resource)
-	if result != expected {
-		t.Errorf("Expected %s but received %s", expected, result)
+func TestCleanSlice(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    []string
+		resource string
+		expected []string
+	}{
+		{
+			name:     "no changes needed",
+			input:    []string{"testdata", "test", "data"},
+			resource: "azurerm_resource_group",
+			expected: []string{"testdata", "test", "data"},
+		},
+		{
+			name:     "empty slice",
+			input:    []string{},
+			resource: "azurerm_resource_group",
+			expected: []string{},
+		},
+		{
+			name:     "slice with empty strings",
+			input:    []string{"", "test", ""},
+			resource: "azurerm_resource_group",
+			expected: []string{"", "test", ""},
+		},
+		{
+			name:     "slice with special chars",
+			input:    []string{"test@123", "test#456", "test$789"},
+			resource: "azurerm_resource_group",
+			expected: []string{"test123", "test456", "test789"},
+		},
 	}
-}
 
-func TestCleanInput_not_remove_special_allowed_chars(t *testing.T) {
-	data := "testdata()"
-	expected := "testdata()"
-	resource := models.ResourceDefinitions["azurerm_resource_group"]
-	result := cleanString(data, &resource)
-	if result != expected {
-		t.Errorf("Expected %s but received %s", expected, result)
-	}
-}
-
-func TestCleanSplice_no_changes(t *testing.T) {
-	data := []string{"testdata", "test", "data"}
-	resource := models.ResourceDefinitions["azurerm_resource_group"]
-	result := cleanSlice(data, &resource)
-	for i := range data {
-		if data[i] != result[i] {
-			t.Errorf("Expected %s but received %s", data[i], result[i])
-		}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			resource := models.ResourceDefinitions[tt.resource]
+			result := cleanSlice(tt.input, &resource)
+			if len(result) != len(tt.expected) {
+				t.Errorf("cleanSlice() got %v items, want %v items", len(result), len(tt.expected))
+				return
+			}
+			for i := range tt.expected {
+				if result[i] != tt.expected[i] {
+					t.Errorf("cleanSlice() index %d got %v, want %v", i, result[i], tt.expected[i])
+				}
+			}
+		})
 	}
 }
 
