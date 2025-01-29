@@ -57,9 +57,9 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 	if len(randomString) > 0 {
 		randomSuffix = randomString
 	} else {
-		if err := d.SetNew("random_string", randomSuffix); err != nil {
-			return fmt.Errorf("error setting random_string: %w", err)
-		}
+	if err := d.SetNew("random_string", randomSuffix); err != nil {
+		return fmt.Errorf("failed to set random_string: %v", err)
+	}
 	}
 	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
 	result, results, _, err :=
@@ -68,14 +68,14 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 			cleanInput, passthrough, useSlug, namePrecedence)
 	if !d.GetRawState().IsNull() {
 		if err := d.SetNew("result", result); err != nil {
-			return fmt.Errorf("error setting result: %v", err)
+			return fmt.Errorf("failed to set result: %v", err)
 		}
 		if err := d.SetNew("results", results); err != nil {
-			return fmt.Errorf("error setting results: %v", err)
+			return fmt.Errorf("failed to set results: %v", err)
 		}
 	}
 	if err != nil {
-		return fmt.Errorf("error getting data: %v", err)
+		return fmt.Errorf("failed to get data: %v", err)
 	}
 	return nil
 }
@@ -90,6 +90,9 @@ func resourceNameUpdate(ctx context.Context, d *schema.ResourceData, meta interf
 
 func resourceNameRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
+	if err := getNameResult(d, meta); err != nil {
+		return diag.FromErr(fmt.Errorf("failed to read resource: %w", err))
+	}
 	return diags
 }
 
