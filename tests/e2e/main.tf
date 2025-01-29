@@ -37,5 +37,5 @@ output "data_source_name" {
 # Test environment variable data source
 data "azurecaf_environment_variable" "test_env" {
   name = "TEST_ENV_VAR"
-  default_value = "default"
+  fails_if_empty = false
 }
