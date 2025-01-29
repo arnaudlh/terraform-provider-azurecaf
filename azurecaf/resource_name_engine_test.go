@@ -1,5 +1,3 @@
-//go:build unit
-
 package azurecaf
 
 import (
@@ -68,21 +66,43 @@ func TestCleanString(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    string
+		regex    string
 		expected string
 	}{
-		{"empty string", "", ""},
-		{"string with spaces", " test ", " test "},
-		{"string with special chars", "test@#$%", "test@#$%"},
-		{"mixed case", "TestString", "TestString"},
-	}
-
-	resource := &models.ResourceStructure{
-		MinLength: 1,
-		MaxLength: 63,
+		{
+			name:     "empty string",
+			input:    "",
+			regex:    "^[a-z0-9]+$",
+			expected: "",
+		},
+		{
+			name:     "string with special chars",
+			input:    "test@#$%",
+			regex:    "^[a-z0-9-]+$",
+			expected: "test",
+		},
+		{
+			name:     "container registry name with hyphens",
+			input:    "my-registry-name",
+			regex:    "^[a-zA-Z0-9]{1,63}$",
+			expected: "myregistryname",
+		},
+		{
+			name:     "storage account name with special chars",
+			input:    "my_storage@123",
+			regex:    "^[a-z0-9]+$",
+			expected: "mystorage123",
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			resource := &models.ResourceStructure{
+				MinLength:        1,
+				MaxLength:        63,
+				RegEx:           tt.regex,
+				ValidationRegExp: tt.regex,
+			}
 			result := cleanString(tt.input, resource)
 			if result != tt.expected {
 				t.Errorf("cleanString() = %v, want %v", result, tt.expected)
@@ -200,17 +220,23 @@ func TestTrimResourceName(t *testing.T) {
 	}
 }
 
-func TestValidateResourceType(t *testing.T) {
+func TestValidateResourceTypes(t *testing.T) {
 	tests := []struct {
 		name          string
 		resourceType  string
 		resourceTypes []string
-		wantErr       bool
+		wantErr      bool
 	}{
 		{
 			name:          "valid resource",
 			resourceType:  "azurerm_resource_group",
 			resourceTypes: []string{"azurerm_resource_group"},
+			wantErr:      false,
+		},
+		{
+			name:          "multiple valid resources",
+			resourceType:  "azurerm_resource_group",
+			resourceTypes: []string{"azurerm_resource_group", "azurerm_storage_account"},
 			wantErr:      false,
 		},
 		{
@@ -225,13 +251,19 @@ func TestValidateResourceType(t *testing.T) {
 			resourceTypes: []string{},
 			wantErr:      true,
 		},
+		{
+			name:          "invalid resource in list",
+			resourceType:  "azurerm_resource_group",
+			resourceTypes: []string{"invalid_resource", "azurerm_storage_account"},
+			wantErr:      true,
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			isValid, _ := validateResourceType(tt.resourceType, tt.resourceTypes)
-			if isValid == tt.wantErr {
-				t.Errorf("validateResourceType() got = %v, want = %v", isValid, !tt.wantErr)
+			err := validateResourceTypes(tt.resourceType, tt.resourceTypes)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("validateResourceTypes() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
