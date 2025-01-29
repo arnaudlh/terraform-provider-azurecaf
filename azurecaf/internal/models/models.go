@@ -5,11 +5,13 @@ import (
 	"regexp"
 )
 
-// ResourceDefinitions maps resource types to their structures
-var ResourceDefinitions = make(map[string]ResourceStructure)
-
-// ResourceMaps provides alternative names for resource types
-var ResourceMaps = make(map[string]string)
+func init() {
+    // Initialize ResourceMaps after ResourceDefinitions is populated
+    for k, v := range ResourceDefinitions {
+        ResourceMaps[k] = k
+        ResourceMaps[v.ResourceTypeName] = k
+    }
+}
 
 // ValidateResourceType validates if a resource type exists
 func ValidateResourceType(resourceType string) (bool, error) {
