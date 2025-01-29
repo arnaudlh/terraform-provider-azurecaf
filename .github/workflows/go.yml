@@ -77,17 +77,19 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: unit-coverage-*
-          merge-multiple: true
+          path: coverage-reports
 
       - name: Merge coverage reports
         run: |
           echo "mode: atomic" > coverage.txt
-          for report in unit-coverage-*/coverage.txt; do
-            tail -n +2 "$report" >> coverage.txt
-          done
+          find coverage-reports -name "coverage.txt" -type f -exec sh -c 'tail -n +2 "$1" >> coverage.txt' sh {} \;
+          if [ ! -s coverage.txt ]; then
+            echo "No coverage data found"
+            exit 1
+          fi
           go tool cover -func=coverage.txt | tee coverage.out
           echo "Total coverage:"
-          grep "total:" coverage.out
+          grep "total:" coverage.out || echo "Failed to find total coverage"
 
       - name: Upload combined coverage report
         uses: actions/upload-artifact@v4
