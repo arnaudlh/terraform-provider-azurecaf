@@ -1,4 +1,4 @@
-package models
+package azurecaf
 
 import (
 	"regexp"
@@ -157,16 +157,17 @@ func TestRegexValidationDashes(t *testing.T) {
 					return
 				}
 
-				// Skip patterns with special validation requirements
+				// Only test patterns that allow dashes
+				if !strings.Contains(resource.ValidationRegExp, "-") &&
+					!strings.Contains(resource.ValidationRegExp, "\\-") {
+					return
+				}
+
+				// Skip patterns with complex validation requirements
 				if strings.Contains(resource.ValidationRegExp, "[^") ||
 					strings.Contains(resource.ValidationRegExp, "\\s") ||
-					strings.Contains(resource.ValidationRegExp, "?") ||
-					strings.Contains(resource.ValidationRegExp, "+") ||
-					strings.Contains(resource.ValidationRegExp, "\\.") ||
-					strings.Contains(resource.ValidationRegExp, "\\-") ||
 					strings.Contains(resource.ValidationRegExp, "\\d") ||
 					strings.Contains(resource.ValidationRegExp, "\\w") {
-					t.Skip("Skipping pattern with special validation requirements")
 					return
 				}
 

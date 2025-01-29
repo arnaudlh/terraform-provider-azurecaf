@@ -4,7 +4,7 @@
 // using data from
 // resourceDefinition.json and resourceDefinition_out_of_docs.json
 
-package models
+package azurecaf
 
 // ResourceDefinitions are a map of difinitions for the resources supported
 var ResourceDefinitions = map[string]ResourceStructure{
