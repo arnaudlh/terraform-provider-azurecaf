@@ -25,11 +25,11 @@ go build -v ./...
 3. Install the provider locally:
 ```bash
 # For Linux/macOS:
-mkdir -p ~/.terraform.d/plugins/registry.terraform.io/arnaudlh/azurecaf/$(git describe --tags --abbrev=0)/$(go env GOOS)_$(go env GOARCH)
-cp terraform-provider-azurecaf ~/.terraform.d/plugins/registry.terraform.io/arnaudlh/azurecaf/$(git describe --tags --abbrev=0)/$(go env GOOS)_$(go env GOARCH)/
+mkdir -p ~/.terraform.d/plugins/registry.terraform.io/arnaudlh/azurecaf/2.0.0-preview4/$(go env GOOS)_$(go env GOARCH)
+cp terraform-provider-azurecaf ~/.terraform.d/plugins/registry.terraform.io/arnaudlh/azurecaf/2.0.0-preview4/$(go env GOOS)_$(go env GOARCH)/
 
 # For Windows (PowerShell):
-$version = $(git describe --tags --abbrev=0)
+$version = "2.0.0-preview4"
 $arch = "$(go env GOOS)_$(go env GOARCH)"
 New-Item -Path "$env:APPDATA\terraform.d\plugins\registry.terraform.io\arnaudlh\azurecaf\$version\$arch" -ItemType Directory -Force
 Copy-Item "terraform-provider-azurecaf.exe" -Destination "$env:APPDATA\terraform.d\plugins\registry.terraform.io\arnaudlh\azurecaf\$version\$arch\"
@@ -57,8 +57,8 @@ cat > main.tf << 'EOF'
 terraform {
   required_providers {
     azurecaf = {
-      source  = "arnaudlh/azurecaf"
-      version = "~> 2.0.0-preview4"
+      source = "registry.terraform.io/arnaudlh/azurecaf"
+      version = "2.0.0-preview4"
     }
   }
 }
@@ -74,12 +74,15 @@ resource "azurecaf_name" "rg" {
   clean_input   = true
 }
 
-# Test storage account naming
+# Test storage account naming (compliant with Azure rules)
 resource "azurecaf_name" "st" {
   name          = "data"
   resource_type = "azurerm_storage_account"
   prefixes      = ["dev"]
   random_length = 5
+  clean_input   = true
+  separator     = ""  # Storage accounts don't allow dashes
+  use_slug      = true
 }
 
 output "resource_group_name" {
@@ -96,17 +99,24 @@ EOF
 ```bash
 terraform init
 terraform plan
-terraform apply
 ```
 
-3. Verify the generated names follow Azure naming conventions:
+3. Apply and verify the configuration:
 ```bash
+# Apply the configuration
+terraform apply -auto-approve
+
+# Verify the generated names
 terraform output
+
+# Expected output format:
+# resource_group_name = "dev-myapp-001"
+# storage_account_name = "devstdataxxx" (where xxx is a random string)
 ```
 
 4. Clean up:
 ```bash
-terraform destroy
+terraform destroy -auto-approve
 ```
 
 ## Resource Definition Schema
@@ -161,3 +171,20 @@ go tool cover -func=coverage.txt
 ```
 
 3. Follow Azure naming conventions when adding new resource types
+
+## Common Issues and Solutions
+
+1. Provider installation errors:
+   - Ensure the provider binary is placed in the correct Terraform plugins directory
+   - Verify the version in your Terraform configuration matches the built version
+   - Check file permissions on the provider binary
+
+2. Storage account naming failures:
+   - Storage accounts have strict naming rules: lowercase letters and numbers only
+   - Maximum length is 24 characters
+   - Use `separator = ""` and `use_slug = true` for proper formatting
+
+3. Resource group naming issues:
+   - Resource groups allow dashes and underscores
+   - Names must be between 1-90 characters
+   - Verify prefixes and suffixes don't cause validation errors
