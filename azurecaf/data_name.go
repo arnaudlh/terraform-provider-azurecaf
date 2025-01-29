@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
@@ -162,8 +163,33 @@ func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 
-	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
-	result, _, id, err := getData(resourceType, nil, separator, prefixes, name, suffixes, randomString, cleanInput, passthrough, useSlug, namePrecedence)
+	namePrecedence := []string{"name", "random", "suffixes", "prefixes"}
+	slug := ""
+	if useSlug {
+		slug = getSlug(resourceType)
+	}
+	result, _, id, err := getData(resourceType, nil, separator, prefixes, name, suffixes, randomString, cleanInput, passthrough, false, namePrecedence)
+	if err != nil {
+		return fmt.Errorf("error generating name: %w", err)
+	}
+
+	// Add slug after name generation if useSlug is true
+	if useSlug && len(slug) > 0 {
+		if resourceType == "azurerm_storage_account" {
+			// For storage accounts, add slug at the beginning without separator
+			result = slug + result
+		} else {
+			parts := strings.Split(result, separator)
+			for i, part := range parts {
+				if part == name {
+					parts = append(parts[:i+1], parts[i:]...)
+					parts[i] = slug
+					break
+				}
+			}
+			result = strings.Join(parts, separator)
+		}
+	}
 	if err != nil {
 		return fmt.Errorf("error generating name: %w", err)
 	}
@@ -173,7 +199,6 @@ func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 			return fmt.Errorf("error setting result: %w", err)
 		}
 	}
-	// We don't use results array for data source
 
 	d.SetId(id)
 	return nil
