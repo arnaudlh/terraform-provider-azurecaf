@@ -6,8 +6,9 @@
 
 package models
 
-// ResourceDefinitions are a map of difinitions for the resources supported
-var ResourceDefinitions = map[string]ResourceStructure{
+func init() {
+	// Populate ResourceDefinitions
+	resourceDefs := map[string]ResourceStructure{
 	"aks_node_pool_linux":                                              {"aks_node_pool_linux", "npl", 1, 12, false, "[^0-9a-z]", "^[a-z][0-9a-z]{0,11}$", false, "parent"},
 	"aks_node_pool_windows":                                            {"aks_node_pool_windows", "npw", 1, 6, false, "[^0-9a-z]", "^[a-z][0-9a-z]{0,5}$", false, "parent"},
 	"azurerm_aadb2c_directory":                                         {"azurerm_aadb2c_directory", "aadb2c", 1, 75, false, "[^0-9A-Za-z-]", "^[a-zA-Z0-9][a-zA-Z0-9-]{0,73}[a-zA-Z0-9]$", true, "global"},
@@ -393,20 +394,20 @@ var ResourceDefinitions = map[string]ResourceStructure{
 	"general_safe":                                                     {"general_safe", "", 1, 250, true, "[^a-z]", "^[a-z]{1,250}$", false, "global"},
 }
 
-// ResourceMaps are a map from the slug to the resource definition
-var ResourceMaps = map[string]string{
-	"":             "general",
-	"aa":           "azurerm_automation_account",
-	"aacert":       "azurerm_automation_certificate",
-	"aacred":       "azurerm_automation_credential",
-	"aadb2c":       "azurerm_aadb2c_directory",
-	"aahwg":        "azurerm_automation_hybrid_runbook_worker_group",
-	"aajs":         "azurerm_automation_job_schedule",
-	"aarun":        "azurerm_automation_runbook",
-	"aasched":      "azurerm_automation_schedule",
-	"aavar":        "azurerm_automation_variable",
-	"acbrg":        "azurerm_consumption_budget_resource_group",
-	"acbs":         "azurerm_consumption_budget_subscription",
+	// Populate ResourceMaps with all mappings
+	for k, v := range map[string]string{
+		"":             "general",
+		"aa":           "azurerm_automation_account",
+		"aacert":       "azurerm_automation_certificate",
+		"aacred":       "azurerm_automation_credential",
+		"aadb2c":       "azurerm_aadb2c_directory",
+		"aahwg":        "azurerm_automation_hybrid_runbook_worker_group",
+		"aajs":         "azurerm_automation_job_schedule",
+		"aarun":        "azurerm_automation_runbook",
+		"aasched":      "azurerm_automation_schedule",
+		"aavar":        "azurerm_automation_variable",
+		"acbrg":        "azurerm_consumption_budget_resource_group",
+		"acbs":         "azurerm_consumption_budget_subscription",
 	"acs":          "azurerm_communication_service",
 	"adf":          "azurerm_data_factory",
 	"adfblob":      "azurerm_data_factory_dataset_azure_blob",
@@ -741,4 +742,77 @@ var ResourceMaps = map[string]string{
 	"wafw":         "azurerm_web_application_firewall_policy",
 	"wvdws":        "azurerm_virtual_desktop_workspace",
 	"wwapp":        "azurerm_windows_web_app",
+	}
+	
+	// Populate ResourceDefinitions
+	for k, v := range resourceDefs {
+		ResourceDefinitions[k] = v
+	}
+
+	// Populate ResourceMaps
+	resourceMaps := map[string]string{
+		"":             "general",
+		"aa":           "azurerm_automation_account",
+		"aacert":       "azurerm_automation_certificate",
+		"aacred":       "azurerm_automation_credential",
+		"aadb2c":       "azurerm_aadb2c_directory",
+		"aahwg":        "azurerm_automation_hybrid_runbook_worker_group",
+		"aajs":         "azurerm_automation_job_schedule",
+		"aarun":        "azurerm_automation_runbook",
+		"aasched":      "azurerm_automation_schedule",
+		"aavar":        "azurerm_automation_variable",
+		"acbrg":        "azurerm_consumption_budget_resource_group",
+		"acbs":         "azurerm_consumption_budget_subscription",
+		"acs":          "azurerm_communication_service",
+		"adf":          "azurerm_data_factory",
+		"adfblob":      "azurerm_data_factory_dataset_azure_blob",
+		"adfdtext":     "azurerm_data_factory_dataset_delimited_text",
+		"adfhttp":      "azurerm_data_factory_dataset_http",
+		"adfir":        "azurerm_data_factory_integration_runtime_managed",
+		"adfjson":      "azurerm_data_factory_dataset_json",
+		"adflsabs":     "azurerm_data_factory_linked_service_azure_blob_storage",
+		"adflsacdb":    "azurerm_data_factory_linked_service_cosmosdb",
+		"adflsadb":     "azurerm_data_factory_linked_service_azure_databricks",
+		"adflsaf":      "azurerm_data_factory_linked_service_azure_function",
+		"adflsaftp":    "azurerm_data_factory_linked_service_sftp",
+		"adflsasdb":    "azurerm_data_factory_linked_service_azure_sql_database",
+		"adfmssql":     "azurerm_data_factory_dataset_sql_server_table",
+		"adfmysql":     "azurerm_data_factory_dataset_mysql",
+		"adfpl":        "azurerm_data_factory_pipeline",
+		"adfpsql":      "azurerm_data_factory_dataset_postgresql",
+		"adfsqlapi":    "azurerm_data_factory_dataset_cosmosdb_sqlapi",
+		"adfsvkv":      "azurerm_data_factory_linked_service_key_vault",
+		"adfsvmssql":   "azurerm_data_factory_linked_service_sql_server",
+		"adfsvmysql":   "azurerm_data_factory_linked_service_mysql",
+		"adfsvpsql":    "azurerm_data_factory_linked_service_postgresql",
+		"adfsvst":      "azurerm_data_factory_linked_service_data_lake_storage_gen2",
+		"adfsvweb":     "azurerm_data_factory_linked_service_web",
+		"adftg":        "azurerm_data_factory_trigger_schedule",
+		"adt":          "azurerm_digital_twins_instance",
+		"adteg":        "azurerm_digital_twins_endpoint_eventgrid",
+		"adteh":        "azurerm_digital_twins_endpoint_eventhub",
+		"adtsb":        "azurerm_digital_twins_endpoint_servicebus",
+		"afwp":         "azurerm_firewall_policy",
+		"agw":          "azurerm_application_gateway",
+		"aks":          "azurerm_kubernetes_cluster",
+		"aksdns":       "azurerm_private_dns_zone",
+		"aksvnet":      "azurerm_virtual_network",
+		"apim":         "azurerm_api_management",
+		"appi":         "azurerm_application_insights",
+		"app":          "azurerm_app_service",
+		"as":           "azurerm_analysis_services_server",
+		"ase":          "azurerm_app_service_environment",
+		"asr":          "azurerm_recovery_services_vault",
+		"evh":          "azurerm_eventhub",
+		"evhcg":        "azurerm_eventhub_consumer_group",
+		"evhns":        "azurerm_eventhub_namespace",
+		"kv":           "azurerm_key_vault",
+		"st":           "azurerm_storage_account",
+		"vnet":         "azurerm_virtual_network",
+	}
+
+	// Populate ResourceMaps
+	for k, v := range resourceMaps {
+		ResourceMaps[k] = v
+	}
 }
