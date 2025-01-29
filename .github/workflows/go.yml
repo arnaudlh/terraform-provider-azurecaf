@@ -154,6 +154,13 @@ jobs:
           retention-days: 5
           if-no-files-found: error
 
+      - name: Download Provider Artifact
+        if: matrix.go-version == '1.23'
+        uses: actions/download-artifact@v4
+        with:
+          name: provider-${{ matrix.go-version }}
+          path: e2e-artifacts
+
       - name: Import GPG key
         id: import_gpg
         uses: crazy-max/ghaction-import-gpg@v5.1.0
