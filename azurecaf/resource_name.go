@@ -60,7 +60,7 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 			return err
 		}
 	}
-	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
+	namePrecedence := []string{"prefixes", "slug", "name", "random", "suffixes"}
 	result, results, _, err :=
 		getData(resourceType, resourceTypes, separator,
 			prefixes, name, suffixes, randomSuffix,

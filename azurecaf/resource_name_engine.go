@@ -130,42 +130,47 @@ func composeName(separator string,
 		return true
 	}
 
-	// If no precedence is specified, use default order
-	if len(namePrecedence) == 0 {
-		namePrecedence = []string{"prefixes", "slug", "name", "random", "suffixes"}
-	}
-
-	// Process components in the specified precedence order
-	for _, precedence := range namePrecedence {
-		switch precedence {
+	// Process components in order specified by namePrecedence
+	for _, component := range namePrecedence {
+		switch component {
 		case "prefixes":
+			// Add prefixes in order
 			for _, prefix := range prefixes {
-				if !addComponent(prefix) {
-					return strings.Join(contents, separator)
+				if len(prefix) > 0 && calcTotalLength(append(contents, prefix)) <= maxlength {
+					contents = append(contents, prefix)
 				}
 			}
 		case "slug":
-			if !addComponent(slug) {
-				return strings.Join(contents, separator)
+			// Add slug if present and fits
+			if len(slug) > 0 && calcTotalLength(append(contents, slug)) <= maxlength {
+				contents = append(contents, slug)
 			}
 		case "name":
-			if !addComponent(name) {
-				return strings.Join(contents, separator)
+			// Add name if present and fits
+			if len(name) > 0 && calcTotalLength(append(contents, name)) <= maxlength {
+				contents = append(contents, name)
 			}
 		case "random":
-			if !addComponent(randomSuffix) {
-				return strings.Join(contents, separator)
+			// Add random suffix if present and fits
+			if len(randomSuffix) > 0 && calcTotalLength(append(contents, randomSuffix)) <= maxlength {
+				contents = append(contents, randomSuffix)
 			}
 		case "suffixes":
+			// Add suffixes in order
 			for _, suffix := range suffixes {
-				if !addComponent(suffix) {
-					return strings.Join(contents, separator)
+				if len(suffix) > 0 && calcTotalLength(append(contents, suffix)) <= maxlength {
+					contents = append(contents, suffix)
+				}
 			}
 		}
 	}
+
+	// Join all components and ensure max length
+	result := strings.Join(contents, separator)
+	if len(result) > maxlength {
+		result = result[:maxlength]
 	}
-	return strings.Join(contents, separator)
-	return strings.Join(contents, separator)
+	return result
 }
 
 // validateResourceType is implemented in data_name.go
