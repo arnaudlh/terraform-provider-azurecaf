@@ -217,15 +217,6 @@ func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 			} else {
 				result = slug + result
 			}
-			// For storage accounts, ensure prefix + st + rest format
-			if strings.HasPrefix(result, slug) {
-				result = strings.TrimPrefix(result, slug)
-				if len(prefixes) > 0 {
-					result = strings.Join(prefixes, "") + slug + result
-				} else {
-					result = slug + result
-				}
-			}
 		} else {
 			parts := strings.Split(result, separator)
 			for i, part := range parts {
