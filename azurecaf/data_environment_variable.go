@@ -39,9 +39,10 @@ func resourceAction(ctx context.Context, d *schema.ResourceData, meta interface{
 	value, ok := os.LookupEnv(name)
 
 	if !ok {
-		if defaultValue, ok := d.GetOk("default_value"); ok {
-			value = defaultValue.(string)
+		if failsIfEmpty := d.Get("fails_if_empty").(bool); failsIfEmpty {
+			return diag.Errorf("Value is not set for environment variable: %s", name)
 		}
+		value = ""
 	}
 
 	d.SetId(name)
