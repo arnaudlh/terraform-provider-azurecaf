@@ -57,7 +57,9 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 	if len(randomString) > 0 {
 		randomSuffix = randomString
 	} else {
-		d.SetNew("random_string", randomSuffix)
+		if err := d.SetNew("random_string", randomSuffix); err != nil {
+			return fmt.Errorf("error setting random_string: %w", err)
+		}
 	}
 	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
 	result, results, _, err :=

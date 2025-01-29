@@ -22,11 +22,7 @@ func main() {
 	}}
 
 	if debugMode {
-		err := plugin.Debug(context.Background(), "registry.terraform.io/aztfmod/azurecaf", opts)
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-		return
+		opts.Debug = true
 	}
 
 	plugin.Serve(opts)

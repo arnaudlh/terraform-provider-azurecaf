@@ -1,1 +1,3 @@
-// Package azurecaf has been moved to use resourceName() for both resource and data source implementations
+package azurecaf
+
+// This file is intentionally empty as its functionality has been moved to resourceName()
