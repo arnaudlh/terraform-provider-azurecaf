@@ -4,7 +4,7 @@ import (
 	"github.com/arnaudlh/terraform-provider-azurecaf/azurecaf/internal/models"
 )
 
-func getResourceMaps() []string {
+func GetResourceMaps() []string {
 	resourceMapsKeys := make([]string, 0, len(models.ResourceDefinitions))
 	for k := range models.ResourceDefinitions {
 		resourceMapsKeys = append(resourceMapsKeys, k)

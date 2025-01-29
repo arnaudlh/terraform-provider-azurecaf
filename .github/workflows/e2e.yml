@@ -1,0 +1,125 @@
+name: E2E Tests
+
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - "v*"
+  pull_request:
+    branches:
+      - '**'
+
+permissions:
+  contents: read
+
+jobs:
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: ['1.23']
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+          cache: true
+          cache-dependency-path: |
+            go.sum
+            go.mod
+
+      - name: Install Terraform
+        run: |
+          sudo apt-get update && sudo apt-get install -y unzip
+          curl -OL https://releases.hashicorp.com/terraform/1.5.7/terraform_1.5.7_linux_amd64.zip
+          unzip terraform_1.5.7_linux_amd64.zip
+          sudo mv terraform /usr/local/bin/
+
+      - name: Build Provider
+        run: |
+          go build -o terraform-provider-azurecaf
+          mkdir -p ~/.terraform.d/plugins/registry.terraform.io/arnaudlh/azurecaf/2.0.0-preview4/linux_amd64/
+          cp terraform-provider-azurecaf ~/.terraform.d/plugins/registry.terraform.io/arnaudlh/azurecaf/2.0.0-preview4/linux_amd64/
+
+      - name: Generate Test Configuration
+        run: |
+          mkdir e2e-test && cd e2e-test
+          cat > main.tf << 'EOF'
+          terraform {
+            required_providers {
+              azurecaf = {
+                source  = "arnaudlh/azurecaf"
+                version = "2.0.0-preview4"
+              }
+            }
+          }
+
+          provider "azurecaf" {}
+
+          # Test resource group naming using resource
+          resource "azurecaf_name" "rg" {
+            name          = "myapp"
+            resource_type = "azurerm_resource_group"
+            prefixes      = ["dev"]
+            suffixes      = ["001"]
+            clean_input   = true
+          }
+
+          # Test storage account naming using resource
+          resource "azurecaf_name" "st" {
+            name          = "data"
+            resource_type = "azurerm_storage_account"
+            prefixes      = ["dev"]
+            random_length = 5
+            clean_input   = true
+            separator     = ""
+            use_slug      = true
+          }
+
+          # Test resource group naming using data source
+          data "azurecaf_name" "rg_data" {
+            name          = "myapp"
+            resource_type = "azurerm_resource_group"
+            prefixes      = ["dev"]
+            suffixes      = ["001"]
+            clean_input   = true
+          }
+
+          # Test storage account naming using data source
+          data "azurecaf_name" "st_data" {
+            name          = "data"
+            resource_type = "azurerm_storage_account"
+            prefixes      = ["dev"]
+            random_length = 5
+            clean_input   = true
+            separator     = ""
+            use_slug      = true
+          }
+
+          output "resource_group_name_resource" {
+            value = azurecaf_name.rg.result
+          }
+
+          output "storage_account_name_resource" {
+            value = azurecaf_name.st.result
+          }
+
+          output "resource_group_name_data" {
+            value = data.azurecaf_name.rg_data.result
+          }
+
+          output "storage_account_name_data" {
+            value = data.azurecaf_name.st_data.result
+          }
+          EOF
+
+      - name: Run Terraform Tests
+        run: |
+          cd e2e-test
+          terraform init
+          terraform plan
+          terraform apply -auto-approve
+          terraform output

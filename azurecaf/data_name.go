@@ -128,7 +128,8 @@ func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 
 func getResourceDefinitions() map[string]interface{} {
 	resourceDefs := make(map[string]interface{})
-	for k := range models.ResourceDefinitions {
+	resourceMapsKeys := schemas.GetResourceMaps()
+	for _, k := range resourceMapsKeys {
 		resourceDefs[k] = nil
 	}
 	return resourceDefs

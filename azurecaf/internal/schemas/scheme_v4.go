@@ -8,7 +8,7 @@ import (
 )
 
 func V4_Schema() map[string]*schema.Schema {
-	resourceMapsKeys := getResourceMaps()
+	resourceMapsKeys := GetResourceMaps()
 	return map[string]*schema.Schema{
 		"name": {
 			Type:        schema.TypeString,
