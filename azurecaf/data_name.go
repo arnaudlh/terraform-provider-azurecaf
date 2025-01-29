@@ -2,7 +2,9 @@ package azurecaf
 
 import (
 	"context"
+	b64 "encoding/base64"
 	"fmt"
+	"time"
 
 	"github.com/arnaudlh/terraform-provider-azurecaf/azurecaf/internal/models"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -11,8 +13,8 @@ import (
 )
 
 func dataName() *schema.Resource {
-	resourceMapsKeys := make([]string, 0, len(getResourceDefinitions()))
-	for k := range getResourceDefinitions() {
+	resourceMapsKeys := make([]string, 0, len(models.ResourceDefinitions))
+	for k := range models.ResourceDefinitions {
 		resourceMapsKeys = append(resourceMapsKeys, k)
 	}
 
@@ -74,9 +76,10 @@ func dataName() *schema.Resource {
 			},
 			"resource_type": {
 				Type:         schema.TypeString,
-				Optional:     true,
+				Required:     true,
 				ValidateFunc: validation.StringInSlice(resourceMapsKeys, false),
 				ForceNew:     true,
+				Description:  "The resource type to generate a name for",
 			},
 			"random_seed": {
 				Type:     schema.TypeInt,
@@ -94,11 +97,27 @@ func dataName() *schema.Resource {
 }
 
 func dataNameRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	err := getNameReadResult(d, meta)
-	if err != nil {
+	if err := validateResourceType(d.Get("resource_type").(string)); err != nil {
 		return diag.FromErr(err)
 	}
+
+	if err := getNameReadResult(d, meta); err != nil {
+		return diag.FromErr(fmt.Errorf("error generating name: %w", err))
+	}
+
 	return diag.Diagnostics{}
+}
+
+func validateResourceType(resourceType string) error {
+	if resourceType == "" {
+		return fmt.Errorf("resource_type cannot be empty")
+	}
+	
+	if _, exists := models.ResourceDefinitions[resourceType]; !exists {
+		return fmt.Errorf("resource type %q is not supported", resourceType)
+	}
+	
+	return nil
 }
 
 func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
@@ -113,24 +132,26 @@ func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 	randomLength := d.Get("random_length").(int)
 	randomSeed := int64(d.Get("random_seed").(int))
 
-	randomSuffix := randSeq(randomLength, randomSeed)
+	if randomSeed == 0 {
+		randomSeed = time.Now().UnixMicro()
+		if err := d.Set("random_seed", randomSeed); err != nil {
+			return fmt.Errorf("error setting random_seed: %w", err)
+		}
+	}
 
-	// Ensure the correct types are passed to getResourceName
-	resourceName, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, []string{})
+	randomSuffix := randSeq(randomLength, randomSeed)
+	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
+
+	result, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
 	if err != nil {
 		return err
 	}
-	if err := d.Set("result", resourceName); err != nil {
+
+	if err := d.Set("result", result); err != nil {
 		return fmt.Errorf("error setting result: %w", err)
 	}
-	return nil
-}
 
-func getResourceDefinitions() map[string]interface{} {
-	resourceDefs := make(map[string]interface{})
-	resourceMapsKeys := schemas.GetResourceMaps()
-	for _, k := range resourceMapsKeys {
-		resourceDefs[k] = nil
-	}
-	return resourceDefs
+	// Set the ID after all other operations are successful
+	d.SetId(b64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s\t%s", resourceType, result))))
+	return nil
 }

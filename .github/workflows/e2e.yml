@@ -59,60 +59,111 @@ jobs:
 
           provider "azurecaf" {}
 
-          # Test resource group naming using resource
-          resource "azurecaf_name" "rg" {
-            name          = "myapp"
-            resource_type = "azurerm_resource_group"
-            prefixes      = ["dev"]
-            suffixes      = ["001"]
-            clean_input   = true
+          # Test common Azure resource types
+          locals {
+            test_cases = {
+              rg = {
+                name = "myapp"
+                type = "azurerm_resource_group"
+                prefixes = ["dev"]
+                suffixes = ["001"]
+              }
+              st = {
+                name = "data"
+                type = "azurerm_storage_account"
+                prefixes = ["dev"]
+                random_length = 5
+                use_slug = true
+                separator = ""
+              }
+              kv = {
+                name = "secrets"
+                type = "azurerm_key_vault"
+                prefixes = ["dev"]
+                random_length = 5
+              }
+              func = {
+                name = "api"
+                type = "azurerm_function_app"
+                prefixes = ["dev"]
+                suffixes = ["func"]
+              }
+              cosmos = {
+                name = "db"
+                type = "azurerm_cosmosdb_account"
+                prefixes = ["dev"]
+                random_length = 4
+              },
+              vnet = {
+                name = "network"
+                type = "azurerm_virtual_network"
+                prefixes = ["dev"]
+                suffixes = ["vnet"]
+              },
+              webapp = {
+                name = "web"
+                type = "azurerm_app_service"
+                prefixes = ["dev"]
+                suffixes = ["app"]
+              },
+              acr = {
+                name = "registry"
+                type = "azurerm_container_registry"
+                prefixes = ["dev"]
+                random_length = 4
+                use_slug = true
+              }
+            }
           }
 
-          # Test storage account naming using resource
-          resource "azurecaf_name" "st" {
-            name          = "data"
-            resource_type = "azurerm_storage_account"
-            prefixes      = ["dev"]
-            random_length = 5
-            clean_input   = true
-            separator     = ""
-            use_slug      = true
+          # Test resources
+          resource "azurecaf_name" "test" {
+            for_each = local.test_cases
+            
+            name = each.value.name
+            resource_type = each.value.type
+            prefixes = try(each.value.prefixes, [])
+            suffixes = try(each.value.suffixes, [])
+            random_length = try(each.value.random_length, 0)
+            clean_input = true
+            separator = try(each.value.separator, "-")
+            use_slug = try(each.value.use_slug, false)
           }
 
-          # Test resource group naming using data source
-          data "azurecaf_name" "rg_data" {
-            name          = "myapp"
-            resource_type = "azurerm_resource_group"
-            prefixes      = ["dev"]
-            suffixes      = ["001"]
-            clean_input   = true
+          # Test data sources
+          data "azurecaf_name" "test" {
+            for_each = local.test_cases
+            
+            name = each.value.name
+            resource_type = each.value.type
+            prefixes = try(each.value.prefixes, [])
+            suffixes = try(each.value.suffixes, [])
+            random_length = try(each.value.random_length, 0)
+            clean_input = true
+            separator = try(each.value.separator, "-")
+            use_slug = try(each.value.use_slug, false)
           }
 
-          # Test storage account naming using data source
-          data "azurecaf_name" "st_data" {
-            name          = "data"
-            resource_type = "azurerm_storage_account"
-            prefixes      = ["dev"]
-            random_length = 5
-            clean_input   = true
-            separator     = ""
-            use_slug      = true
+          # Outputs for validation
+          output "resource_results" {
+            value = {
+              for k, v in azurecaf_name.test : k => v.result
+            }
           }
 
-          output "resource_group_name_resource" {
-            value = azurecaf_name.rg.result
+          output "data_source_results" {
+            value = {
+              for k, v in data.azurecaf_name.test : k => v.result
+            }
           }
 
-          output "storage_account_name_resource" {
-            value = azurecaf_name.st.result
-          }
-
-          output "resource_group_name_data" {
-            value = data.azurecaf_name.rg_data.result
-          }
-
-          output "storage_account_name_data" {
-            value = data.azurecaf_name.st_data.result
+          # Verify data source and resource results match
+          output "validation" {
+            value = {
+              for k, v in azurecaf_name.test : k => (
+                v.result == data.azurecaf_name.test[k].result ? "PASS" : "FAIL: ${v.result} != ${data.azurecaf_name.test[k].result}"
+              )
+            }
           }
           EOF
 
