@@ -150,7 +150,9 @@ func getNameResult(d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 }
 
 func getData(resourceType string, resourceTypes []string, separator string, prefixes []string, name string, suffixes []string, randomSuffix string, cleanInput bool, passthrough bool, useSlug bool, namePrecedence []string) (result string, results map[string]string, id string, err error) {
-	if err := validateResourceTypes(resourceType, resourceTypes); err != nil {
+	validationErr := validateResourceTypes(resourceType, resourceTypes)
+	if validationErr != nil {
+		err = validationErr
 		return
 	}
 	if results == nil {
@@ -167,11 +169,13 @@ func getData(resourceType string, resourceTypes []string, separator string, pref
 	}
 
 	for _, resourceTypeName := range resourceTypes {
-		results[resourceTypeName], err = getResourceName(resourceTypeName, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
+		var resourceResult string
+		resourceResult, err = getResourceName(resourceTypeName, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
 		if err != nil {
 			return
 		}
-		ids = append(ids, fmt.Sprintf("%s\t%s", resourceTypeName, results[resourceTypeName]))
+		results[resourceTypeName] = resourceResult
+		ids = append(ids, fmt.Sprintf("%s\t%s", resourceTypeName, resourceResult))
 	}
 	id = b64.StdEncoding.EncodeToString([]byte(strings.Join(ids, "\n")))
 	return
