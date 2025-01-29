@@ -101,7 +101,6 @@ func composeName(separator string,
 	}
 
 	var contents []string
-	currentlength := 0
 
 	// Helper to calculate total length with separators
 	calcTotalLength := func(components []string) int {
@@ -128,7 +127,6 @@ func composeName(separator string,
 			return false
 		}
 		contents = newComponents
-		currentlength = calcTotalLength(contents)
 		return true
 	}
 
