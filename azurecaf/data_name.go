@@ -3,6 +3,8 @@ package azurecaf
 
 import (
 	"context"
+	"encoding/base64"
+	"fmt"
 	"time"
 
 	models "github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
