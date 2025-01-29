@@ -58,7 +58,7 @@ terraform {
 
 provider "azurecaf" {}
 
-# Test resource group naming
+# Test resource group naming using resource
 resource "azurecaf_name" "rg" {
   name          = "myapp"
   resource_type = "azurerm_resource_group"
@@ -67,7 +67,7 @@ resource "azurecaf_name" "rg" {
   clean_input   = true
 }
 
-# Test storage account naming
+# Test storage account naming using resource
 resource "azurecaf_name" "st" {
   name          = "data"
   resource_type = "azurerm_storage_account"
@@ -78,12 +78,40 @@ resource "azurecaf_name" "st" {
   use_slug      = true
 }
 
-output "resource_group_name" {
+# Test resource group naming using data source
+data "azurecaf_name" "rg_data" {
+  name          = "myapp"
+  resource_type = "azurerm_resource_group"
+  prefixes      = ["dev"]
+  suffixes      = ["001"]
+  clean_input   = true
+}
+
+# Test storage account naming using data source
+data "azurecaf_name" "st_data" {
+  name          = "data"
+  resource_type = "azurerm_storage_account"
+  prefixes      = ["dev"]
+  random_length = 5
+  clean_input   = true
+  separator     = ""
+  use_slug      = true
+}
+
+output "resource_group_name_resource" {
   value = azurecaf_name.rg.result
 }
 
-output "storage_account_name" {
+output "storage_account_name_resource" {
   value = azurecaf_name.st.result
+}
+
+output "resource_group_name_data" {
+  value = data.azurecaf_name.rg_data.result
+}
+
+output "storage_account_name_data" {
+  value = data.azurecaf_name.st_data.result
 }
 EOF
 ```
