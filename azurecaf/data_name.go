@@ -117,7 +117,7 @@ func dataNameRead(ctx context.Context, d *schema.ResourceData, meta interface{})
 	randomSuffix := utils.RandSeq(randomLength, randomSeed)
 
 	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
-	result, results, id, err := getData(resourceType, []string{}, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
+	result, _, id, err := getData(resourceType, []string{}, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
 	if err != nil {
 		return diag.FromErr(err)
 	}

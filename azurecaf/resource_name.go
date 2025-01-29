@@ -18,7 +18,10 @@ func resourceName() *schema.Resource {
 		CreateContext: resourceNameCreate,
 		UpdateContext: resourceNameUpdate,
 		ReadContext:   resourceNameRead,
-		DeleteContext: schema.RemoveFromStateContext,
+		DeleteContext: func(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+			d.SetId("")
+			return nil
+		},
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
