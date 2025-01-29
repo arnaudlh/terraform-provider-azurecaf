@@ -94,60 +94,79 @@ func composeName(separator string,
 	randomSuffix string,
 	maxlength int,
 	namePrecedence []string) string {
+	
+	// Special case: if name is longer than maxlength, just return it truncated
+	if len(name) >= maxlength {
+		return name[:maxlength]
+	}
+
 	var contents []string
 	currentlength := 0
 
-	// Add prefixes first, regardless of precedence
-	for _, prefix := range prefixes {
-		if len(prefix) > 0 && currentlength+len(prefix)+len(separator) <= maxlength {
-			contents = append(contents, prefix)
-			if len(contents) > 1 {
-				currentlength += len(separator)
-			}
-			currentlength += len(prefix)
+	// Helper to calculate total length with separators
+	calcTotalLength := func(components []string) int {
+		if len(components) == 0 {
+			return 0
 		}
+		total := 0
+		for _, c := range components {
+			if len(c) > 0 {
+				total += len(c)
+			}
+		}
+		return total + (len(components)-1)*len(separator)
 	}
 
-	// Process remaining components in the specified precedence order
+	// Helper to add a component
+	addComponent := func(component string) bool {
+		if len(component) == 0 {
+			return true
+		}
+		newComponents := append([]string{}, contents...)
+		newComponents = append(newComponents, component)
+		if calcTotalLength(newComponents) > maxlength {
+			return false
+		}
+		contents = newComponents
+		currentlength = calcTotalLength(contents)
+		return true
+	}
+
+	// If no precedence is specified, use default order
+	if len(namePrecedence) == 0 {
+		namePrecedence = []string{"prefixes", "slug", "name", "random", "suffixes"}
+	}
+
+	// Process components in the specified precedence order
 	for _, precedence := range namePrecedence {
 		switch precedence {
-		case "slug":
-			if len(slug) > 0 && currentlength+len(slug)+len(separator) <= maxlength {
-				if len(contents) > 0 {
-					currentlength += len(separator)
+		case "prefixes":
+			for _, prefix := range prefixes {
+				if !addComponent(prefix) {
+					return strings.Join(contents, separator)
 				}
-				contents = append(contents, slug)
-				currentlength += len(slug)
+			}
+		case "slug":
+			if !addComponent(slug) {
+				return strings.Join(contents, separator)
 			}
 		case "name":
-			if len(name) > 0 && currentlength+len(name)+len(separator) <= maxlength {
-				if len(contents) > 0 {
-					currentlength += len(separator)
-				}
-				contents = append(contents, name)
-				currentlength += len(name)
+			if !addComponent(name) {
+				return strings.Join(contents, separator)
 			}
 		case "random":
-			if len(randomSuffix) > 0 && currentlength+len(randomSuffix)+len(separator) <= maxlength {
-				if len(contents) > 0 {
-					currentlength += len(separator)
-				}
-				contents = append(contents, randomSuffix)
-				currentlength += len(randomSuffix)
+			if !addComponent(randomSuffix) {
+				return strings.Join(contents, separator)
 			}
 		case "suffixes":
 			for _, suffix := range suffixes {
-				if len(suffix) > 0 && currentlength+len(suffix)+len(separator) <= maxlength {
-					if len(contents) > 0 {
-						currentlength += len(separator)
-					}
-					contents = append(contents, suffix)
-					currentlength += len(suffix)
-				}
+				if !addComponent(suffix) {
+					return strings.Join(contents, separator)
 			}
 		}
 	}
-
+	}
+	return strings.Join(contents, separator)
 	return strings.Join(contents, separator)
 }
 
@@ -177,10 +196,8 @@ func getResourceName(resourceTypeName string, separator string,
 		slug = getSlug(resourceTypeName)
 	}
 
-	// Set default name precedence if not provided
-	if len(namePrecedence) == 0 {
-		namePrecedence = []string{"prefixes", "slug", "name", "random", "suffixes"}
-	}
+	// Always use the standard name precedence order for consistency
+	namePrecedence = []string{"prefixes", "slug", "name", "random", "suffixes"}
 
 	if cleanInput {
 		prefixes = cleanSlice(prefixes, resource)
