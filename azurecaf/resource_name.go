@@ -18,7 +18,7 @@ func resourceName() *schema.Resource {
 		CreateContext: resourceNameCreate,
 		UpdateContext: resourceNameUpdate,
 		ReadContext:   resourceNameRead,
-		Delete:        schema.RemoveFromState,
+		DeleteContext: schema.RemoveFromStateContext,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -58,7 +58,7 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 		randomSuffix = randomString
 	} else {
 	if err := d.SetNew("random_string", randomSuffix); err != nil {
-		return fmt.Errorf("failed to set random_string: %v", err)
+		return fmt.Errorf("failed to set random_string")
 	}
 	}
 	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
@@ -67,15 +67,15 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 			prefixes, name, suffixes, randomSuffix,
 			cleanInput, passthrough, useSlug, namePrecedence)
 	if !d.GetRawState().IsNull() {
-		if err := d.SetNew("result", result); err != nil {
-			return fmt.Errorf("failed to set result: %v", err)
-		}
-		if err := d.SetNew("results", results); err != nil {
-			return fmt.Errorf("failed to set results: %v", err)
-		}
+	if err := d.SetNew("result", result); err != nil {
+		return fmt.Errorf("failed to set result")
+	}
+	if err := d.SetNew("results", results); err != nil {
+		return fmt.Errorf("failed to set results")
+	}
 	}
 	if err != nil {
-		return fmt.Errorf("failed to get data: %v", err)
+		return fmt.Errorf("failed to get data")
 	}
 	return nil
 }
@@ -89,11 +89,7 @@ func resourceNameUpdate(ctx context.Context, d *schema.ResourceData, meta interf
 }
 
 func resourceNameRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	var diags diag.Diagnostics
-	if err := getNameResult(d, meta); err != nil {
-		return diag.FromErr(fmt.Errorf("failed to read resource: %w", err))
-	}
-	return diags
+	return getNameResult(d, meta)
 }
 
 func convertInterfaceToString(source []interface{}) []string {
@@ -138,7 +134,11 @@ func getNameResult(d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	result, results, id, err :=
 		getData(resourceType, resourceTypes, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
 	if err != nil {
-		return diag.FromErr(err)
+		return diag.Diagnostics{{
+			Severity: diag.Error,
+			Summary:  "Failed to get data",
+			Detail:   err.Error(),
+		}}
 	}
 	if len(result) > 0 {
 		if err := d.Set("result", result); err != nil {
