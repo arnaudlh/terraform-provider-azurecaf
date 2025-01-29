@@ -213,20 +213,35 @@ func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 				// Insert slug after prefixes
 				prefix := strings.Join(prefixes, "")
 				rest := strings.TrimPrefix(result, prefix)
-				result = prefix + slug + rest
+				// Only add slug if it's not already present
+				if !strings.Contains(rest, slug) {
+					result = prefix + slug + rest
+				}
 			} else {
-				result = slug + result
+				// Only add slug if it's not already present
+				if !strings.HasPrefix(result, slug) {
+					result = slug + result
+				}
 			}
 		} else {
 			parts := strings.Split(result, separator)
-			for i, part := range parts {
-				if part == name {
-					parts = append(parts[:i+1], parts[i:]...)
-					parts[i] = slug
+			slugFound := false
+			for _, part := range parts {
+				if part == slug {
+					slugFound = true
 					break
 				}
 			}
-			result = strings.Join(parts, separator)
+			if !slugFound {
+				for i, part := range parts {
+					if part == name {
+						parts = append(parts[:i+1], parts[i:]...)
+						parts[i] = slug
+						break
+					}
+				}
+				result = strings.Join(parts, separator)
+			}
 		}
 	}
 	if err != nil {
