@@ -113,12 +113,13 @@ func composeName(separator string,
 
 		switch component {
 		case "prefixes":
+			// Process prefixes in order
 			for _, prefix := range prefixes {
 				if len(prefix) > 0 && currentLength+len(prefix)+sepLen <= maxlength {
 					if len(contents) > 0 {
 						currentLength += sepLen
 					}
-					contents = append(contents, prefix)
+					contents = append([]string{prefix}, contents...)
 					currentLength += len(prefix)
 				}
 			}
