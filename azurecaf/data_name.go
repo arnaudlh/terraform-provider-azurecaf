@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/arnaudlh/terraform-provider-azurecaf/azurecaf/internal/models"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
@@ -126,8 +127,9 @@ func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 }
 
 func getResourceDefinitions() map[string]interface{} {
-	// Dummy implementation, replace with actual logic
-	return map[string]interface{}{
-		"example": nil,
+	resourceDefs := make(map[string]interface{})
+	for k := range models.ResourceDefinitions {
+		resourceDefs[k] = nil
 	}
+	return resourceDefs
 }
