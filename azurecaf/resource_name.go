@@ -52,25 +52,28 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 	randomLength := d.Get("random_length").(int)
 	randomSeed := int64(d.Get("random_seed").(int))
 	randomString := d.Get("random_string").(string)
-	randomSuffix := randSeq(int(randomLength), randomSeed)
+	randomSuffix := randSeq(randomLength, randomSeed)
 	if len(randomString) > 0 {
 		randomSuffix = randomString
 	} else {
-		d.SetNew("random_string", randomSuffix)
+		if err := d.SetNew("random_string", randomSuffix); err != nil {
+			return err
+		}
 	}
-	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
+	namePrecedence := []string{"prefixes", "slug", "name", "random", "suffixes"}
 	result, results, _, err :=
 		getData(resourceType, resourceTypes, separator,
 			prefixes, name, suffixes, randomSuffix,
 			cleanInput, passthrough, useSlug, namePrecedence)
 	if !d.GetRawState().IsNull() {
-		d.SetNew("result", result)
-		d.SetNew("results", results)
+		if err := d.SetNew("result", result); err != nil {
+			return err
+		}
+		if err := d.SetNew("results", results); err != nil {
+			return err
+		}
 	}
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func resourceNameCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
@@ -110,14 +113,18 @@ func getNameResult(d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 
 	if randomSeed == 0 {
 		randomSeed = time.Now().UnixMicro()
-		d.Set("random_seed", randomSeed)
+		if err := d.Set("random_seed", randomSeed); err != nil {
+			return diag.FromErr(err)
+		}
 	}
 	randomString := d.Get("random_string").(string)
-	randomSuffix := randSeq(int(randomLength), randomSeed)
+	randomSuffix := randSeq(randomLength, randomSeed)
 	if len(randomString) > 0 {
 		randomSuffix = randomString
 	} else {
-		d.Set("random_string", randomSuffix)
+		if err := d.Set("random_string", randomSuffix); err != nil {
+			return diag.FromErr(err)
+		}
 	}
 
 	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
@@ -127,18 +134,25 @@ func getNameResult(d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 		return diag.FromErr(err)
 	}
 	if len(result) > 0 {
-		d.Set("result", result)
+		if err := d.Set("result", result); err != nil {
+			return diag.FromErr(err)
+		}
 	}
 	if len(results) > 0 {
-		d.Set("results", results)
+		if err := d.Set("results", results); err != nil {
+			return append(diags, diag.FromErr(err)...)
+		}
 	}
+	
+	// Set the ID after all other operations are successful
 	d.SetId(id)
-	return diags
+	return nil
 }
 
 func getData(resourceType string, resourceTypes []string, separator string, prefixes []string, name string, suffixes []string, randomSuffix string, cleanInput bool, passthrough bool, useSlug bool, namePrecedence []string) (result string, results map[string]string, id string, err error) {
-	isValid, err := validateResourceType(resourceType, resourceTypes)
-	if !isValid {
+	validationErr := validateResourceType(resourceType)
+	if validationErr != nil {
+		err = validationErr
 		return
 	}
 	if results == nil {
@@ -146,20 +160,24 @@ func getData(resourceType string, resourceTypes []string, separator string, pref
 	}
 	ids := []string{}
 	if len(resourceType) > 0 {
-		result, err = getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
+		var resourceResult string
+		resourceResult, err = getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
 		if err != nil {
 			return
 		}
-		results[resourceType] = result
-		ids = append(ids, fmt.Sprintf("%s\t%s", resourceType, result))
+		result = resourceResult
+		results[resourceType] = resourceResult
+		ids = append(ids, fmt.Sprintf("%s\t%s", resourceType, resourceResult))
 	}
 
 	for _, resourceTypeName := range resourceTypes {
-		results[resourceTypeName], err = getResourceName(resourceTypeName, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
+		var resourceResult string
+		resourceResult, err = getResourceName(resourceTypeName, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
 		if err != nil {
 			return
 		}
-		ids = append(ids, fmt.Sprintf("%s\t%s", resourceTypeName, results[resourceTypeName]))
+		results[resourceTypeName] = resourceResult
+		ids = append(ids, fmt.Sprintf("%s\t%s", resourceTypeName, resourceResult))
 	}
 	id = b64.StdEncoding.EncodeToString([]byte(strings.Join(ids, "\n")))
 	return

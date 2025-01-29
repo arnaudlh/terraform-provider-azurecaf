@@ -1,14 +1,10 @@
-package main
+package completness
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"log"
 	"os"
 	"path"
-	"sort"
 )
 
 // The idea of this package it is to check for package completness
@@ -40,44 +36,58 @@ type ResourceStructure struct {
 	Scope string `json:"scope,omitempty"`
 }
 
-func main() {
+func ValidateResourceDefinition(resources []string) error {
 	wd, err := os.Getwd()
-	sourceDefinitions, err := ioutil.ReadFile(path.Join(wd, "../resourceDefinition.json"))
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("failed to get working directory: %v", err)
 	}
-	s, err := readLines(path.Join(wd, "/existing_tf_resources.txt"))
+	sourceDefinitions, err := os.ReadFile(path.Join(wd, "resourceDefinition.json"))
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("failed to read resource definition file: %v", err)
 	}
-	sort.Strings(s)
 	var data []ResourceStructure
 	err = json.Unmarshal(sourceDefinitions, &data)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("failed to unmarshal resource definitions: %v", err)
 	}
-	implemented := make(map[string]bool)
-	for _, name := range s {
-		_, found := findByName(data, name)
-		implemented[name] = found
-	}
-	fmt.Println("|resource | status |")
-	fmt.Println("|---|---|")
-	current := ""
-	for _, name := range s {
-		if name == current {
-			continue
-		} else {
-			current = name
+	for _, name := range resources {
+		if _, found := findByName(data, name); !found {
+			return fmt.Errorf("resource type %s not found in the resource definition file", name)
 		}
-		status := "❌"
-		if implemented[name] {
-			status = "✔"
-		}
-		fmt.Printf("|%s | %s |\n", name, status)
 	}
-
+	return nil
 }
+
+func GetResourceDefinition() ([]ResourceStructure, error) {
+	wd, err := os.Getwd()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get working directory: %v", err)
+	}
+	sourceDefinitions, err := os.ReadFile(path.Join(wd, "../resourceDefinition.json"))
+	if err != nil {
+		return nil, fmt.Errorf("failed to read resource definition file: %v", err)
+	}
+	var result []ResourceStructure
+	err = json.Unmarshal(sourceDefinitions, &result)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal resource definitions: %v", err)
+	}
+	return result, nil
+}
+
+func GetResourceMap() (map[string]ResourceStructure, error) {
+	resourceDefs, err := GetResourceDefinition()
+	if err != nil {
+		return nil, err
+	}
+	result := make(map[string]ResourceStructure)
+	for _, def := range resourceDefs {
+		result[def.ResourceTypeName] = def
+	}
+	return result, nil
+}
+
+
 
 func findByName(slice []ResourceStructure, name string) (int, bool) {
 	for i, item := range slice {
@@ -86,19 +96,4 @@ func findByName(slice []ResourceStructure, name string) (int, bool) {
 		}
 	}
 	return -1, false
-}
-
-func readLines(path string) ([]string, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	var lines []string
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-	return lines, scanner.Err()
 }

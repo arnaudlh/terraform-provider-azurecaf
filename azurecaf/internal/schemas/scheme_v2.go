@@ -8,7 +8,7 @@ import (
 )
 
 func V2() *schema.Resource {
-	resourceMapsKeys := getResourceMaps()
+	resourceMapsKeys := GetResourceMaps()
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -96,6 +96,12 @@ func V2() *schema.Resource {
 }
 
 func ResourceNameStateUpgradeV2(ctx context.Context, rawState map[string]interface{}, meta interface{}) (map[string]interface{}, error) {
+	if rawState == nil {
+		rawState = make(map[string]interface{})
+	}
 	rawState["use_slug"] = true
+	if _, exists := rawState["result"]; !exists {
+		rawState["result"] = nil
+	}
 	return rawState, nil
 }

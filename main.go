@@ -1,8 +1,6 @@
 package main
 
 import (
-	"context"
-	"log"
 	"os"
 	"strings"
 
@@ -22,10 +20,8 @@ func main() {
 	}}
 
 	if debugMode {
-		err := plugin.Debug(context.Background(), "registry.terraform.io/aztfmod/azurecaf", opts)
-		if err != nil {
-			log.Fatal(err.Error())
-		}
+		opts.Debug = true
+		plugin.Serve(opts)
 		return
 	}
 

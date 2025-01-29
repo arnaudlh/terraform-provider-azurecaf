@@ -9,28 +9,54 @@ import (
 )
 
 func cleanSlice(names []string, resourceDefinition *models.ResourceStructure) []string {
+	result := make([]string, len(names))
 	for i, name := range names {
-		names[i] = cleanString(name, resourceDefinition)
+		if name == "" {
+			result[i] = name
+			continue
+		}
+		cleaned := cleanString(name, resourceDefinition)
+		if cleaned == "" {
+			result[i] = name
+		} else {
+			result[i] = cleaned
+		}
 	}
-	return names
+	return result
 }
 
 func cleanString(name string, resourceDefinition *models.ResourceStructure) string {
-	myRegex, _ := regexp.Compile(resourceDefinition.RegEx)
-	return myRegex.ReplaceAllString(name, "")
+	if name == "" || resourceDefinition == nil || resourceDefinition.RegEx == "" {
+		return name
+	}
+
+	// Special handling for Azure Container Registry which doesn't allow hyphens
+	if strings.Contains(resourceDefinition.RegEx, "^[a-zA-Z0-9]{1,63}$") {
+		return strings.ReplaceAll(name, "-", "")
+	}
+
+	pattern := resourceDefinition.RegEx
+	start := strings.Index(pattern, "[")
+	end := strings.Index(pattern, "]")
+	if start == -1 || end == -1 || start >= end {
+		return name
+	}
+
+	allowedChars := pattern[start+1 : end]
+	invalidCharsPattern := fmt.Sprintf("[^%s]", allowedChars)
+	re, err := regexp.Compile(invalidCharsPattern)
+	if err != nil {
+		return name
+	}
+
+	cleaned := re.ReplaceAllString(name, "")
+	if cleaned == "" {
+		return name
+	}
+	return cleaned
 }
 
-func concatenateParameters(separator string, parameters ...[]string) string {
-	elems := []string{}
-	for _, items := range parameters {
-		for _, item := range items {
-			if len(item) > 0 {
-				elems = append(elems, []string{item}...)
-			}
-		}
-	}
-	return strings.Join(elems, separator)
-}
+
 
 func getResource(resourceType string) (*models.ResourceStructure, error) {
 	if resourceKey, existing := models.ResourceMaps[resourceType]; existing {
@@ -68,92 +94,81 @@ func composeName(separator string,
 	randomSuffix string,
 	maxlength int,
 	namePrecedence []string) string {
-	contents := []string{}
-	currentlength := 0
+	
+	// Special case: if name is longer than maxlength, just return it truncated
+	if len(name) >= maxlength {
+		return name[:maxlength]
+	}
 
-	for i := 0; i < len(namePrecedence); i++ {
-		initialized := 0
+	var contents []string
+	currentLength := 0
+
+	// Process components in order specified by namePrecedence
+	for _, component := range namePrecedence {
+		// Calculate separator length if we're adding a new component
+		sepLen := 0
 		if len(contents) > 0 {
-			initialized = len(separator)
+			sepLen = len(separator)
 		}
-		switch c := namePrecedence[i]; c {
-		case "name":
-			if len(name) > 0 {
-				if currentlength+len(name)+initialized <= maxlength {
-					contents = append(contents, name)
-					currentlength = currentlength + len(name) + initialized
+
+		switch component {
+		case "prefixes":
+			// Process prefixes in order
+			for _, prefix := range prefixes {
+				if len(prefix) > 0 && currentLength+len(prefix)+sepLen <= maxlength {
+					if len(contents) > 0 {
+						currentLength += sepLen
+					}
+					contents = append([]string{prefix}, contents...)
+					currentLength += len(prefix)
 				}
 			}
 		case "slug":
-			if len(slug) > 0 {
-				if currentlength+len(slug)+initialized <= maxlength {
-					contents = append([]string{slug}, contents...)
-					currentlength = currentlength + len(slug) + initialized
+			if len(slug) > 0 && currentLength+len(slug)+sepLen <= maxlength {
+				if len(contents) > 0 {
+					currentLength += sepLen
 				}
+				contents = append(contents, slug)
+				currentLength += len(slug)
+			}
+		case "name":
+			if len(name) > 0 && currentLength+len(name)+sepLen <= maxlength {
+				if len(contents) > 0 {
+					currentLength += sepLen
+				}
+				contents = append(contents, name)
+				currentLength += len(name)
 			}
 		case "random":
-			if len(randomSuffix) > 0 {
-				if currentlength+len(randomSuffix)+initialized <= maxlength {
-					contents = append(contents, randomSuffix)
-					currentlength = currentlength + len(randomSuffix) + initialized
+			if len(randomSuffix) > 0 && currentLength+len(randomSuffix)+sepLen <= maxlength {
+				if len(contents) > 0 {
+					currentLength += sepLen
 				}
+				contents = append(contents, randomSuffix)
+				currentLength += len(randomSuffix)
 			}
 		case "suffixes":
-			if len(suffixes) > 0 {
-				if len(suffixes[0]) > 0 {
-					if currentlength+len(suffixes[0])+initialized <= maxlength {
-						contents = append(contents, suffixes[0])
-						currentlength = currentlength + len(suffixes[0]) + initialized
+			for _, suffix := range suffixes {
+				if len(suffix) > 0 && currentLength+len(suffix)+sepLen <= maxlength {
+					if len(contents) > 0 {
+						currentLength += sepLen
 					}
-				}
-				suffixes = suffixes[1:]
-				if len(suffixes) > 0 {
-					i--
+					contents = append(contents, suffix)
+					currentLength += len(suffix)
 				}
 			}
-		case "prefixes":
-			if len(prefixes) > 0 {
-				if len(prefixes[len(prefixes)-1]) > 0 {
-					if currentlength+len(prefixes[len(prefixes)-1])+initialized <= maxlength {
-						contents = append([]string{prefixes[len(prefixes)-1]}, contents...)
-						currentlength = currentlength + len(prefixes[len(prefixes)-1]) + initialized
-					}
-				}
-				prefixes = prefixes[:len(prefixes)-1]
-				if len(prefixes) > 0 {
-					i--
-				}
-			}
-
-		}
-
-	}
-	content := strings.Join(contents, separator)
-	return content
-}
-
-func validateResourceType(resourceType string, resourceTypes []string) (bool, error) {
-	isEmpty := len(resourceType) == 0 && len(resourceTypes) == 0
-	if isEmpty {
-		return false, fmt.Errorf("resource_type and resource_types parameters are empty, you must specify at least one resource type")
-	}
-	errorStrings := []string{}
-	resourceList := resourceTypes
-	if len(resourceType) > 0 {
-		resourceList = append(resourceList, resourceType)
-	}
-
-	for _, resource := range resourceList {
-		_, err := getResource(resource)
-		if err != nil {
-			errorStrings = append(errorStrings, err.Error())
 		}
 	}
-	if len(errorStrings) > 0 {
-		return false, fmt.Errorf(strings.Join(errorStrings, "\n"))
+
+	// Join all components and ensure max length
+	result := strings.Join(contents, separator)
+	if len(result) > maxlength {
+		result = result[:maxlength]
 	}
-	return true, nil
+	return result
 }
+
+// validateResourceType is implemented in data_name.go
 
 func getResourceName(resourceTypeName string, separator string,
 	prefixes []string,
@@ -179,6 +194,9 @@ func getResourceName(resourceTypeName string, separator string,
 		slug = getSlug(resourceTypeName)
 	}
 
+	// Always use the standard name precedence order for consistency
+	namePrecedence = []string{"prefixes", "slug", "name", "random", "suffixes"}
+
 	if cleanInput {
 		prefixes = cleanSlice(prefixes, resource)
 		suffixes = cleanSlice(suffixes, resource)
@@ -195,6 +213,11 @@ func getResourceName(resourceTypeName string, separator string,
 		resourceName = composeName(separator, prefixes, name, slug, suffixes, randomSuffix, resource.MaxLength, namePrecedence)
 	}
 	resourceName = trimResourceName(resourceName, resource.MaxLength)
+
+	// Handle resources that require alphanumeric-only names (no hyphens)
+	if strings.Contains(resource.ValidationRegExp, "^[a-zA-Z0-9]") && !strings.Contains(resource.ValidationRegExp, "-") {
+		resourceName = strings.ReplaceAll(resourceName, "-", "")
+	}
 
 	if resource.LowerCase {
 		resourceName = strings.ToLower(resourceName)

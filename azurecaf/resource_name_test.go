@@ -1,201 +1,12 @@
 package azurecaf
 
 import (
-	"context"
-	"fmt"
-	"reflect"
-	"regexp"
-	"strings"
 	"testing"
-
-	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
-	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/schemas"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-func testAccCafNamingValidation(id string, name string, expectedLength int, prefix string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[id]
-		if !ok {
-			return fmt.Errorf("Not found: %s", id)
-		}
-		if rs.Primary.ID == "" {
-			return fmt.Errorf("No ID is set")
-		}
+// Unit tests for these functions have been moved to resource_name_engine_test.go
 
-		attrs := rs.Primary.Attributes
-
-		result := attrs["result"]
-		if len(result) != expectedLength {
-			return fmt.Errorf("got %s %d result items; want %d", result, len(result), expectedLength)
-		}
-		if !strings.HasPrefix(result, prefix) {
-			return fmt.Errorf("got %s which doesn't start with %s", result, prefix)
-		}
-		if !strings.Contains(result, name) {
-			return fmt.Errorf("got %s which doesn't contain the name %s", result, name)
-		}
-		return nil
-	}
-}
-
-func regexMatch(id string, exp *regexp.Regexp, requiredMatches int) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[id]
-		if !ok {
-			return fmt.Errorf("Not found: %s", id)
-		}
-		if rs.Primary.ID == "" {
-			return fmt.Errorf("No ID is set")
-		}
-
-		result := rs.Primary.Attributes["result"]
-
-		if matches := exp.FindAllStringSubmatchIndex(result, -1); len(matches) != requiredMatches {
-			return fmt.Errorf("result string is %s; did not match %s, got %d", result, exp, len(matches))
-		}
-
-		return nil
-	}
-}
-
-func TestCleanInput_no_changes(t *testing.T) {
-	data := "testdata"
-	resource := models.ResourceDefinitions["azurerm_resource_group"]
-	result := cleanString(data, &resource)
-	if data != result {
-		t.Errorf("Expected %s but received %s", data, result)
-	}
-}
-
-func TestCleanInput_remove_always(t *testing.T) {
-	data := "😀testdata😊"
-	expected := "testdata"
-	resource := models.ResourceDefinitions["azurerm_resource_group"]
-	result := cleanString(data, &resource)
-	if result != expected {
-		t.Errorf("Expected %s but received %s", expected, result)
-	}
-}
-
-func TestCleanInput_not_remove_special_allowed_chars(t *testing.T) {
-	data := "testdata()"
-	expected := "testdata()"
-	resource := models.ResourceDefinitions["azurerm_resource_group"]
-	result := cleanString(data, &resource)
-	if result != expected {
-		t.Errorf("Expected %s but received %s", expected, result)
-	}
-}
-
-func TestCleanSplice_no_changes(t *testing.T) {
-	data := []string{"testdata", "test", "data"}
-	resource := models.ResourceDefinitions["azurerm_resource_group"]
-	result := cleanSlice(data, &resource)
-	for i := range data {
-		if data[i] != result[i] {
-			t.Errorf("Expected %s but received %s", data[i], result[i])
-		}
-	}
-}
-
-func TestConcatenateParameters_azurerm_public_ip_prefix(t *testing.T) {
-	prefixes := []string{"pre"}
-	suffixes := []string{"suf"}
-	content := []string{"name", "ip"}
-	separator := "-"
-	expected := "pre-name-ip-suf"
-	result := concatenateParameters(separator, prefixes, content, suffixes)
-	if result != expected {
-		t.Errorf("Expected %s but received %s", expected, result)
-	}
-}
-
-func TestGetSlug(t *testing.T) {
-	resourceType := "azurerm_resource_group"
-	result := getSlug(resourceType)
-	expected := "rg"
-	if result != expected {
-		t.Errorf("Expected %s but received %s", expected, result)
-	}
-}
-
-func TestGetSlug_unknown(t *testing.T) {
-	resourceType := "azurerm_does_not_exist"
-	result := getSlug(resourceType)
-	expected := ""
-	if result != expected {
-		t.Errorf("Expected %s but received %s", expected, result)
-	}
-}
-
-func TestAccResourceName_CafClassic(t *testing.T) {
-	resource.UnitTest(t, resource.TestCase{
-
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckResourceDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccResourceNameCafClassicConfig,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCafNamingValidation(
-						"azurecaf_name.classic_rg",
-						"pr1-pr2-rg-myrg-",
-						29,
-						"pr1-pr2"),
-					regexMatch("azurecaf_name.classic_rg", regexp.MustCompile(models.ResourceDefinitions["azurerm_resource_group"].ValidationRegExp), 1),
-				),
-			},
-			{
-				Config: testAccResourceNameCafClassicConfig,
-				Check: resource.ComposeTestCheckFunc(
-
-					testAccCafNamingValidation(
-						"azurecaf_name.passthrough",
-						"passthrough",
-						11,
-						""),
-					regexMatch("azurecaf_name.passthrough", regexp.MustCompile(models.ResourceDefinitions["azurerm_container_registry"].ValidationRegExp), 1),
-				),
-			},
-			{
-				Config: testAccResourceNameCafClassicConfig,
-				Check: resource.ComposeTestCheckFunc(
-
-					testAccCafNamingValidation(
-						"azurecaf_name.apim",
-						"vsic-apim-apim",
-						14,
-						"vsic"),
-					regexMatch("azurecaf_name.apim", regexp.MustCompile(models.ResourceDefinitions["azurerm_api_management_service"].ValidationRegExp), 1),
-				),
-			},
-		},
-	})
-}
-
-func TestAccResourceName_RsvCafClassic(t *testing.T) {
-	resource.UnitTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckResourceDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccResourceNameCafClassicConfigRsv,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCafNamingValidation(
-						"azurecaf_name.rsv",
-						"pr1-rsv-test-gm-su1",
-						19,
-						""),
-					regexMatch("azurecaf_name.rsv", regexp.MustCompile(models.ResourceDefinitions["azurerm_recovery_services_vault"].ValidationRegExp), 1),
-				),
-			},
-		},
-	})
-}
+// Integration tests moved to resource_name_integration_test.go
 
 func TestComposeName(t *testing.T) {
 	namePrecedence := []string{"name", "random", "slug", "suffixes", "prefixes"}
@@ -259,27 +70,18 @@ func TestComposeEmptyStringArray(t *testing.T) {
 
 func TestValidResourceType_validParameters(t *testing.T) {
 	resourceType := "azurerm_resource_group"
-	resourceTypes := []string{"azurerm_container_registry", "azurerm_storage_account"}
-	isValid, err := validateResourceType(resourceType, resourceTypes)
-	if !isValid {
-		t.Logf("resource types considered invalid while input parameters are valid")
-		t.Fail()
-	}
+	err := validateResourceType(resourceType)
 	if err != nil {
 		t.Logf("resource validation generated an unexpected error %s", err.Error())
 		t.Fail()
 	}
 }
+
 func TestValidResourceType_invalidParameters(t *testing.T) {
-	resourceType := "azurerm_resource_group"
-	resourceTypes := []string{"azurerm_not_supported", "azurerm_storage_account"}
-	isValid, err := validateResourceType(resourceType, resourceTypes)
-	if isValid {
-		t.Logf("resource types considered valid while input parameters are invalid")
-		t.Fail()
-	}
+	resourceType := "azurerm_not_supported"
+	err := validateResourceType(resourceType)
 	if err == nil {
-		t.Logf("resource validation did generate an error while the input is invalid")
+		t.Logf("resource validation did not generate an error while the input is invalid")
 		t.Fail()
 	}
 }
@@ -355,87 +157,4 @@ func TestGetResourceNamePassthrough(t *testing.T) {
 	}
 }
 
-func testResourceNameStateDataV2() map[string]interface{} {
-	return map[string]interface{}{}
-}
-
-func testResourceNameStateDataV3() map[string]interface{} {
-	return map[string]interface{}{
-		"use_slug": true,
-	}
-}
-
-func TestResourceExampleInstanceStateUpgradeV2(t *testing.T) {
-	expected := testResourceNameStateDataV3()
-	actual, err := schemas.ResourceNameStateUpgradeV2(context.Background(), testResourceNameStateDataV2(), nil)
-	if err != nil {
-		t.Fatalf("error migrating state: %s", err)
-	}
-
-	if !reflect.DeepEqual(expected, actual) {
-		t.Fatalf("\n\nexpected:\n\n%#v\n\ngot:\n\n%#v\n\n", expected, actual)
-	}
-}
-
-const testAccResourceNameCafClassicConfig = `
-
-
-# Resource Group
-resource "azurecaf_name" "classic_rg" {
-    name            = "myrg"
-	resource_type   = "azurerm_resource_group"
-	prefixes        = ["pr1", "pr2"]
-	suffixes        = ["su1", "su2"]
-	random_seed     = 1
-	random_length   = 5
-	clean_input     = true
-}
-
-resource "azurecaf_name" "classic_acr_invalid" {
-    name            = "my_invalid_acr_name"
-	resource_type   = "azurerm_container_registry"
-	prefixes        = ["pr1", "pr2"]
-	suffixes        = ["su1", "su2"]
-	random_seed     = 1
-	random_length   = 5
-	clean_input     = true
-}
-
-resource "azurecaf_name" "passthrough" {
-    name            = "passthRough"
-	resource_type   = "azurerm_container_registry"
-	prefixes        = ["pr1", "pr2"]
-	suffixes        = ["su1", "su2"]
-	random_seed     = 1
-	random_length   = 5
-	clean_input     = true
-	passthrough     = true
-}
-
-
-resource "azurecaf_name" "apim" {
-	name = "apim"
-	resource_type = "azurerm_api_management_service"
-	prefixes = ["vsic"]
-	random_length = 0
-	clean_input = true
-	passthrough = false
-   }
-`
-
-const testAccResourceNameCafClassicConfigRsv = `
-
-
-# Resource Group
-
-resource "azurecaf_name" "rsv" {
-    name            = "test"
-	resource_type   = "azurerm_recovery_services_vault"
-	prefixes        = ["pr1"]
-	suffixes        = ["su1"]
-	random_length   = 2
-	random_seed     = 1
-	clean_input     = true
-	passthrough     = false
-}
-`
+// Test configurations moved to resource_name_integration_test.go
