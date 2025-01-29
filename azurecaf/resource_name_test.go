@@ -1,7 +1,6 @@
 package azurecaf
 
 import (
-	"fmt"
 	"testing"
 )
 

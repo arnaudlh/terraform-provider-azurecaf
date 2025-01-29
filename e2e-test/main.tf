@@ -38,6 +38,44 @@ locals {
       prefixes = ["dev"]
       suffixes = ["func"]
     }
+     acr = {
+      name = "registry"
+      type = "azurerm_container_registry"
+      prefixes = ["dev"]
+      random_length = 4
+      separator = ""  # ACR names can't contain hyphens
+      use_slug = true
+    }
+    aks = {
+      name = "cluster"
+      type = "azurerm_kubernetes_cluster"
+      prefixes = ["dev"]
+      suffixes = ["aks"]
+    }
+    app = {
+      name = "webapp"
+      type = "azurerm_app_service"
+      prefixes = ["dev"]
+      random_length = 3
+    }
+    cosmos = {
+      name = "db"
+      type = "azurerm_cosmosdb_account"
+      prefixes = ["dev"]
+      random_length = 4
+    }
+    sql = {
+      name = "sqldb"
+      type = "azurerm_sql_server"
+      prefixes = ["dev"]
+      random_length = 4
+    }
+    vm = {
+      name = "server"
+      type = "azurerm_virtual_machine"
+      prefixes = ["dev"]
+      suffixes = ["vm"]
+    }
   }
 }
 
@@ -91,4 +129,17 @@ output "validation" {
       v.result == data.azurecaf_name.test[k].result ? "PASS" : "FAIL: ${v.result} != ${data.azurecaf_name.test[k].result}"
     )
   }
+}
+
+# Additional validation outputs
+output "resource_types" {
+  value = distinct([for k, v in azurecaf_name.test : v.resource_type])
+  description = "List of all resource types tested"
+}
+
+output "name_lengths" {
+  value = {
+    for k, v in azurecaf_name.test : k => length(v.result)
+  }
+  description = "Length of each generated name to verify against Azure limits"
 }

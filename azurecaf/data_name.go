@@ -157,21 +157,15 @@ func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 				return fmt.Errorf("error setting random_seed: %w", err)
 			}
 		}
-		randomString = randSeq(randomLength, randomSeed)
+		randomString = randSeq(randomLength, int64(randomSeed))
 		if err := d.Set("random_string", randomString); err != nil {
 			return fmt.Errorf("error setting random_string: %w", err)
 		}
 	}
 
-	// Get slug before name generation
-	slug := ""
-	if useSlug {
-		slug = getSlug(resourceType)
-	}
-
 	// Use the same name precedence as resources
-	namePrecedence := []string{"prefixes", "name", "random", "suffixes"}
-	result, _, id, err := getData(resourceType, nil, separator, prefixes, name, suffixes, randomString, cleanInput, passthrough, false, namePrecedence)
+	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
+	result, _, id, err := getData(resourceType, nil, separator, prefixes, name, suffixes, randomString, cleanInput, passthrough, useSlug, namePrecedence)
 
 	// Handle slug after name generation to match resource behavior
 	if useSlug {
@@ -204,46 +198,6 @@ func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("error generating name: %w", err)
 	}
 
-	// Add slug after name generation if useSlug is true
-	if useSlug && len(slug) > 0 {
-		if resourceType == "azurerm_storage_account" {
-			// For storage accounts, handle without separators
-			result = strings.ReplaceAll(result, separator, "")
-			if len(prefixes) > 0 {
-				// Insert slug after prefixes
-				prefix := strings.Join(prefixes, "")
-				rest := strings.TrimPrefix(result, prefix)
-				// Only add slug if it's not already present
-				if !strings.Contains(rest, slug) {
-					result = prefix + slug + rest
-				}
-			} else {
-				// Only add slug if it's not already present
-				if !strings.HasPrefix(result, slug) {
-					result = slug + result
-				}
-			}
-		} else {
-			parts := strings.Split(result, separator)
-			slugFound := false
-			for _, part := range parts {
-				if part == slug {
-					slugFound = true
-					break
-				}
-			}
-			if !slugFound {
-				for i, part := range parts {
-					if part == name {
-						parts = append(parts[:i+1], parts[i:]...)
-						parts[i] = slug
-						break
-					}
-				}
-				result = strings.Join(parts, separator)
-			}
-		}
-	}
 	if err != nil {
 		return fmt.Errorf("error generating name: %w", err)
 	}
