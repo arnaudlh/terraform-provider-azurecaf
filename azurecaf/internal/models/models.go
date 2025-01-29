@@ -1,5 +1,53 @@
 package models
 
+import (
+	"fmt"
+	"regexp"
+)
+
+// ResourceDefinitions maps resource types to their structures
+var ResourceDefinitions = make(map[string]ResourceStructure)
+
+// ResourceMaps provides alternative names for resource types
+var ResourceMaps = make(map[string]string)
+
+// ValidateResourceType validates if a resource type exists
+func ValidateResourceType(resourceType string) (bool, error) {
+	if _, exists := ResourceDefinitions[resourceType]; !exists {
+		return false, fmt.Errorf("invalid resource type: %s", resourceType)
+	}
+	return true, nil
+}
+
+// GetResourceStructure returns the resource structure for a given type
+func GetResourceStructure(resourceType string) (*ResourceStructure, error) {
+	if resource, exists := ResourceDefinitions[resourceType]; exists {
+		return &resource, nil
+	}
+	return nil, fmt.Errorf("resource type not found: %s", resourceType)
+}
+
+// ValidateLength checks if a string meets length requirements
+func ValidateLength(input string, minLength, maxLength int) error {
+	length := len(input)
+	if length < minLength || length > maxLength {
+		return fmt.Errorf("length must be between %d and %d, got %d", minLength, maxLength, length)
+	}
+	return nil
+}
+
+// ValidateRegex checks if a string matches a regex pattern
+func ValidateRegex(input, pattern string) error {
+	regex, err := regexp.Compile(pattern)
+	if err != nil {
+		return fmt.Errorf("invalid regex pattern: %v", err)
+	}
+	if !regex.MatchString(input) {
+		return fmt.Errorf("input does not match pattern %s", pattern)
+	}
+	return nil
+}
+
 // ResourceStructure stores the CafPrefix and the MaxLength of an azure resource
 type ResourceStructure struct {
 	// Resource type name

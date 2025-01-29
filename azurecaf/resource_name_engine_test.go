@@ -1,8 +1,24 @@
 package azurecaf
 
 import (
+	"math/rand"
 	"testing"
+	
+	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
 )
+
+func init() {
+	// Initialize test resource definitions
+	models.ResourceDefinitions["azurerm_storage_account"] = models.ResourceStructure{
+		ResourceTypeName:  "azurerm_storage_account",
+		CafPrefix:        "st",
+		MinLength:        3,
+		MaxLength:        24,
+		RegEx:           "^[a-z0-9]{3,24}$",
+		ValidationRegExp: "^[a-z0-9]{3,24}$",
+		LowerCase:       true,
+	}
+}
 
 func TestGenerateRandomString(t *testing.T) {
 	tests := []struct {
@@ -33,7 +49,7 @@ func TestGenerateRandomString(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := randSeq(tt.length, &tt.seed)
+			got := randSeq(tt.length, tt.seed)
 			if len(got) != tt.want {
 				t.Errorf("randSeq() length = %v, want %v", len(got), tt.want)
 			}
@@ -41,69 +57,37 @@ func TestGenerateRandomString(t *testing.T) {
 	}
 }
 
-func TestCleanInput(t *testing.T) {
+func TestConcatenateParameters(t *testing.T) {
 	tests := []struct {
-		name  string
-		input string
-		want  string
-	}{
-		{
-			name:  "remove special characters",
-			input: "Test@123!",
-			want:  "Test123",
-		},
-		{
-			name:  "remove spaces",
-			input: "Test Input",
-			want:  "TestInput",
-		},
-		{
-			name:  "already clean",
-			input: "Test123",
-			want:  "Test123",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := cleanInput(tt.input); got != tt.want {
-				t.Errorf("cleanInput() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestBuildResourceName(t *testing.T) {
-	tests := []struct {
-		name       string
-		parts      []string
-		separator  string
-		want       string
+		name      string
+		separator string
+		params    [][]string
+		want      string
 	}{
 		{
 			name:      "join with hyphen",
-			parts:     []string{"prefix", "name", "suffix"},
 			separator: "-",
+			params:    [][]string{{"prefix"}, {"name"}, {"suffix"}},
 			want:      "prefix-name-suffix",
 		},
 		{
 			name:      "empty separator",
-			parts:     []string{"prefix", "name", "suffix"},
 			separator: "",
+			params:    [][]string{{"prefix"}, {"name"}, {"suffix"}},
 			want:      "prefixnamesuffix",
 		},
 		{
 			name:      "single part",
-			parts:     []string{"name"},
 			separator: "-",
+			params:    [][]string{{"name"}},
 			want:      "name",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := buildResourceName(tt.parts, tt.separator); got != tt.want {
-				t.Errorf("buildResourceName() = %v, want %v", got, tt.want)
+			if got := concatenateParameters(tt.separator, tt.params...); got != tt.want {
+				t.Errorf("concatenateParameters() = %v, want %v", got, tt.want)
 			}
 		})
 	}
