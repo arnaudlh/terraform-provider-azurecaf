@@ -124,14 +124,21 @@ func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 	randomLength := d.Get("random_length").(int)
 	randomSeed := int64(d.Get("random_seed").(int))
 
-	if randomSeed == 0 {
+	// Use the same random seed logic as resource implementation
+	randomString := d.Get("random_string").(string)
+	randomSuffix := randSeq(randomLength, randomSeed)
+	if len(randomString) > 0 {
+		randomSuffix = randomString
+	} else if randomSeed == 0 {
 		randomSeed = time.Now().UnixMicro()
 		if err := d.Set("random_seed", randomSeed); err != nil {
 			return fmt.Errorf("error setting random_seed: %w", err)
 		}
+		randomSuffix = randSeq(randomLength, randomSeed)
+		if err := d.Set("random_string", randomSuffix); err != nil {
+			return fmt.Errorf("error setting random_string: %w", err)
+		}
 	}
-
-	randomSuffix := randSeq(randomLength, randomSeed)
 	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
 
 	result, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
