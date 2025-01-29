@@ -14,3 +14,4 @@ __debug_bin
 **/.terraform.lock.hclcoverage.out
 coverage.txt
 test_output.txt
+coverage.out
