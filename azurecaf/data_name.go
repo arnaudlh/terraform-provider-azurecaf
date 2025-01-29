@@ -176,13 +176,24 @@ func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 	// Add slug after name generation if useSlug is true
 	if useSlug && len(slug) > 0 {
 		if resourceType == "azurerm_storage_account" {
-			// For storage accounts, add slug after prefixes without separator
-			parts := strings.Split(result, separator)
-			if len(parts) > 0 && len(prefixes) > 0 {
+			// For storage accounts, handle without separators
+			result = strings.ReplaceAll(result, separator, "")
+			if len(prefixes) > 0 {
 				// Insert slug after prefixes
-				result = strings.Join(parts[:len(prefixes)], "") + slug + strings.Join(parts[len(prefixes):], "")
+				prefix := strings.Join(prefixes, "")
+				rest := strings.TrimPrefix(result, prefix)
+				result = prefix + slug + rest
 			} else {
 				result = slug + result
+			}
+			// For storage accounts, ensure prefix + st + rest format
+			if strings.HasPrefix(result, slug) {
+				result = strings.TrimPrefix(result, slug)
+				if len(prefixes) > 0 {
+					result = strings.Join(prefixes, "") + slug + result
+				} else {
+					result = slug + result
+				}
 			}
 		} else {
 			parts := strings.Split(result, separator)
