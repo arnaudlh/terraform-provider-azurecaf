@@ -94,9 +94,13 @@ func composeName(separator string,
 	randomSuffix string,
 	maxlength int,
 	namePrecedence []string) string {
-	contents := []string{}
+	var contents []string
 	currentlength := 0
 
+	// Create a map to track what components have been added
+	added := make(map[string]bool)
+
+	// Process components in the specified precedence order
 	for _, precedence := range namePrecedence {
 		initialized := 0
 		if len(contents) > 0 {
@@ -105,39 +109,49 @@ func composeName(separator string,
 
 		switch precedence {
 		case "prefixes":
-			for _, prefix := range prefixes {
-				if len(prefix) > 0 && currentlength+len(prefix)+initialized <= maxlength {
-					contents = append(contents, prefix)
-					currentlength = currentlength + len(prefix) + initialized
+			if !added["prefixes"] {
+				// Add prefixes in order
+				for _, prefix := range prefixes {
+					if len(prefix) > 0 && currentlength+len(prefix)+initialized <= maxlength {
+						contents = append(contents, prefix)
+						currentlength = currentlength + len(prefix) + initialized
+					}
 				}
-			}
-		case "name":
-			if len(name) > 0 && currentlength+len(name)+initialized <= maxlength {
-				contents = append(contents, name)
-				currentlength = currentlength + len(name) + initialized
+				added["prefixes"] = true
 			}
 		case "slug":
-			if len(slug) > 0 && currentlength+len(slug)+initialized <= maxlength {
+			if !added["slug"] && len(slug) > 0 && currentlength+len(slug)+initialized <= maxlength {
 				contents = append(contents, slug)
 				currentlength = currentlength + len(slug) + initialized
+				added["slug"] = true
+			}
+		case "name":
+			if !added["name"] && len(name) > 0 && currentlength+len(name)+initialized <= maxlength {
+				contents = append(contents, name)
+				currentlength = currentlength + len(name) + initialized
+				added["name"] = true
 			}
 		case "random":
-			if len(randomSuffix) > 0 && currentlength+len(randomSuffix)+initialized <= maxlength {
+			if !added["random"] && len(randomSuffix) > 0 && currentlength+len(randomSuffix)+initialized <= maxlength {
 				contents = append(contents, randomSuffix)
 				currentlength = currentlength + len(randomSuffix) + initialized
+				added["random"] = true
 			}
 		case "suffixes":
-			for _, suffix := range suffixes {
-				if len(suffix) > 0 && currentlength+len(suffix)+initialized <= maxlength {
-					contents = append(contents, suffix)
-					currentlength = currentlength + len(suffix) + initialized
+			if !added["suffixes"] {
+				// Add suffixes in order
+				for _, suffix := range suffixes {
+					if len(suffix) > 0 && currentlength+len(suffix)+initialized <= maxlength {
+						contents = append(contents, suffix)
+						currentlength = currentlength + len(suffix) + initialized
+					}
 				}
+				added["suffixes"] = true
 			}
 		}
 	}
 
-	content := strings.Join(contents, separator)
-	return content
+	return strings.Join(contents, separator)
 }
 
 // validateResourceType is implemented in data_name.go
