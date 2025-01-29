@@ -101,65 +101,59 @@ func composeName(separator string,
 	}
 
 	var contents []string
-
-	// Helper to calculate total length with separators
-	calcTotalLength := func(components []string) int {
-		if len(components) == 0 {
-			return 0
-		}
-		total := 0
-		for _, c := range components {
-			if len(c) > 0 {
-				total += len(c)
-			}
-		}
-		return total + (len(components)-1)*len(separator)
-	}
-
-	// Helper to add a component
-	addComponent := func(component string) bool {
-		if len(component) == 0 {
-			return true
-		}
-		newComponents := append([]string{}, contents...)
-		newComponents = append(newComponents, component)
-		if calcTotalLength(newComponents) > maxlength {
-			return false
-		}
-		contents = newComponents
-		return true
-	}
+	currentLength := 0
 
 	// Process components in order specified by namePrecedence
 	for _, component := range namePrecedence {
+		// Calculate separator length if we're adding a new component
+		sepLen := 0
+		if len(contents) > 0 {
+			sepLen = len(separator)
+		}
+
 		switch component {
 		case "prefixes":
-			// Add prefixes in order
 			for _, prefix := range prefixes {
-				if len(prefix) > 0 && calcTotalLength(append(contents, prefix)) <= maxlength {
+				if len(prefix) > 0 && currentLength+len(prefix)+sepLen <= maxlength {
+					if len(contents) > 0 {
+						currentLength += sepLen
+					}
 					contents = append(contents, prefix)
+					currentLength += len(prefix)
 				}
 			}
 		case "slug":
-			// Add slug if present and fits
-			if len(slug) > 0 && calcTotalLength(append(contents, slug)) <= maxlength {
+			if len(slug) > 0 && currentLength+len(slug)+sepLen <= maxlength {
+				if len(contents) > 0 {
+					currentLength += sepLen
+				}
 				contents = append(contents, slug)
+				currentLength += len(slug)
 			}
 		case "name":
-			// Add name if present and fits
-			if len(name) > 0 && calcTotalLength(append(contents, name)) <= maxlength {
+			if len(name) > 0 && currentLength+len(name)+sepLen <= maxlength {
+				if len(contents) > 0 {
+					currentLength += sepLen
+				}
 				contents = append(contents, name)
+				currentLength += len(name)
 			}
 		case "random":
-			// Add random suffix if present and fits
-			if len(randomSuffix) > 0 && calcTotalLength(append(contents, randomSuffix)) <= maxlength {
+			if len(randomSuffix) > 0 && currentLength+len(randomSuffix)+sepLen <= maxlength {
+				if len(contents) > 0 {
+					currentLength += sepLen
+				}
 				contents = append(contents, randomSuffix)
+				currentLength += len(randomSuffix)
 			}
 		case "suffixes":
-			// Add suffixes in order
 			for _, suffix := range suffixes {
-				if len(suffix) > 0 && calcTotalLength(append(contents, suffix)) <= maxlength {
+				if len(suffix) > 0 && currentLength+len(suffix)+sepLen <= maxlength {
+					if len(contents) > 0 {
+						currentLength += sepLen
+					}
 					contents = append(contents, suffix)
+					currentLength += len(suffix)
 				}
 			}
 		}
