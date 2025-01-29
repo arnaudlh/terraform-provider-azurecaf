@@ -9,7 +9,7 @@ package models
 func init() {
 	// Initialize ResourceDefinitions
 	ResourceDefinitions = map[string]ResourceStructure{
-	"aks_node_pool_linux": {
+		"aks_node_pool_linux": {
 		ResourceTypeName:  "aks_node_pool_linux",
 		CafPrefix:        "npl",
 		MinLength:        1,
