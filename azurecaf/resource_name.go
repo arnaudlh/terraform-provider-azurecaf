@@ -75,7 +75,7 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 	}
 	}
 	if err != nil {
-		return fmt.Errorf("failed to get data")
+		return fmt.Errorf("failed to get data: %v", err)
 	}
 	return nil
 }
