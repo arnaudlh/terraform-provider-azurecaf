@@ -1,6 +1,8 @@
-# Azure Cloud Adoption Framework - Terraform provider
+# Azure Terraform SRE - Terraform provider
 
-This provider implements a set of methodologies for naming convention implementation including the default Microsoft Cloud Adoption Framework for Azure recommendations as per https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/naming-and-tagging.
+> :warning: This solution, offered by the Open-Source community, will no longer receive contributions from Microsoft.
+
+This provider implements a set of methodologies for naming convention implementation including the default Microsoft Cloud Adoption Framework for Azure recommendations as per <https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/naming-and-tagging>.
 
 ## Using the Provider
 
@@ -32,19 +34,26 @@ The example generates a 23 characters name compatible with the specification for
 dev-aztfmod-001
 
 ```hcl
-resource "azurecaf_name" "rg_example" {
-  name            = "demogroup"
-    resource_type   = "azurerm_resource_group"
-    prefixes        = ["a", "b"]
-    suffixes        = ["y", "z"]
-    random_length   = 5
-    clean_input     = true
+data "azurecaf_name" "rg_example" {
+  name          = "demogroup"
+  resource_type = "azurerm_resource_group"
+  prefixes      = ["a", "b"]
+  suffixes      = ["y", "z"]
+  random_length = 5
+  clean_input   = true
 }
 
-resource "azurerm_resource_group" "demo" {
-  name     = azurecaf_name.rg_example.result
-  location = "southeastasia"
+output "rg_example" {
+  value = data.azurecaf_name.rg_example.result
 }
+```
+
+```
+data.azurecaf_name.rg_example: Reading...
+data.azurecaf_name.rg_example: Read complete after 0s [id=a-b-rg-demogroup-sjdeh-y-z]
+
+Changes to Outputs:
+  + rg_example = "a-b-rg-demogroup-sjdeh-y-z"
 ```
 
 The provider generates a name using the input parameters and automatically appends a prefix (if defined), a caf prefix (resource type) and postfix (if defined) in addition to a generated padding string based on the selected naming convention.
@@ -80,21 +89,21 @@ The following attributes are exported:
 We define resource types as per [naming-and-tagging](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/naming-and-tagging)
 The comprehensive list of resource type can be found [here](./docs/resources/azurecaf_name.md)
 
-
 ## Building the provider
 
 Clone repository to: $GOPATH/src/github.com/aztfmod/terraform-provider-azurecaf
 
 ```
-$ mkdir -p $GOPATH/src/github.com/aztfmod; cd $GOPATH/src/github.com/aztfmod
-$ git clone https://github.com/aztfmod/terraform-provider-azurecaf.git
+mkdir -p $GOPATH/src/github.com/aztfmod; cd $GOPATH/src/github.com/aztfmod
+git clone https://github.com/aztfmod/terraform-provider-azurecaf.git
 
 ```
+
 Enter the provider directory and build the provider
 
 ```
-$ cd $GOPATH/src/github.com/aztfmod/terraform-provider-azurecaf
-$ make build
+cd $GOPATH/src/github.com/aztfmod/terraform-provider-azurecaf
+make build
 
 ```
 
@@ -113,11 +122,13 @@ $ $GOPATH/bin/terraform-provider-azurecaf
 ...
 
 ```
+
 ## Testing
 
-Running the acceptance test suite requires does not require an Azure subscription. 
+Running the acceptance test suite requires does not require an Azure subscription.
 
 to run the unit test:
+
 ```
 make unittest
 ```
@@ -137,7 +148,6 @@ make test
 | [azure_caf_provider](https://github.com/aztfmod/terraform-provider-azurecaf)                     | custom provider for naming conventions                     |
 | [module](https://registry.terraform.io/modules/aztfmod)                                          | official CAF module available in the Terraform registry    |
 
-
 ## Community
 
 Feel free to open an issue for feature or bug, or to submit a PR.
@@ -152,7 +162,7 @@ information about contributing can be found at [CONTRIBUTING.md](.github/CONTRIB
 
 ## Resource Status
 
-This is the current compreheensive status of the implemented resources in the provider comparing with the current list of resources in the azurerm terraform provider.
+This is the current comprehensive status of the implemented resources in the provider comparing with the current list of resources in the azurerm terraform provider.
 
 |resource | status |
 |---|---|
@@ -209,7 +219,7 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_application_insights | ✔ |
 |azurerm_application_insights_analytics_item | ❌ |
 |azurerm_application_insights_api_key | ❌ |
-|azurerm_application_insights_web_test | ❌ |
+|azurerm_application_insights_web_test | ✔ |
 |azurerm_application_security_group | ✔ |
 |azurerm_attestation | ❌ |
 |azurerm_automation_account | ✔ |
@@ -221,7 +231,8 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_automation_credential | ✔ |
 |azurerm_automation_dsc_configuration | ❌ |
 |azurerm_automation_dsc_nodeconfiguration | ❌ |
-|azurerm_automation_job_schedule | ❌ |
+|azurerm_automation_hybrid_runbook_worker_group | ✔ |
+|azurerm_automation_job_schedule | ✔ |
 |azurerm_automation_module | ❌ |
 |azurerm_automation_runbook | ✔ |
 |azurerm_automation_schedule | ✔ |
@@ -251,12 +262,25 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_bot_connection | ✔ |
 |azurerm_bot_web_app | ✔ |
 |azurerm_cdn_endpoint | ✔ |
+|azurerm_cdn_frontdoor_custom_domain | ✔ |
+|azurerm_cdn_frontdoor_endpoint | ✔ |
+|azurerm_cdn_frontdoor_firewall_policy | ✔ |
+|azurerm_cdn_frontdoor_origin | ✔ |
+|azurerm_cdn_frontdoor_origin_group | ✔ |
+|azurerm_cdn_frontdoor_profile | ✔ |
+|azurerm_cdn_frontdoor_route | ✔ |
+|azurerm_cdn_frontdoor_rule | ✔ |
+|azurerm_cdn_frontdoor_rule_set | ✔ |
+|azurerm_cdn_frontdoor_secret | ✔ |
+|azurerm_cdn_frontdoor_security_policy | ✔ |
 |azurerm_cdn_profile | ✔ |
 |azurerm_client_config | ❌ |
 |azurerm_cognitive_account | ✔ |
 |azurerm_communication_service | ✔ |
 |azurerm_consumption_budget_resource_group | ✔ |
 |azurerm_consumption_budget_subscription | ✔ |
+|azurerm_container_app | ✔ |
+|azurerm_container_app_environment | ✔ |
 |azurerm_container_group | ❌ |
 |azurerm_container_registry | ✔ |
 |azurerm_container_registry_webhook | ✔ |
@@ -273,6 +297,7 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_cost_management_export_resource_group | ❌ |
 |azurerm_custom_provider | ✔ |
 |azurerm_dashboard | ✔ |
+|azurerm_portal_dashboard | ✔ |
 |azurerm_data_factory | ✔ |
 |azurerm_data_factory_dataset_azure_blob | ✔ |
 |azurerm_data_factory_dataset_cosmosdb_sqlapi | ✔ |
@@ -304,10 +329,11 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_data_lake_store | ✔ |
 |azurerm_data_lake_store_file | ❌ |
 |azurerm_data_lake_store_firewall_rule | ✔ |
-|azurerm_data_protection_backup_vault | ✔ |
 |azurerm_data_protection_backup_policy_blob_storage | ✔ |
 |azurerm_data_protection_backup_policy_disk | ✔ |
 |azurerm_data_protection_backup_policy_postgresql | ✔ |
+|azurerm_data_protection_backup_policy_postgresql_flexible_server | ✔ |
+|azurerm_data_protection_backup_vault | ✔ |
 |azurerm_data_share | ❌ |
 |azurerm_data_share_account | ❌ |
 |azurerm_data_share_dataset_blob_storage | ❌ |
@@ -321,10 +347,6 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_dedicated_hardware_security_module | ❌ |
 |azurerm_dedicated_host | ✔ |
 |azurerm_dedicated_host_group | ✔ |
-|azurerm_digital_twins_instance | ✔ |
-|azurerm_digital_twins_endpoint_eventhub | ✔ |
-|azurerm_digital_twins_endpoint_eventgrid | ✔ |
-|azurerm_digital_twins_endpoint_servicebus | ✔ |
 |azurerm_dev_test_global_vm_shutdown_schedule | ❌ |
 |azurerm_dev_test_lab | ✔ |
 |azurerm_dev_test_linux_virtual_machine | ✔ |
@@ -333,6 +355,10 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_dev_test_virtual_network | ❌ |
 |azurerm_dev_test_windows_virtual_machine | ✔ |
 |azurerm_devspace_controller | ❌ |
+|azurerm_digital_twins_endpoint_eventgrid | ✔ |
+|azurerm_digital_twins_endpoint_eventhub | ✔ |
+|azurerm_digital_twins_endpoint_servicebus | ✔ |
+|azurerm_digital_twins_instance | ✔ |
 |azurerm_disk_encryption_set | ✔ |
 |azurerm_dns_a_record | ❌ |
 |azurerm_dns_aaaa_record | ❌ |
@@ -360,6 +386,7 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_express_route_circuit_authorization | ❌ |
 |azurerm_express_route_circuit_peering | ❌ |
 |azurerm_express_route_gateway | ✔ |
+|azurerm_federated_identity_credential | ✔ |
 |azurerm_firewall | ✔ |
 |azurerm_firewall_application_rule_collection | ❌ |
 |azurerm_firewall_nat_rule_collection | ❌ |
@@ -381,29 +408,36 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_hdinsight_rserver_cluster | ✔ |
 |azurerm_hdinsight_spark_cluster | ✔ |
 |azurerm_hdinsight_storm_cluster | ✔ |
-|azurerm_healthcare_service | ❌ |
+|azurerm_healthcare_dicom_service | ✔ |
+|azurerm_healthcare_fhir_service | ✔ |
+|azurerm_healthcare_medtech_service | ✔ |
+|azurerm_healthcare_service | ✔ |
+|azurerm_healthcare_workspace | ✔ |
 |azurerm_hpc_cache | ❌ |
 |azurerm_hpc_cache_blob_target | ❌ |
 |azurerm_hpc_cache_nfs_target | ❌ |
 |azurerm_image | ✔ |
 |azurerm_images | ❌ |
 |azurerm_integration_service_environment | ✔ |
+|azurerm_iot_security_device_group | ✔ |
+|azurerm_iot_security_solution | ✔ |
 |azurerm_iot_time_series_insights_access_policy | ❌ |
 |azurerm_iot_time_series_insights_reference_data_set | ❌ |
 |azurerm_iot_time_series_insights_standard_environment | ❌ |
 |azurerm_iotcentral_application | ✔ |
 |azurerm_iothub | ✔ |
+|azurerm_iothub_certificate | ✔ |
 |azurerm_iothub_consumer_group | ✔ |
 |azurerm_iothub_dps | ✔ |
 |azurerm_iothub_dps_certificate | ✔ |
-|azurerm_iothub_dps_shared_access_policy | ❌ |
+|azurerm_iothub_dps_shared_access_policy | ✔ |
 |azurerm_iothub_endpoint_eventhub | ❌ |
 |azurerm_iothub_endpoint_servicebus_queue | ❌ |
 |azurerm_iothub_endpoint_servicebus_topic | ❌ |
 |azurerm_iothub_endpoint_storage_container | ❌ |
 |azurerm_iothub_fallback_route | ❌ |
 |azurerm_iothub_route | ❌ |
-|azurerm_iothub_shared_access_policy | ❌ |
+|azurerm_iothub_shared_access_policy | ✔ |
 |azurerm_ip_group | ✔ |
 |azurerm_key_vault | ✔ |
 |azurerm_key_vault_access_policy | ❌ |
@@ -413,6 +447,7 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_key_vault_secret | ✔ |
 |azurerm_kubernetes_cluster | ✔ |
 |azurerm_kubernetes_cluster_node_pool | ❌ |
+|azurerm_kubernetes_fleet_manager | ✔ |
 |azurerm_kubernetes_service_versions | ❌ |
 |azurerm_kusto_attached_database_configuration | ❌ |
 |azurerm_kusto_cluster | ✔ |
@@ -434,9 +469,11 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_lighthouse_definition | ❌ |
 |azurerm_linux_virtual_machine | ✔ |
 |azurerm_linux_virtual_machine_scale_set | ✔ |
+|azurerm_linux_web_app | ✔ |
+|azurerm_linux_web_app_slot | ⚠ |
+|azurerm_load_test | ✔ |
 |azurerm_local_network_gateway | ✔ |
-|azurerm_log_analytics_cluster | ❌ |
-|azurerm_log_analytics_cluster_customer_managed_key | ❌ |
+|azurerm_log_analytics_cluster | ✔ |
 |azurerm_log_analytics_data_export_rule | ❌ |
 |azurerm_log_analytics_datasource_windows_event | ❌ |
 |azurerm_log_analytics_datasource_windows_performance_counter | ❌ |
@@ -457,7 +494,7 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_machine_learning_workspace | ✔ |
 |azurerm_maintenance_assignment_dedicated_host | ❌ |
 |azurerm_maintenance_assignment_virtual_machine | ❌ |
-|azurerm_maintenance_configuration | ❌ |
+|azurerm_maintenance_configuration | ✔ |
 |azurerm_managed_application | ❌ |
 |azurerm_managed_application_definition | ❌ |
 |azurerm_managed_disk | ✔ |
@@ -476,11 +513,13 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_monitor_action_rule_suppression | ❌ |
 |azurerm_monitor_activity_log_alert | ❌ |
 |azurerm_monitor_autoscale_setting | ✔ |
+|azurerm_monitor_data_collection_endpoint | ✔ |
 |azurerm_monitor_diagnostic_categories | ❌ |
 |azurerm_monitor_diagnostic_setting | ✔ |
 |azurerm_monitor_log_profile | ❌ |
-|azurerm_monitor_metric_alert | ❌ |
-|azurerm_monitor_scheduled_query_rules_alert | ❌ |
+|azurerm_monitor_metric_alert | ✔ |
+|azurerm_monitor_private_link_scope | ✔ |
+|azurerm_monitor_scheduled_query_rules_alert | ✔ |
 |azurerm_monitor_scheduled_query_rules_log | ❌ |
 |azurerm_monitor_smart_detector_alert_rule | ❌ |
 |azurerm_mssql_database | ✔ |
@@ -493,13 +532,13 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_mssql_server_security_alert_policy | ❌ |
 |azurerm_mssql_server_vulnerability_assessment | ❌ |
 |azurerm_mssql_virtual_machine | ❌ |
-|azurerm_mysql_flexible_server | ✔ |
-|azurerm_mysql_flexible_server_database | ✔ |
-|azurerm_mysql_flexible_server_firewall_rule | ✔ |
 |azurerm_mysql_active_directory_administrator | ❌ |
 |azurerm_mysql_configuration | ❌ |
 |azurerm_mysql_database | ✔ |
 |azurerm_mysql_firewall_rule | ✔ |
+|azurerm_mysql_flexible_server | ✔ |
+|azurerm_mysql_flexible_server_database | ✔ |
+|azurerm_mysql_flexible_server_firewall_rule | ✔ |
 |azurerm_mysql_server | ✔ |
 |azurerm_mysql_server_key | ❌ |
 |azurerm_mysql_virtual_network_rule | ✔ |
@@ -524,6 +563,7 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_network_service_tags | ❌ |
 |azurerm_network_watcher | ✔ |
 |azurerm_network_watcher_flow_log | ❌ |
+|azurerm_nginx_deployment | ✔ |
 |azurerm_notification_hub | ✔ |
 |azurerm_notification_hub_authorization_rule | ✔ |
 |azurerm_notification_hub_namespace | ✔ |
@@ -552,11 +592,17 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_private_dns_cname_record | ❌ |
 |azurerm_private_dns_mx_record | ❌ |
 |azurerm_private_dns_ptr_record | ❌ |
+|azurerm_private_dns_resolver | ✔ |
+|azurerm_private_dns_resolver_dns_forwarding_ruleset | ✔ |
+|azurerm_private_dns_resolver_forwarding_rule | ✔ |
+|azurerm_private_dns_resolver_inbound_endpoint | ✔ |
+|azurerm_private_dns_resolver_outbound_endpoint | ✔ |
+|azurerm_private_dns_resolver_virtual_network_link | ✔ |
 |azurerm_private_dns_srv_record | ❌ |
 |azurerm_private_dns_txt_record | ❌ |
 |azurerm_private_dns_zone | ✔ |
 |azurerm_private_dns_zone_virtual_network_link | ✔ |
-|azurerm_private_endpoint | ❌ |
+|azurerm_private_endpoint | ✔ |
 |azurerm_private_endpoint_connection | ❌ |
 |azurerm_private_link_service | ❌ |
 |azurerm_private_link_service_endpoint_connections | ❌ |
@@ -566,19 +612,23 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_public_ips | ❌ |
 |azurerm_purview_account | ✔ |
 |azurerm_recovery_services_vault | ✔ |
+|azurerm_redhat_openshift_cluster | ✔ |
+|azurerm_redhat_openshift_domain | ✔ |
 |azurerm_redis_cache | ✔ |
 |azurerm_redis_firewall_rule | ✔ |
 |azurerm_redis_linked_server | ❌ |
 |azurerm_relay_hybrid_connection | ✔ |
 |azurerm_relay_namespace | ✔ |
 |azurerm_resource_group | ✔ |
+|azurerm_resource_group_policy_assignment | ✔ |
 |azurerm_resource_group_template_deployment | ❌ |
 |azurerm_role_assignment | ✔ |
 |azurerm_role_definition | ✔ |
 |azurerm_route | ✔ |
 |azurerm_route_filter | ❌ |
+|azurerm_route_server | ✔ |
 |azurerm_route_table | ✔ |
-|azurerm_search_service | ❌ |
+|azurerm_search_service | ✔ |
 |azurerm_security_center_auto_provisioning | ❌ |
 |azurerm_security_center_automation | ❌ |
 |azurerm_security_center_contact | ❌ |
@@ -625,6 +675,7 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_sql_firewall_rule | ✔ |
 |azurerm_sql_server | ✔ |
 |azurerm_sql_virtual_network_rule | ❌ |
+|azurerm_static_site | ✔ |
 |azurerm_storage_account | ✔ |
 |azurerm_storage_account_blob_container_sas | ❌ |
 |azurerm_storage_account_customer_managed_key | ❌ |
@@ -659,6 +710,7 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_subnet_network_security_group_association | ❌ |
 |azurerm_subnet_route_table_association | ❌ |
 |azurerm_subscription | ❌ |
+|azurerm_subscription_policy_assignment | ✔ |
 |azurerm_subscription_template_deployment | ❌ |
 |azurerm_subscriptions | ❌ |
 |azurerm_synapse_firewall_rule | ✔ |
@@ -667,12 +719,12 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_synapse_linked_service | ✔ |
 |azurerm_synapse_managed_private_endpoint | ✔ |
 |azurerm_synapse_private_link_hub | ✔ |
+|azurerm_synapse_role_assignment | ❌ |
+|azurerm_synapse_spark_pool | ✔ |
 |azurerm_synapse_sql_pool | ✔ |
 |azurerm_synapse_sql_pool_vulnerability_assessment_baseline | ✔ |
 |azurerm_synapse_sql_pool_workload_classifier | ✔ |
 |azurerm_synapse_sql_pool_workload_group | ✔ |
-|azurerm_synapse_role_assignment | ❌ |
-|azurerm_synapse_spark_pool | ✔ |
 |azurerm_synapse_workspace | ✔ |
 |azurerm_template_deployment | ✔ |
 |azurerm_traffic_manager_endpoint | ❌ |
@@ -707,8 +759,12 @@ This is the current compreheensive status of the implemented resources in the pr
 |azurerm_vpn_server_configuration | ❌ |
 |azurerm_vpn_site | ✔ |
 |azurerm_web_application_firewall_policy | ✔ |
+|azurerm_web_pubsub | ✔ |
+|azurerm_web_pubsub_hub | ✔ |
 |azurerm_windows_virtual_machine | ✔ |
 |azurerm_windows_virtual_machine_scale_set | ✔ |
+|azurerm_windows_web_app | ✔ |
+|azurerm_windows_web_app_slot | ⚠ |
 
 ❌ = Not yet implemented
 ✔  = Already implemented

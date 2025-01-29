@@ -151,6 +151,61 @@ func TestAccResourceName_CafClassic(t *testing.T) {
 			{
 				Config: testAccResourceNameCafClassicConfig,
 				Check: resource.ComposeTestCheckFunc(
+					testAccCafNamingValidation(
+						"azurecaf_name.classic_ca_invalid",
+						"ca-myinvalidcaname",
+						24,
+						""),
+					regexMatch("azurecaf_name.classic_ca_invalid", regexp.MustCompile(models.ResourceDefinitions["azurerm_container_app"].ValidationRegExp), 1),
+				),
+			},
+			{
+				Config: testAccResourceNameCafClassicConfig,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCafNamingValidation(
+						"azurecaf_name.passthrough",
+						"passthrough",
+						11,
+						""),
+					regexMatch("azurecaf_name.passthrough", regexp.MustCompile(models.ResourceDefinitions["azurerm_container_app"].ValidationRegExp), 1),
+				),
+			},
+			{
+				Config: testAccResourceNameCafClassicConfig,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCafNamingValidation(
+						"azurecaf_name.classic_cae_invalid",
+						"cae-myinvalidcaename",
+						26,
+						""),
+					regexMatch("azurecaf_name.classic_cae_invalid", regexp.MustCompile(models.ResourceDefinitions["azurerm_container_app_environment"].ValidationRegExp), 1),
+				),
+			},
+			{
+				Config: testAccResourceNameCafClassicConfig,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCafNamingValidation(
+						"azurecaf_name.passthrough",
+						"passthrough",
+						11,
+						""),
+					regexMatch("azurecaf_name.passthrough", regexp.MustCompile(models.ResourceDefinitions["azurerm_container_app_environment"].ValidationRegExp), 1),
+				),
+			},
+			{
+				Config: testAccResourceNameCafClassicConfig,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCafNamingValidation(
+						"azurecaf_name.classic_acr_invalid",
+						"pr1pr2crmyinvalidacrname",
+						35,
+						"pr1pr2"),
+					regexMatch("azurecaf_name.classic_acr_invalid", regexp.MustCompile(models.ResourceDefinitions["azurerm_container_registry"].ValidationRegExp), 1),
+				),
+			},
+			{
+				Config: testAccResourceNameCafClassicConfig,
+				Check: resource.ComposeTestCheckFunc(
 
 					testAccCafNamingValidation(
 						"azurecaf_name.passthrough",
@@ -386,6 +441,22 @@ resource "azurecaf_name" "classic_rg" {
 	resource_type   = "azurerm_resource_group"
 	prefixes        = ["pr1", "pr2"]
 	suffixes        = ["su1", "su2"]
+	random_seed     = 1
+	random_length   = 5
+	clean_input     = true
+}
+
+resource "azurecaf_name" "classic_ca_invalid" {
+    name            = "my_invalid_ca_name"
+	resource_type   = "azurerm_container_app"
+	random_seed     = 1
+	random_length   = 5
+	clean_input     = true
+}
+
+resource "azurecaf_name" "classic_cae_invalid" {
+    name            = "my_invalid_cae_name"
+	resource_type   = "azurerm_container_app_environment"
 	random_seed     = 1
 	random_length   = 5
 	clean_input     = true
