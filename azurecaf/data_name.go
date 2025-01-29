@@ -2,9 +2,9 @@ package azurecaf
 
 import (
 	"context"
-	b64 "encoding/base64"
 	"fmt"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
@@ -115,6 +115,20 @@ func dataNameRead(ctx context.Context, d *schema.ResourceData, meta interface{})
 	return diag.Diagnostics{}
 }
 
+func expandStringList(input []interface{}) []string {
+	output := make([]string, 0)
+	if input == nil {
+		return output
+	}
+	for _, v := range input {
+		if v == nil {
+			continue
+		}
+		output = append(output, v.(string))
+	}
+	return output
+}
+
 func validateResourceType(resourceType string) error {
 	if _, ok := models.ResourceDefinitions[resourceType]; !ok {
 		return fmt.Errorf("resource_type %q is not supported", resourceType)
@@ -124,8 +138,8 @@ func validateResourceType(resourceType string) error {
 
 func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 	name := d.Get("name").(string)
-	prefixes := expandStringArray(d.Get("prefixes").([]interface{}))
-	suffixes := expandStringArray(d.Get("suffixes").([]interface{}))
+	prefixes := expandStringList(d.Get("prefixes").([]interface{}))
+	suffixes := expandStringList(d.Get("suffixes").([]interface{}))
 	separator := d.Get("separator").(string)
 	resourceType := d.Get("resource_type").(string)
 	cleanInput := d.Get("clean_input").(bool)
@@ -157,8 +171,15 @@ func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("error generating name: %w", err)
 	}
 
-	if err := d.Set("result", result); err != nil {
-		return fmt.Errorf("error setting result: %w", err)
+	if len(result) > 0 {
+		if err := d.Set("result", result); err != nil {
+			return fmt.Errorf("error setting result: %w", err)
+		}
+	}
+	if len(results) > 0 {
+		if err := d.Set("results", results); err != nil {
+			return fmt.Errorf("error setting results: %w", err)
+		}
 	}
 
 	d.SetId(id)
