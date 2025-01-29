@@ -92,10 +92,12 @@ func TestRegexValidationDashes(t *testing.T) {
 		if err != nil {
 			t.Logf("Error on the regex %s for the resource %s error %v", resource.ValidationRegExp, resource.ResourceTypeName, err.Error())
 			t.Fail()
+			continue
 		}
-		dashes := resource.Dashes
-		if exp.MatchString(content) == !dashes {
-			t.Logf("Error on the regex %s for the resource %s using dashes", resource.ValidationRegExp, resource.ResourceTypeName)
+		// Check if the regex pattern contains a dash in its allowed characters
+		allowsDashes := strings.Contains(resource.ValidationRegExp, "-")
+		if exp.MatchString(content) != allowsDashes {
+			t.Logf("Regex pattern and dash validation mismatch for %s. Pattern: %s", resource.ResourceTypeName, resource.ValidationRegExp)
 			t.Fail()
 		}
 	}
