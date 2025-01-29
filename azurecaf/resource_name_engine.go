@@ -97,56 +97,53 @@ func composeName(separator string,
 	var contents []string
 	currentlength := 0
 
-	// Create a map to track what components have been added
-	added := make(map[string]bool)
-
-	// Process components in the specified precedence order
-	for _, precedence := range namePrecedence {
-		initialized := 0
-		if len(contents) > 0 {
-			initialized = len(separator)
-		}
-
-		switch precedence {
-		case "prefixes":
-			if !added["prefixes"] {
-				// Add prefixes in order
-				for _, prefix := range prefixes {
-					if len(prefix) > 0 && currentlength+len(prefix)+initialized <= maxlength {
-						contents = append(contents, prefix)
-						currentlength = currentlength + len(prefix) + initialized
-					}
-				}
-				added["prefixes"] = true
+	// Add prefixes first, regardless of precedence
+	for _, prefix := range prefixes {
+		if len(prefix) > 0 && currentlength+len(prefix)+len(separator) <= maxlength {
+			contents = append(contents, prefix)
+			if len(contents) > 1 {
+				currentlength += len(separator)
 			}
+			currentlength += len(prefix)
+		}
+	}
+
+	// Process remaining components in the specified precedence order
+	for _, precedence := range namePrecedence {
+		switch precedence {
 		case "slug":
-			if !added["slug"] && len(slug) > 0 && currentlength+len(slug)+initialized <= maxlength {
+			if len(slug) > 0 && currentlength+len(slug)+len(separator) <= maxlength {
+				if len(contents) > 0 {
+					currentlength += len(separator)
+				}
 				contents = append(contents, slug)
-				currentlength = currentlength + len(slug) + initialized
-				added["slug"] = true
+				currentlength += len(slug)
 			}
 		case "name":
-			if !added["name"] && len(name) > 0 && currentlength+len(name)+initialized <= maxlength {
+			if len(name) > 0 && currentlength+len(name)+len(separator) <= maxlength {
+				if len(contents) > 0 {
+					currentlength += len(separator)
+				}
 				contents = append(contents, name)
-				currentlength = currentlength + len(name) + initialized
-				added["name"] = true
+				currentlength += len(name)
 			}
 		case "random":
-			if !added["random"] && len(randomSuffix) > 0 && currentlength+len(randomSuffix)+initialized <= maxlength {
+			if len(randomSuffix) > 0 && currentlength+len(randomSuffix)+len(separator) <= maxlength {
+				if len(contents) > 0 {
+					currentlength += len(separator)
+				}
 				contents = append(contents, randomSuffix)
-				currentlength = currentlength + len(randomSuffix) + initialized
-				added["random"] = true
+				currentlength += len(randomSuffix)
 			}
 		case "suffixes":
-			if !added["suffixes"] {
-				// Add suffixes in order
-				for _, suffix := range suffixes {
-					if len(suffix) > 0 && currentlength+len(suffix)+initialized <= maxlength {
-						contents = append(contents, suffix)
-						currentlength = currentlength + len(suffix) + initialized
+			for _, suffix := range suffixes {
+				if len(suffix) > 0 && currentlength+len(suffix)+len(separator) <= maxlength {
+					if len(contents) > 0 {
+						currentlength += len(separator)
 					}
+					contents = append(contents, suffix)
+					currentlength += len(suffix)
 				}
-				added["suffixes"] = true
 			}
 		}
 	}
