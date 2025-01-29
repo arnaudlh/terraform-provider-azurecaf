@@ -147,17 +147,15 @@ func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 	randomLength := d.Get("random_length").(int)
 	randomSeed := int64(d.Get("random_seed").(int))
 
-	// Initialize random seed if not provided
-	if randomSeed == 0 {
-		randomSeed = time.Now().UnixMicro()
-		if err := d.Set("random_seed", randomSeed); err != nil {
-			return fmt.Errorf("error setting random_seed: %w", err)
-		}
-	}
-
-	// Generate or use existing random string
+	// Use existing random string or generate a new one with the provided seed
 	randomString := d.Get("random_string").(string)
 	if randomString == "" && randomLength > 0 {
+		if randomSeed == 0 {
+			randomSeed = time.Now().UnixMicro()
+			if err := d.Set("random_seed", randomSeed); err != nil {
+				return fmt.Errorf("error setting random_seed: %w", err)
+			}
+		}
 		randomString = randSeq(randomLength, randomSeed)
 		if err := d.Set("random_string", randomString); err != nil {
 			return fmt.Errorf("error setting random_string: %w", err)
@@ -165,7 +163,7 @@ func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
-	result, results, id, err := getData(resourceType, nil, separator, prefixes, name, suffixes, randomString, cleanInput, passthrough, useSlug, namePrecedence)
+	result, _, id, err := getData(resourceType, nil, separator, prefixes, name, suffixes, randomString, cleanInput, passthrough, useSlug, namePrecedence)
 	if err != nil {
 		return fmt.Errorf("error generating name: %w", err)
 	}
@@ -175,11 +173,7 @@ func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 			return fmt.Errorf("error setting result: %w", err)
 		}
 	}
-	if len(results) > 0 {
-		if err := d.Set("results", results); err != nil {
-			return fmt.Errorf("error setting results: %w", err)
-		}
-	}
+	// We don't use results array for data source
 
 	d.SetId(id)
 	return nil
