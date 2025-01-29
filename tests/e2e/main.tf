@@ -5,16 +5,6 @@ terraform {
       version = "2.0.0-preview5"
     }
   }
-
-  # Use local provider build
-  provider_installation {
-    filesystem_mirror {
-      path = "/home/runner/.terraform.d/plugins"
-    }
-    direct {
-      exclude = ["registry.terraform.io/aztfmod/azurecaf"]
-    }
-  }
 }
 
 provider "azurecaf" {}
