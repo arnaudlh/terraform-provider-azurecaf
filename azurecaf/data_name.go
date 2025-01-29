@@ -4,6 +4,7 @@ import (
 	"context"
 	b64 "encoding/base64"
 	"fmt"
+	"sort"
 	"time"
 
 	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
@@ -17,6 +18,7 @@ func dataName() *schema.Resource {
 	for k := range models.ResourceDefinitions {
 		resourceMapsKeys = append(resourceMapsKeys, k)
 	}
+	sort.Strings(resourceMapsKeys)
 
 	return &schema.Resource{
 		ReadContext: dataNameRead,
@@ -114,13 +116,16 @@ func dataNameRead(ctx context.Context, d *schema.ResourceData, meta interface{})
 }
 
 func validateResourceType(resourceType string) error {
-	return validateResourceTypes(resourceType, nil)
+	if _, ok := models.ResourceDefinitions[resourceType]; !ok {
+		return fmt.Errorf("resource_type %q is not supported", resourceType)
+	}
+	return nil
 }
 
 func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 	name := d.Get("name").(string)
-	prefixes := convertInterfaceToString(d.Get("prefixes").([]interface{}))
-	suffixes := convertInterfaceToString(d.Get("suffixes").([]interface{}))
+	prefixes := expandStringArray(d.Get("prefixes").([]interface{}))
+	suffixes := expandStringArray(d.Get("suffixes").([]interface{}))
 	separator := d.Get("separator").(string)
 	resourceType := d.Get("resource_type").(string)
 	cleanInput := d.Get("clean_input").(bool)
@@ -129,33 +134,33 @@ func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 	randomLength := d.Get("random_length").(int)
 	randomSeed := int64(d.Get("random_seed").(int))
 
-	// Use the same random seed logic as resource implementation
-	randomString := d.Get("random_string").(string)
-	randomSuffix := randSeq(randomLength, randomSeed)
-	if len(randomString) > 0 {
-		randomSuffix = randomString
-	} else if randomSeed == 0 {
+	// Initialize random seed if not provided
+	if randomSeed == 0 {
 		randomSeed = time.Now().UnixMicro()
 		if err := d.Set("random_seed", randomSeed); err != nil {
 			return fmt.Errorf("error setting random_seed: %w", err)
 		}
-		randomSuffix = randSeq(randomLength, randomSeed)
-		if err := d.Set("random_string", randomSuffix); err != nil {
+	}
+
+	// Generate or use existing random string
+	randomString := d.Get("random_string").(string)
+	if randomString == "" && randomLength > 0 {
+		randomString = randSeq(randomLength, randomSeed)
+		if err := d.Set("random_string", randomString); err != nil {
 			return fmt.Errorf("error setting random_string: %w", err)
 		}
 	}
-	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
 
-	result, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
+	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
+	result, results, id, err := getData(resourceType, nil, separator, prefixes, name, suffixes, randomString, cleanInput, passthrough, useSlug, namePrecedence)
 	if err != nil {
-		return err
+		return fmt.Errorf("error generating name: %w", err)
 	}
 
 	if err := d.Set("result", result); err != nil {
 		return fmt.Errorf("error setting result: %w", err)
 	}
 
-	// Set the ID after all other operations are successful
-	d.SetId(b64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s\t%s", resourceType, result))))
+	d.SetId(id)
 	return nil
 }
