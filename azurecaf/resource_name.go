@@ -4,7 +4,6 @@ import (
 	"context"
 	b64 "encoding/base64"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/schemas"
@@ -79,9 +78,7 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 		return fmt.Errorf("failed to set results")
 	}
 	}
-	if err != nil {
-		return fmt.Errorf("failed to get data: %s", err.Error())
-	}
+
 	return nil
 }
 
