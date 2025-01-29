@@ -7,7 +7,7 @@
 package models
 
 var ResourceDefinitions = map[string]ResourceStructure{
-		"aks_node_pool_linux": {
+	"aks_node_pool_linux": {
 			ResourceTypeName:  "aks_node_pool_linux",
 			CafPrefix:        "npl",
 			MinLength:        1,
@@ -3406,8 +3406,8 @@ var ResourceDefinitions = map[string]ResourceStructure{
 	},
 }
 
-	ResourceMaps = map[string]string{
-		"":             "general",
+var ResourceMaps = map[string]string{
+	"":             "general",
 		"aa":           "azurerm_automation_account",
 		"aacert":       "azurerm_automation_certificate",
 		"aacred":       "azurerm_automation_credential",
