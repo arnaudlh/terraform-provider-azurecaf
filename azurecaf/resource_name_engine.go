@@ -51,17 +51,7 @@ func cleanString(name string, resourceDefinition *models.ResourceStructure) stri
 	return cleaned
 }
 
-func concatenateParameters(separator string, parameters ...[]string) string {
-	elems := []string{}
-	for _, items := range parameters {
-		for _, item := range items {
-			if len(item) > 0 {
-				elems = append(elems, []string{item}...)
-			}
-		}
-	}
-	return strings.Join(elems, separator)
-}
+
 
 func getResource(resourceType string) (*models.ResourceStructure, error) {
 	if resourceKey, existing := models.ResourceMaps[resourceType]; existing {
@@ -181,7 +171,7 @@ func validateResourceType(resourceType string, resourceTypes []string) (bool, er
 		}
 	}
 	if len(errorStrings) > 0 {
-		return false, fmt.Errorf(strings.Join(errorStrings, "\n"))
+		return false, fmt.Errorf("%s", strings.Join(errorStrings, "\n"))
 	}
 	return true, nil
 }

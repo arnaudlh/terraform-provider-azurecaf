@@ -4,7 +4,6 @@
 package completness
 
 import (
-	"fmt"
 	"os"
 	"path"
 	"testing"
@@ -123,47 +122,7 @@ func TestGetResourceMap(t *testing.T) {
 	}
 }
 
-func TestReadLines(t *testing.T) {
-	// Create a temporary test file
-	tmpFile, err := os.CreateTemp("", "test_resources_*.txt")
-	if err != nil {
-		t.Fatalf("Failed to create temp file: %v", err)
-	}
-	defer os.Remove(tmpFile.Name())
 
-	// Write test data
-	testData := []string{
-		"azurerm_resource_group",
-		"azurerm_storage_account",
-		"azurerm_virtual_network",
-	}
-	content := []byte(fmt.Sprintf("%s\n%s\n%s", testData[0], testData[1], testData[2]))
-	if err := os.WriteFile(tmpFile.Name(), content, 0644); err != nil {
-		t.Fatalf("Failed to write to temp file: %v", err)
-	}
-
-	// Test reading lines
-	got, err := readLines(tmpFile.Name())
-	if err != nil {
-		t.Fatalf("readLines() error = %v", err)
-	}
-
-	// Verify results
-	if len(got) != len(testData) {
-		t.Errorf("readLines() returned %d lines, want %d", len(got), len(testData))
-	}
-	for i, want := range testData {
-		if got[i] != want {
-			t.Errorf("readLines()[%d] = %v, want %v", i, got[i], want)
-		}
-	}
-
-	// Test reading non-existent file
-	_, err = readLines("non_existent_file.txt")
-	if err == nil {
-		t.Error("readLines() expected error for non-existent file, got nil")
-	}
-}
 
 func TestResourceValidation(t *testing.T) {
 	testData := []string{

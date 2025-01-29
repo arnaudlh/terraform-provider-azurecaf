@@ -91,48 +91,7 @@ func TestCleanString(t *testing.T) {
 	}
 }
 
-func TestConcatenateParameters(t *testing.T) {
-	tests := []struct {
-		name       string
-		separator  string
-		params     [][]string
-		expected   string
-	}{
-		{
-			name:      "empty params",
-			separator: "-",
-			params:    [][]string{},
-			expected:  "",
-		},
-		{
-			name:      "single param array",
-			separator: "-",
-			params:    [][]string{{"test"}},
-			expected:  "test",
-		},
-		{
-			name:      "multiple param arrays",
-			separator: "-",
-			params:    [][]string{{"a", "b", "c"}},
-			expected:  "a-b-c",
-		},
-		{
-			name:      "empty strings in array",
-			separator: "-",
-			params:    [][]string{{"", "test", ""}},
-			expected:  "test",
-		},
-	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := concatenateParameters(tt.separator, tt.params...)
-			if result != tt.expected {
-				t.Errorf("concatenateParameters() = %v, want %v", result, tt.expected)
-			}
-		})
-	}
-}
 
 func TestGetResource(t *testing.T) {
 	tests := []struct {
