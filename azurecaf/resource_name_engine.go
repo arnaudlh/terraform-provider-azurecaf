@@ -97,63 +97,45 @@ func composeName(separator string,
 	contents := []string{}
 	currentlength := 0
 
-	for i := 0; i < len(namePrecedence); i++ {
+	for _, precedence := range namePrecedence {
 		initialized := 0
 		if len(contents) > 0 {
 			initialized = len(separator)
 		}
-		switch c := namePrecedence[i]; c {
-		case "name":
-			if len(name) > 0 {
-				if currentlength+len(name)+initialized <= maxlength {
-					contents = append(contents, name)
-					currentlength = currentlength + len(name) + initialized
+
+		switch precedence {
+		case "prefixes":
+			for _, prefix := range prefixes {
+				if len(prefix) > 0 && currentlength+len(prefix)+initialized <= maxlength {
+					contents = append(contents, prefix)
+					currentlength = currentlength + len(prefix) + initialized
 				}
+			}
+		case "name":
+			if len(name) > 0 && currentlength+len(name)+initialized <= maxlength {
+				contents = append(contents, name)
+				currentlength = currentlength + len(name) + initialized
 			}
 		case "slug":
-			if len(slug) > 0 {
-				if currentlength+len(slug)+initialized <= maxlength {
-					contents = append([]string{slug}, contents...)
-					currentlength = currentlength + len(slug) + initialized
-				}
+			if len(slug) > 0 && currentlength+len(slug)+initialized <= maxlength {
+				contents = append(contents, slug)
+				currentlength = currentlength + len(slug) + initialized
 			}
 		case "random":
-			if len(randomSuffix) > 0 {
-				if currentlength+len(randomSuffix)+initialized <= maxlength {
-					contents = append(contents, randomSuffix)
-					currentlength = currentlength + len(randomSuffix) + initialized
-				}
+			if len(randomSuffix) > 0 && currentlength+len(randomSuffix)+initialized <= maxlength {
+				contents = append(contents, randomSuffix)
+				currentlength = currentlength + len(randomSuffix) + initialized
 			}
 		case "suffixes":
-			if len(suffixes) > 0 {
-				if len(suffixes[0]) > 0 {
-					if currentlength+len(suffixes[0])+initialized <= maxlength {
-						contents = append(contents, suffixes[0])
-						currentlength = currentlength + len(suffixes[0]) + initialized
-					}
-				}
-				suffixes = suffixes[1:]
-				if len(suffixes) > 0 {
-					i--
+			for _, suffix := range suffixes {
+				if len(suffix) > 0 && currentlength+len(suffix)+initialized <= maxlength {
+					contents = append(contents, suffix)
+					currentlength = currentlength + len(suffix) + initialized
 				}
 			}
-		case "prefixes":
-			if len(prefixes) > 0 {
-				if len(prefixes[len(prefixes)-1]) > 0 {
-					if currentlength+len(prefixes[len(prefixes)-1])+initialized <= maxlength {
-						contents = append([]string{prefixes[len(prefixes)-1]}, contents...)
-						currentlength = currentlength + len(prefixes[len(prefixes)-1]) + initialized
-					}
-				}
-				prefixes = prefixes[:len(prefixes)-1]
-				if len(prefixes) > 0 {
-					i--
-				}
-			}
-
 		}
-
 	}
+
 	content := strings.Join(contents, separator)
 	return content
 }
@@ -182,6 +164,11 @@ func getResourceName(resourceTypeName string, separator string,
 	slug := ""
 	if useSlug {
 		slug = getSlug(resourceTypeName)
+	}
+
+	// Set default name precedence if not provided
+	if len(namePrecedence) == 0 {
+		namePrecedence = []string{"prefixes", "slug", "name", "random", "suffixes"}
 	}
 
 	if cleanInput {
