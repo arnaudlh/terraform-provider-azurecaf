@@ -160,12 +160,14 @@ func getData(resourceType string, resourceTypes []string, separator string, pref
 	}
 	ids := []string{}
 	if len(resourceType) > 0 {
-		result, err = getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
+		var resourceResult string
+		resourceResult, err = getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
 		if err != nil {
 			return
 		}
-		results[resourceType] = result
-		ids = append(ids, fmt.Sprintf("%s\t%s", resourceType, result))
+		result = resourceResult
+		results[resourceType] = resourceResult
+		ids = append(ids, fmt.Sprintf("%s\t%s", resourceType, resourceResult))
 	}
 
 	for _, resourceTypeName := range resourceTypes {
