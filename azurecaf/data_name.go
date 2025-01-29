@@ -175,15 +175,24 @@ func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 			// For storage accounts, handle without separators
 			result = strings.ReplaceAll(result, separator, "")
 		} else if resourceType == "azurerm_resource_group" {
-			// For resource groups, ensure no duplicate slug
+			// For resource groups, ensure slug is present after prefixes
 			parts := strings.Split(result, separator)
-			for i := 0; i < len(parts); i++ {
-				if parts[i] == resourceSlug {
-					parts = append(parts[:i], parts[i+1:]...)
-					i--
+			hasSlug := false
+			for _, part := range parts {
+				if part == resourceSlug {
+					hasSlug = true
+					break
 				}
 			}
-			result = strings.Join(parts, separator)
+			if !hasSlug {
+				// Insert slug after prefixes
+				prefixCount := len(prefixes)
+				newParts := make([]string, 0, len(parts)+1)
+				newParts = append(newParts, parts[:prefixCount]...)
+				newParts = append(newParts, resourceSlug)
+				newParts = append(newParts, parts[prefixCount:]...)
+				result = strings.Join(newParts, separator)
+			}
 		}
 	}
 	if err != nil {
