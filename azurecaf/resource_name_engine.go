@@ -2,27 +2,12 @@ package azurecaf
 
 import (
 	"fmt"
-	"math/rand"
 	"regexp"
 	"strings"
 
 	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
+	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/utils"
 )
-
-const letters = "abcdefghijklmnopqrstuvwxyz0123456789"
-
-func randSeq(n int, seed int64) string {
-	if n <= 0 {
-		return ""
-	}
-	
-	r := rand.New(rand.NewSource(seed))
-	b := make([]byte, n)
-	for i := range b {
-		b[i] = letters[r.Intn(len(letters))]
-	}
-	return string(b)
-}
 
 func cleanSlice(names []string, resourceDefinition *models.ResourceStructure) []string {
 	for i, name := range names {
@@ -32,7 +17,13 @@ func cleanSlice(names []string, resourceDefinition *models.ResourceStructure) []
 }
 
 func cleanString(name string, resourceDefinition *models.ResourceStructure) string {
+	if name == "" {
+		return ""
+	}
 	myRegex, _ := regexp.Compile(resourceDefinition.RegEx)
+	if myRegex.FindString(name) == "" {
+		return name
+	}
 	return myRegex.ReplaceAllString(name, "")
 }
 

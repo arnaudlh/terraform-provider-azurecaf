@@ -1,22 +1,22 @@
 package azurecaf
 
 import (
-	"math/rand"
 	"testing"
-	
+
 	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
+	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/utils"
 )
 
 func init() {
 	// Initialize test resource definitions
 	models.ResourceDefinitions["azurerm_storage_account"] = models.ResourceStructure{
-		ResourceTypeName:  "azurerm_storage_account",
+		ResourceTypeName: "azurerm_storage_account",
 		CafPrefix:        "st",
 		MinLength:        3,
 		MaxLength:        24,
-		RegEx:           "^[a-z0-9]{3,24}$",
+		RegEx:            "^[a-z0-9]{3,24}$",
 		ValidationRegExp: "^[a-z0-9]{3,24}$",
-		LowerCase:       true,
+		LowerCase:        true,
 	}
 }
 
@@ -49,7 +49,7 @@ func TestGenerateRandomString(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := randSeq(tt.length, tt.seed)
+			got := utils.RandSeq(tt.length, tt.seed)
 			if len(got) != tt.want {
 				t.Errorf("randSeq() length = %v, want %v", len(got), tt.want)
 			}

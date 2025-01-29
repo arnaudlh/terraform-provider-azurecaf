@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
+	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/utils"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
@@ -109,7 +110,7 @@ func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 	randomLength := d.Get("random_length").(int)
 	randomSeed := int64(d.Get("random_seed").(int))
 
-	randomSuffix := randSeq(int(randomLength), randomSeed)
+	randomSuffix := utils.RandSeq(randomLength, randomSeed)
 
 	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
 

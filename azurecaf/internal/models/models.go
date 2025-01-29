@@ -6,11 +6,11 @@ import (
 )
 
 func init() {
-    // Initialize ResourceMaps after ResourceDefinitions is populated
-    for k, v := range ResourceDefinitions {
-        ResourceMaps[k] = k
-        ResourceMaps[v.ResourceTypeName] = k
-    }
+	// Initialize ResourceMaps after ResourceDefinitions is populated
+	for k, v := range ResourceDefinitions {
+		ResourceMaps[k] = k
+		ResourceMaps[v.ResourceTypeName] = k
+	}
 }
 
 // ValidateResourceType validates if a resource type exists

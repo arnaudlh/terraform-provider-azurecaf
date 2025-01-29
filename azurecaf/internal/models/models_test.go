@@ -2,49 +2,47 @@ package models
 
 import (
 	"testing"
-	"regexp"
-	"fmt"
 )
 
 func init() {
 	// Initialize test resource definitions
 	ResourceDefinitions["azurerm_storage_account"] = ResourceStructure{
-		ResourceTypeName:  "azurerm_storage_account",
+		ResourceTypeName: "azurerm_storage_account",
 		CafPrefix:        "st",
 		MinLength:        3,
 		MaxLength:        24,
-		RegEx:           "^[a-z0-9]{3,24}$",
+		RegEx:            "^[a-z0-9]{3,24}$",
 		ValidationRegExp: "^[a-z0-9]{3,24}$",
-		LowerCase:       true,
+		LowerCase:        true,
 	}
 }
 
 func TestValidateResourceType(t *testing.T) {
 	tests := []struct {
-		name        string
+		name         string
 		resourceType string
-		wantErr     bool
+		wantErr      bool
 	}{
 		{
-			name:        "valid resource type",
+			name:         "valid resource type",
 			resourceType: "azurerm_storage_account",
-			wantErr:     false,
+			wantErr:      false,
 		},
 		{
-			name:        "invalid resource type",
+			name:         "invalid resource type",
 			resourceType: "invalid_resource",
-			wantErr:     true,
+			wantErr:      true,
 		},
 		{
-			name:        "empty resource type",
+			name:         "empty resource type",
 			resourceType: "",
-			wantErr:     true,
+			wantErr:      true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := validateResourceType(tt.resourceType)
+			_, err := ValidateResourceType(tt.resourceType)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("validateResourceType() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -54,25 +52,25 @@ func TestValidateResourceType(t *testing.T) {
 
 func TestGetResourceStructure(t *testing.T) {
 	tests := []struct {
-		name        string
+		name         string
 		resourceType string
-		wantErr     bool
+		wantErr      bool
 	}{
 		{
-			name:        "existing resource type",
+			name:         "existing resource type",
 			resourceType: "azurerm_storage_account",
-			wantErr:     false,
+			wantErr:      false,
 		},
 		{
-			name:        "non-existent resource type",
+			name:         "non-existent resource type",
 			resourceType: "nonexistent_type",
-			wantErr:     true,
+			wantErr:      true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := getResourceStructure(tt.resourceType)
+			_, err := GetResourceStructure(tt.resourceType)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getResourceStructure() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -82,11 +80,11 @@ func TestGetResourceStructure(t *testing.T) {
 
 func TestValidateLength(t *testing.T) {
 	tests := []struct {
-		name        string
-		input       string
-		minLength   int
-		maxLength   int
-		wantErr     bool
+		name      string
+		input     string
+		minLength int
+		maxLength int
+		wantErr   bool
 	}{
 		{
 			name:      "valid length",
@@ -113,7 +111,7 @@ func TestValidateLength(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := validateLength(tt.input, tt.minLength, tt.maxLength)
+			err := ValidateLength(tt.input, tt.minLength, tt.maxLength)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("validateLength() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -123,10 +121,10 @@ func TestValidateLength(t *testing.T) {
 
 func TestValidateRegex(t *testing.T) {
 	tests := []struct {
-		name        string
-		input       string
-		regex       string
-		wantErr     bool
+		name    string
+		input   string
+		regex   string
+		wantErr bool
 	}{
 		{
 			name:    "valid storage account name",
@@ -150,7 +148,7 @@ func TestValidateRegex(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := validateRegex(tt.input, tt.regex)
+			err := ValidateRegex(tt.input, tt.regex)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("validateRegex() error = %v, wantErr %v", err, tt.wantErr)
 			}

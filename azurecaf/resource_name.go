@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/schemas"
+	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/utils"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -52,7 +53,7 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 	randomLength := d.Get("random_length").(int)
 	randomSeed := int64(d.Get("random_seed").(int))
 	randomString := d.Get("random_string").(string)
-	randomSuffix := randSeq(int(randomLength), randomSeed)
+	randomSuffix := utils.RandSeq(randomLength, randomSeed)
 	if len(randomString) > 0 {
 		randomSuffix = randomString
 	} else {
@@ -113,7 +114,7 @@ func getNameResult(d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 		d.Set("random_seed", randomSeed)
 	}
 	randomString := d.Get("random_string").(string)
-	randomSuffix := randSeq(int(randomLength), randomSeed)
+	randomSuffix := utils.RandSeq(randomLength, randomSeed)
 	if len(randomString) > 0 {
 		randomSuffix = randomString
 	} else {
