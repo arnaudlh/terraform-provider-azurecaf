@@ -112,6 +112,7 @@ jobs:
                 prefixes = ["dev"]
                 random_length = 4
                 use_slug = true
+                separator = ""
               }
             }
           }

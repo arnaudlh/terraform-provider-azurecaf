@@ -222,6 +222,11 @@ func getResourceName(resourceTypeName string, separator string,
 	}
 	resourceName = trimResourceName(resourceName, resource.MaxLength)
 
+	// Handle resources that require alphanumeric-only names (no hyphens)
+	if strings.Contains(resource.ValidationRegExp, "^[a-zA-Z0-9]") && !strings.Contains(resource.ValidationRegExp, "-") {
+		resourceName = strings.ReplaceAll(resourceName, "-", "")
+	}
+
 	if resource.LowerCase {
 		resourceName = strings.ToLower(resourceName)
 	}
