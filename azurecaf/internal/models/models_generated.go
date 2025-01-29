@@ -6,7 +6,13 @@
 
 package models
 
+var (
+    ResourceDefinitions map[string]ResourceStructure
+    ResourceMaps       map[string]string
+)
+
 func init() {
+    ResourceMaps = make(map[string]string)
 	// Initialize ResourceDefinitions
 	ResourceDefinitions = map[string]ResourceStructure{
 		"aks_node_pool_linux": {
@@ -4194,4 +4200,11 @@ func init() {
 		LowerCase:       false,
 		Scope:           "resourceGroup",
 	},
+}
+
+	// Initialize ResourceMaps after ResourceDefinitions is populated
+	for k, v := range ResourceDefinitions {
+		ResourceMaps[k] = k
+		ResourceMaps[v.ResourceTypeName] = k
+	}
 }
