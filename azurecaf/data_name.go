@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"sort"
-	"strings"
 	"time"
 
 	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
