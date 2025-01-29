@@ -42,7 +42,7 @@ type ResourceStructure struct {
 func main() {
 	wd, err := os.Getwd()
 	if err != nil {
-		log.Fatal(fmt.Errorf("failed to get working directory: %w", err))
+		log.Fatal(fmt.Errorf("failed to get working directory: %s", err.Error()))
 	}
 	sourceDefinitions, err := os.ReadFile(path.Join(wd, "../resourceDefinition.json"))
 	if err != nil {

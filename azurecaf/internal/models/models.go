@@ -42,7 +42,7 @@ func ValidateLength(input string, minLength, maxLength int) error {
 func ValidateRegex(input, pattern string) error {
 	regex, err := regexp.Compile(pattern)
 	if err != nil {
-		return fmt.Errorf("invalid regex pattern: %v", err)
+		return fmt.Errorf("invalid regex pattern: %s", err.Error())
 	}
 	if !regex.MatchString(input) {
 		return fmt.Errorf("input does not match pattern %s", pattern)

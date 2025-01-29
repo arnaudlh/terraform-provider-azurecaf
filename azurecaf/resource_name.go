@@ -65,10 +65,13 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 	}
 	}
 	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
-	result, results, _, err :=
-		getData(resourceType, resourceTypes, separator,
-			prefixes, name, suffixes, randomSuffix,
-			cleanInput, passthrough, useSlug, namePrecedence)
+	result, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
+	if err != nil {
+		return fmt.Errorf("failed to get resource name: %s", err.Error())
+	}
+	
+	results := make(map[string]string)
+	results[resourceType] = result
 	if !d.GetRawState().IsNull() {
 	if err := d.SetNew("result", result); err != nil {
 		return fmt.Errorf("failed to set result")
@@ -78,7 +81,7 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 	}
 	}
 	if err != nil {
-		return fmt.Errorf("failed to get data: %v", err)
+		return fmt.Errorf("failed to get data: %s", err.Error())
 	}
 	return nil
 }
@@ -134,22 +137,14 @@ func getNameResult(d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	}
 
 	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
-	result, results, id, err :=
-		getData(resourceType, resourceTypes, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
+	result, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
 	if err != nil {
-		return diag.Diagnostics{{
-			Severity: diag.Error,
-			Summary:  "Failed to get data",
-			Detail:   err.Error(),
-		}}
+		return diag.FromErr(err)
 	}
+	
+	id := b64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s\t%s", resourceType, result)))
 	if len(result) > 0 {
 		if err := d.Set("result", result); err != nil {
-			return diag.FromErr(err)
-		}
-	}
-	if len(results) > 0 {
-		if err := d.Set("results", results); err != nil {
 			return diag.FromErr(err)
 		}
 	}
