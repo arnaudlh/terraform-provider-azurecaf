@@ -153,10 +153,10 @@ func composeName(separator string,
 	return content
 }
 
-func validateResourceType(resourceType string, resourceTypes []string) (bool, error) {
+func validateResourceTypes(resourceType string, resourceTypes []string) error {
 	isEmpty := len(resourceType) == 0 && len(resourceTypes) == 0
 	if isEmpty {
-		return false, fmt.Errorf("resource_type and resource_types parameters are empty, you must specify at least one resource type")
+		return fmt.Errorf("resource_type and resource_types parameters are empty, you must specify at least one resource type")
 	}
 	errorStrings := []string{}
 	resourceList := resourceTypes
@@ -171,9 +171,9 @@ func validateResourceType(resourceType string, resourceTypes []string) (bool, er
 		}
 	}
 	if len(errorStrings) > 0 {
-		return false, fmt.Errorf("%s", strings.Join(errorStrings, "\n"))
+		return fmt.Errorf("%s", strings.Join(errorStrings, "\n"))
 	}
-	return true, nil
+	return nil
 }
 
 func getResourceName(resourceTypeName string, separator string,

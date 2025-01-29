@@ -150,8 +150,7 @@ func getNameResult(d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 }
 
 func getData(resourceType string, resourceTypes []string, separator string, prefixes []string, name string, suffixes []string, randomSuffix string, cleanInput bool, passthrough bool, useSlug bool, namePrecedence []string) (result string, results map[string]string, id string, err error) {
-	isValid, err := validateResourceType(resourceType, resourceTypes)
-	if !isValid {
+	if err := validateResourceTypes(resourceType, resourceTypes); err != nil {
 		return
 	}
 	if results == nil {

@@ -109,15 +109,7 @@ func dataNameRead(ctx context.Context, d *schema.ResourceData, meta interface{})
 }
 
 func validateResourceType(resourceType string) error {
-	if resourceType == "" {
-		return fmt.Errorf("resource_type cannot be empty")
-	}
-	
-	if _, exists := models.ResourceDefinitions[resourceType]; !exists {
-		return fmt.Errorf("resource type %q is not supported", resourceType)
-	}
-	
-	return nil
+	return validateResourceTypes(resourceType, nil)
 }
 
 func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
