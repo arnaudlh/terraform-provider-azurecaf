@@ -30,6 +30,11 @@ func cleanString(name string, resourceDefinition *models.ResourceStructure) stri
 		return name
 	}
 
+	// Special handling for Azure Container Registry which doesn't allow hyphens
+	if strings.Contains(resourceDefinition.RegEx, "^[a-zA-Z0-9]{1,63}$") {
+		return strings.ReplaceAll(name, "-", "")
+	}
+
 	pattern := resourceDefinition.RegEx
 	start := strings.Index(pattern, "[")
 	end := strings.Index(pattern, "]")
