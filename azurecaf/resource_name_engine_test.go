@@ -220,50 +220,34 @@ func TestTrimResourceName(t *testing.T) {
 	}
 }
 
-func TestValidateResourceTypes(t *testing.T) {
+func TestValidateResourceType(t *testing.T) {
 	tests := []struct {
-		name          string
-		resourceType  string
-		resourceTypes []string
-		wantErr      bool
+		name         string
+		resourceType string
+		wantErr     bool
 	}{
 		{
-			name:          "valid resource",
-			resourceType:  "azurerm_resource_group",
-			resourceTypes: []string{"azurerm_resource_group"},
-			wantErr:      false,
+			name:         "valid resource",
+			resourceType: "azurerm_resource_group",
+			wantErr:     false,
 		},
 		{
-			name:          "multiple valid resources",
-			resourceType:  "azurerm_resource_group",
-			resourceTypes: []string{"azurerm_resource_group", "azurerm_storage_account"},
-			wantErr:      false,
+			name:         "invalid resource",
+			resourceType: "invalid_resource",
+			wantErr:     true,
 		},
 		{
-			name:          "invalid resource",
-			resourceType:  "invalid_resource",
-			resourceTypes: []string{"azurerm_resource_group"},
-			wantErr:      true,
-		},
-		{
-			name:          "empty resource",
-			resourceType:  "",
-			resourceTypes: []string{},
-			wantErr:      true,
-		},
-		{
-			name:          "invalid resource in list",
-			resourceType:  "azurerm_resource_group",
-			resourceTypes: []string{"invalid_resource", "azurerm_storage_account"},
-			wantErr:      true,
+			name:         "empty resource",
+			resourceType: "",
+			wantErr:     true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := validateResourceTypes(tt.resourceType, tt.resourceTypes)
+			err := validateResourceType(tt.resourceType)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("validateResourceTypes() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("validateResourceType() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

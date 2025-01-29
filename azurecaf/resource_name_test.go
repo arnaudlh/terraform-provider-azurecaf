@@ -1,5 +1,3 @@
-//go:build unit
-
 package azurecaf
 
 import (
@@ -127,27 +125,18 @@ func TestComposeEmptyStringArray(t *testing.T) {
 
 func TestValidResourceType_validParameters(t *testing.T) {
 	resourceType := "azurerm_resource_group"
-	resourceTypes := []string{"azurerm_container_registry", "azurerm_storage_account"}
-	isValid, err := validateResourceType(resourceType, resourceTypes)
-	if !isValid {
-		t.Logf("resource types considered invalid while input parameters are valid")
-		t.Fail()
-	}
+	err := validateResourceType(resourceType)
 	if err != nil {
 		t.Logf("resource validation generated an unexpected error %s", err.Error())
 		t.Fail()
 	}
 }
+
 func TestValidResourceType_invalidParameters(t *testing.T) {
-	resourceType := "azurerm_resource_group"
-	resourceTypes := []string{"azurerm_not_supported", "azurerm_storage_account"}
-	isValid, err := validateResourceType(resourceType, resourceTypes)
-	if isValid {
-		t.Logf("resource types considered valid while input parameters are invalid")
-		t.Fail()
-	}
+	resourceType := "azurerm_not_supported"
+	err := validateResourceType(resourceType)
 	if err == nil {
-		t.Logf("resource validation did generate an error while the input is invalid")
+		t.Logf("resource validation did not generate an error while the input is invalid")
 		t.Fail()
 	}
 }

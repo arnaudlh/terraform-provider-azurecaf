@@ -158,28 +158,7 @@ func composeName(separator string,
 	return content
 }
 
-func validateResourceTypes(resourceType string, resourceTypes []string) error {
-	isEmpty := len(resourceType) == 0 && len(resourceTypes) == 0
-	if isEmpty {
-		return fmt.Errorf("resource_type and resource_types parameters are empty, you must specify at least one resource type")
-	}
-	errorStrings := []string{}
-	resourceList := resourceTypes
-	if len(resourceType) > 0 {
-		resourceList = append(resourceList, resourceType)
-	}
-
-	for _, resource := range resourceList {
-		_, err := getResource(resource)
-		if err != nil {
-			errorStrings = append(errorStrings, err.Error())
-		}
-	}
-	if len(errorStrings) > 0 {
-		return fmt.Errorf("%s", strings.Join(errorStrings, "\n"))
-	}
-	return nil
-}
+// validateResourceType is implemented in data_name.go
 
 func getResourceName(resourceTypeName string, separator string,
 	prefixes []string,
