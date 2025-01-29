@@ -8,7 +8,7 @@ import (
 )
 
 func V2() *schema.Resource {
-	resourceMapsKeys := getResourceMaps()
+	resourceMapsKeys := GetResourceMaps()
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"name": {
