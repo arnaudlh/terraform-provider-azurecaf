@@ -168,27 +168,19 @@ func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 	result, _, id, err := getData(resourceType, nil, separator, prefixes, name, suffixes, randomString, cleanInput, passthrough, useSlug, namePrecedence)
 
 	// Handle slug after name generation to match resource behavior
+	// Handle slug after name generation
 	if useSlug {
-		slug = getSlug(resourceType)
+		resourceSlug := getSlug(resourceType)
 		if resourceType == "azurerm_storage_account" {
 			// For storage accounts, handle without separators
 			result = strings.ReplaceAll(result, separator, "")
-			if len(prefixes) > 0 {
-				// Insert slug after prefixes
-				prefix := strings.Join(prefixes, "")
-				rest := strings.TrimPrefix(result, prefix)
-				result = prefix + slug + rest
-			} else {
-				result = slug + result
-			}
-		} else {
-			// For other resources, add slug with separator
+		} else if resourceType == "azurerm_resource_group" {
+			// For resource groups, ensure no duplicate slug
 			parts := strings.Split(result, separator)
-			for i, part := range parts {
-				if part == name {
-					parts = append(parts[:i+1], parts[i:]...)
-					parts[i] = slug
-					break
+			for i := 0; i < len(parts); i++ {
+				if parts[i] == resourceSlug {
+					parts = append(parts[:i], parts[i+1:]...)
+					i--
 				}
 			}
 			result = strings.Join(parts, separator)
