@@ -148,7 +148,7 @@ func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 	randomLength := d.Get("random_length").(int)
 	randomSeed := int64(d.Get("random_seed").(int))
 
-	// Use existing random string or generate a new one with the provided seed
+	// Generate random string first if needed
 	randomString := d.Get("random_string").(string)
 	if randomString == "" && randomLength > 0 {
 		if randomSeed == 0 {
@@ -163,12 +163,43 @@ func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 
-	namePrecedence := []string{"name", "random", "suffixes", "prefixes"}
+	// Get slug before name generation
 	slug := ""
 	if useSlug {
 		slug = getSlug(resourceType)
 	}
+
+	// Use the same name precedence as resources
+	namePrecedence := []string{"prefixes", "name", "random", "suffixes"}
 	result, _, id, err := getData(resourceType, nil, separator, prefixes, name, suffixes, randomString, cleanInput, passthrough, false, namePrecedence)
+
+	// Handle slug after name generation to match resource behavior
+	if useSlug {
+		slug = getSlug(resourceType)
+		if resourceType == "azurerm_storage_account" {
+			// For storage accounts, handle without separators
+			result = strings.ReplaceAll(result, separator, "")
+			if len(prefixes) > 0 {
+				// Insert slug after prefixes
+				prefix := strings.Join(prefixes, "")
+				rest := strings.TrimPrefix(result, prefix)
+				result = prefix + slug + rest
+			} else {
+				result = slug + result
+			}
+		} else {
+			// For other resources, add slug with separator
+			parts := strings.Split(result, separator)
+			for i, part := range parts {
+				if part == name {
+					parts = append(parts[:i+1], parts[i:]...)
+					parts[i] = slug
+					break
+				}
+			}
+			result = strings.Join(parts, separator)
+		}
+	}
 	if err != nil {
 		return fmt.Errorf("error generating name: %w", err)
 	}
