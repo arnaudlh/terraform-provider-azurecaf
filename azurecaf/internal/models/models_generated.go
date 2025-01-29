@@ -4193,5 +4193,5 @@ func init() {
 		ValidationRegExp: "^[a-zA-Z0-9][a-zA-Z0-9-]{0,58}[a-zA-Z0-9]$",
 		LowerCase:       false,
 		Scope:           "resourceGroup",
-	}
+	},
 }
