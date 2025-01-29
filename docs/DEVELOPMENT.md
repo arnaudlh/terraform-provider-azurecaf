@@ -13,7 +13,7 @@ This guide helps you get started developing the Azure CAF Terraform Provider.
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/arnaudlh/terraform-provider-azurecaf.git
+git clone https://github.com/aztfmod/terraform-provider-azurecaf.git
 cd terraform-provider-azurecaf
 ```
 

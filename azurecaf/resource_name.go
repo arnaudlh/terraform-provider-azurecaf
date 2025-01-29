@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arnaudlh/terraform-provider-azurecaf/azurecaf/internal/schemas"
+	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/schemas"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )

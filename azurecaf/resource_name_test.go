@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/arnaudlh/terraform-provider-azurecaf/azurecaf/internal/schemas"
+	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/schemas"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )

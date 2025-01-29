@@ -4,7 +4,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arnaudlh/terraform-provider-azurecaf/azurecaf"
+	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
 )
