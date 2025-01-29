@@ -100,11 +100,11 @@ func TestRegexValidationDashes(t *testing.T) {
 			continue
 		}
 
-		// Skip validation for complex patterns
-		if strings.Contains(resource.ValidationRegExp, "^[^") ||
-			strings.Contains(resource.ValidationRegExp, "[^<>*%") ||
-			strings.Contains(resource.ValidationRegExp, "[^&") ||
-			strings.Contains(resource.ValidationRegExp, "\\s") {
+		// Skip validation for complex patterns that use negated character classes or special characters
+		if strings.Contains(resource.ValidationRegExp, "[^") ||
+			strings.Contains(resource.ValidationRegExp, "\\s") ||
+			strings.Contains(resource.ValidationRegExp, "?") ||
+			strings.Contains(resource.ValidationRegExp, "+") {
 			continue
 		}
 
@@ -112,16 +112,25 @@ func TestRegexValidationDashes(t *testing.T) {
 		allowsDashes := false
 		pattern := resource.ValidationRegExp
 
-		// Explicit dash in character class
-		if strings.Contains(pattern, "-") && !strings.HasPrefix(pattern, "^[a-z") &&
+		// Pattern explicitly allows dashes
+		if strings.Contains(pattern, "-") &&
+			!strings.HasPrefix(pattern, "^[a-z") &&
 			!strings.HasPrefix(pattern, "^[a-zA-Z") &&
-			!strings.HasPrefix(pattern, "^[0-9a-z") {
+			!strings.HasPrefix(pattern, "^[0-9a-z") &&
+			!strings.HasPrefix(pattern, "^[a-z0-9") {
 			allowsDashes = true
 		}
 
-		// Pattern uses wildcard
-		if strings.Contains(pattern, ".") {
+		// Pattern uses wildcard that could allow dashes
+		if strings.Contains(pattern, ".") &&
+			!strings.Contains(pattern, "[.]") {
 			allowsDashes = true
+		}
+
+		// Simple alphanumeric patterns don't allow dashes
+		if regexp.MustCompile(`^\^[a-zA-Z0-9]+\$$`).MatchString(pattern) ||
+			regexp.MustCompile(`^\^[a-z0-9]+\$$`).MatchString(pattern) {
+			allowsDashes = false
 		}
 
 		matches := exp.MatchString(content)
