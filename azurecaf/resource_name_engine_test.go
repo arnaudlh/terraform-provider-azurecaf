@@ -3,7 +3,7 @@ package azurecaf
 import (
 	"testing"
 
-	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
+	models "github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
 	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/utils"
 )
 

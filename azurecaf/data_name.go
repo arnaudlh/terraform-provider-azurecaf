@@ -5,7 +5,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
+	models "github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
 	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/utils"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -117,7 +117,8 @@ func dataNameRead(ctx context.Context, d *schema.ResourceData, meta interface{})
 	randomSuffix := utils.RandSeq(randomLength, randomSeed)
 
 	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
-	result, _, id, err := getData(resourceType, []string{}, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
+	result, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
+	id := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s\t%s", resourceType, result)))
 	if err != nil {
 		return diag.FromErr(err)
 	}
