@@ -92,6 +92,11 @@ func dataName() *schema.Resource {
 				ForceNew: true,
 				Default:  true,
 			},
+			"random_string": {
+				Type:     schema.TypeString,
+				Computed: true,
+				ForceNew: true,
+			},
 		},
 	}
 }
