@@ -3406,8 +3406,11 @@ var ResourceDefinitions = map[string]ResourceStructure{
 	},
 }
 
-var ResourceMaps = map[string]string{
-	"":             "general",
+var ResourceMaps = map[string]string{}
+
+func init() {
+	ResourceMaps = map[string]string{
+		"":             "general",
 		"aa":           "azurerm_automation_account",
 		"aacert":       "azurerm_automation_certificate",
 		"aacred":       "azurerm_automation_credential",
@@ -4193,5 +4196,3 @@ var ResourceMaps = map[string]string{
 		Scope:           "resourceGroup",
 	},
 }
-
-var ResourceMaps = map[string]string{}
