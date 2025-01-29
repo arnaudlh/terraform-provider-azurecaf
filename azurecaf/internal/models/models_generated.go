@@ -4195,4 +4195,5 @@ func init() {
 		LowerCase:       false,
 		Scope:           "resourceGroup",
 	},
+	}
 }
