@@ -9,8 +9,8 @@ import (
 )
 
 func dataName() *schema.Resource {
-	resourceMapsKeys := make([]string, 0, len(ResourceDefinitions))
-	for k := range ResourceDefinitions {
+	resourceMapsKeys := make([]string, 0, len(models.ResourceDefinitions))
+	for k := range models.ResourceDefinitions {
 		resourceMapsKeys = append(resourceMapsKeys, k)
 	}
 
@@ -108,13 +108,11 @@ func getNameReadResult(d *schema.ResourceData, meta interface{}) error {
 	randomLength := d.Get("random_length").(int)
 	randomSeed := int64(d.Get("random_seed").(int))
 
-	convention := ConventionCafClassic
-
 	randomSuffix := randSeq(int(randomLength), &randomSeed)
 
 	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
 
-	resourceName, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, convention, cleanInput, passthrough, useSlug, namePrecedence)
+	resourceName, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
 	if err != nil {
 		return err
 	}
