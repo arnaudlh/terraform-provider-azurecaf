@@ -2,11 +2,27 @@ package azurecaf
 
 import (
 	"fmt"
+	"math/rand"
 	"regexp"
 	"strings"
 
 	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
 )
+
+const letters = "abcdefghijklmnopqrstuvwxyz0123456789"
+
+func randSeq(n int, seed int64) string {
+	if n <= 0 {
+		return ""
+	}
+	
+	r := rand.New(rand.NewSource(seed))
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = letters[r.Intn(len(letters))]
+	}
+	return string(b)
+}
 
 func cleanSlice(names []string, resourceDefinition *models.ResourceStructure) []string {
 	for i, name := range names {
@@ -33,13 +49,7 @@ func concatenateParameters(separator string, parameters ...[]string) string {
 }
 
 func getResource(resourceType string) (*models.ResourceStructure, error) {
-	if resourceKey, existing := models.ResourceMaps[resourceType]; existing {
-		resourceType = resourceKey
-	}
-	if resource, resourceFound := models.ResourceDefinitions[resourceType]; resourceFound {
-		return &resource, nil
-	}
-	return nil, fmt.Errorf("invalid resource type %s", resourceType)
+	return models.GetResourceStructure(resourceType)
 }
 
 // Retrieve the resource slug / shortname based on the resourceType and the selected convention
@@ -144,7 +154,7 @@ func validateResourceType(resourceType string, resourceTypes []string) (bool, er
 	}
 
 	for _, resource := range resourceList {
-		_, err := getResource(resource)
+		_, err := models.ValidateResourceType(resource)
 		if err != nil {
 			errorStrings = append(errorStrings, err.Error())
 		}

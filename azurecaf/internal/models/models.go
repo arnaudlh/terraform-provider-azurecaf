@@ -6,15 +6,10 @@ import (
 )
 
 // ResourceDefinitions maps resource types to their structures
-var ResourceDefinitions map[string]ResourceStructure
+var ResourceDefinitions = make(map[string]ResourceStructure)
 
 // ResourceMaps provides alternative names for resource types
-var ResourceMaps map[string]string
-
-func init() {
-	ResourceDefinitions = make(map[string]ResourceStructure)
-	ResourceMaps = make(map[string]string)
-}
+var ResourceMaps = make(map[string]string)
 
 // ValidateResourceType validates if a resource type exists
 func ValidateResourceType(resourceType string) (bool, error) {
