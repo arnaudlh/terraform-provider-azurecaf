@@ -71,7 +71,7 @@ func regexMatch(id string, exp *regexp.Regexp, requiredMatches int) resource.Tes
 func TestCleanInput_no_changes(t *testing.T) {
 	data := "testdata"
 	resource := models.ResourceDefinitions["azurerm_resource_group"]
-	result := cleanString(data, &resource)
+	result := cleanString(data, resource)
 	if data != result {
 		t.Errorf("Expected %s but received %s", data, result)
 	}
@@ -81,7 +81,7 @@ func TestCleanInput_remove_always(t *testing.T) {
 	data := "😀testdata😊"
 	expected := "testdata"
 	resource := models.ResourceDefinitions["azurerm_resource_group"]
-	result := cleanString(data, &resource)
+	result := cleanString(data, resource)
 	if result != expected {
 		t.Errorf("Expected %s but received %s", expected, result)
 	}
@@ -91,7 +91,7 @@ func TestCleanInput_not_remove_special_allowed_chars(t *testing.T) {
 	data := "testdata()"
 	expected := "testdata()"
 	resource := models.ResourceDefinitions["azurerm_resource_group"]
-	result := cleanString(data, &resource)
+	result := cleanString(data, resource)
 	if result != expected {
 		t.Errorf("Expected %s but received %s", expected, result)
 	}
@@ -100,7 +100,7 @@ func TestCleanInput_not_remove_special_allowed_chars(t *testing.T) {
 func TestCleanSplice_no_changes(t *testing.T) {
 	data := []string{"testdata", "test", "data"}
 	resource := models.ResourceDefinitions["azurerm_resource_group"]
-	result := cleanSlice(data, &resource)
+	result := cleanSlice(data, resource)
 	for i := range data {
 		if data[i] != result[i] {
 			t.Errorf("Expected %s but received %s", data[i], result[i])

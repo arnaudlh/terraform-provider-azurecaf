@@ -9,7 +9,7 @@ import (
 
 func init() {
 	// Initialize test resource definitions
-	models.ResourceDefinitions["azurerm_storage_account"] = models.ResourceStructure{
+	models.ResourceDefinitions["azurerm_storage_account"] = &models.ResourceStructure{
 		ResourceTypeName: "azurerm_storage_account",
 		CafPrefix:        "st",
 		MinLength:        3,

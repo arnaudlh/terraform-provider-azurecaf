@@ -105,25 +105,47 @@ func V3() *schema.Resource {
 }
 
 func ResourceNameStateUpgradeV3(ctx context.Context, rawState map[string]interface{}, meta interface{}) (map[string]interface{}, error) {
+	if rawState == nil {
+		return nil, nil
+	}
+
+	// Handle results field
 	results := rawState["results"]
-	resourceType := rawState["resource_type"].(string)
-	result := rawState["result"].(string)
 	content := make(map[string]interface{})
-	switch v := results.(type) {
-	default:
-		fmt.Printf("unexpected type %T", v)
-	case map[string]interface{}:
-		content = v
+	if results != nil {
+		switch v := results.(type) {
+		case map[string]interface{}:
+			content = v
+		}
 	}
-	if _, ok := content[resourceType]; !ok {
-		content[resourceType] = result
+
+	// Handle resource_type and result fields safely
+	resourceType, ok := rawState["resource_type"].(string)
+	if !ok {
+		resourceType = ""
 	}
+	result, ok := rawState["result"].(string)
+	if !ok {
+		result = ""
+	}
+
+	// Only update content if we have valid resource_type and result
+	if resourceType != "" && result != "" {
+		if _, ok := content[resourceType]; !ok {
+			content[resourceType] = result
+		}
+	}
+
 	rawState["results"] = content
-	ids := []string{}
-	for k, v := range content {
-		ids = append(ids, fmt.Sprintf("%s\t%s", k, v))
+
+	// Generate ID only if we have content
+	if len(content) > 0 {
+		ids := make([]string, 0, len(content))
+		for k, v := range content {
+			ids = append(ids, fmt.Sprintf("%s\t%s", k, v.(string)))
+		}
+		rawState["id"] = b64.StdEncoding.EncodeToString([]byte(strings.Join(ids, "\n")))
 	}
-	rawState["id"] = b64.StdEncoding.EncodeToString([]byte(strings.Join(ids, "\n")))
 
 	return rawState, nil
 }

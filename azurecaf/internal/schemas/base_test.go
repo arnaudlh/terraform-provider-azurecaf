@@ -1,6 +1,7 @@
 package schemas
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -115,8 +116,34 @@ func TestResourceNameStateUpgradeV2(t *testing.T) {
 			}
 
 			for k, v := range tt.want {
-				if got, ok := newData[k]; !ok || got != v {
-					t.Errorf("field %s = %v, want %v", k, got, v)
+				got, ok := newData[k]
+				if !ok {
+					t.Errorf("field %s missing from upgraded state", k)
+					continue
+				}
+				switch val := v.(type) {
+				case []interface{}:
+					gotSlice, ok := got.([]interface{})
+					if !ok {
+						t.Errorf("field %s: expected slice but got %T", k, got)
+						continue
+					}
+					if !reflect.DeepEqual(gotSlice, val) {
+						t.Errorf("field %s = %v, want %v", k, gotSlice, val)
+					}
+				case map[string]interface{}:
+					gotMap, ok := got.(map[string]interface{})
+					if !ok {
+						t.Errorf("field %s: expected map but got %T", k, got)
+						continue
+					}
+					if !reflect.DeepEqual(gotMap, val) {
+						t.Errorf("field %s = %v, want %v", k, gotMap, val)
+					}
+				default:
+					if !reflect.DeepEqual(got, v) {
+						t.Errorf("field %s = %v, want %v", k, got, v)
+					}
 				}
 			}
 		})
@@ -182,8 +209,34 @@ func TestResourceNameStateUpgradeV3(t *testing.T) {
 			}
 
 			for k, v := range tt.want {
-				if got, ok := newData[k]; !ok || got != v {
-					t.Errorf("field %s = %v, want %v", k, got, v)
+				got, ok := newData[k]
+				if !ok {
+					t.Errorf("field %s missing from upgraded state", k)
+					continue
+				}
+				switch val := v.(type) {
+				case []interface{}:
+					gotSlice, ok := got.([]interface{})
+					if !ok {
+						t.Errorf("field %s: expected slice but got %T", k, got)
+						continue
+					}
+					if !reflect.DeepEqual(gotSlice, val) {
+						t.Errorf("field %s = %v, want %v", k, gotSlice, val)
+					}
+				case map[string]interface{}:
+					gotMap, ok := got.(map[string]interface{})
+					if !ok {
+						t.Errorf("field %s: expected map but got %T", k, got)
+						continue
+					}
+					if !reflect.DeepEqual(gotMap, val) {
+						t.Errorf("field %s = %v, want %v", k, gotMap, val)
+					}
+				default:
+					if !reflect.DeepEqual(got, v) {
+						t.Errorf("field %s = %v, want %v", k, got, v)
+					}
 				}
 			}
 		})

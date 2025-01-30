@@ -10,49 +10,42 @@ func TestRandSeq(t *testing.T) {
 		n      int
 		seed   int64
 		expect int
-		chars  bool
 	}{
 		{
 			name:   "zero length",
 			n:      0,
 			seed:   1,
 			expect: 0,
-			chars:  true,
 		},
 		{
 			name:   "positive length",
 			n:      5,
 			seed:   1,
 			expect: 5,
-			chars:  true,
 		},
 		{
 			name:   "different seed",
 			n:      5,
 			seed:   2,
 			expect: 5,
-			chars:  true,
 		},
 		{
 			name:   "long string",
 			n:      20,
 			seed:   3,
 			expect: 20,
-			chars:  true,
 		},
 		{
 			name:   "negative length",
 			n:      -1,
 			seed:   1,
 			expect: 0,
-			chars:  true,
 		},
 		{
 			name:   "max length",
 			n:      100,
 			seed:   1,
 			expect: 100,
-			chars:  true,
 		},
 	}
 
@@ -62,9 +55,9 @@ func TestRandSeq(t *testing.T) {
 			if len(result) != tt.expect {
 				t.Errorf("RandSeq() length = %v, want %v", len(result), tt.expect)
 			}
-			if tt.chars {
+			if tt.expect > 0 {
 				for _, c := range result {
-					if !((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) {
+					if c < 'a' || c > 'z' {
 						t.Errorf("RandSeq() contains invalid character: %c", c)
 					}
 				}

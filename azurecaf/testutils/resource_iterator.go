@@ -2,8 +2,6 @@ package testutils
 
 import (
 	"sort"
-
-	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/models"
 )
 
 type ResourceTestData struct {
@@ -17,9 +15,10 @@ type ResourceTestData struct {
 }
 
 func GetAllResourceTestData() []*ResourceTestData {
-	resources := make([]*ResourceTestData, 0, len(models.ResourceDefinitions))
+	defs := loadResourceDefinitions()
+	resources := make([]*ResourceTestData, 0, len(defs))
 	
-	for resourceType, def := range models.ResourceDefinitions {
+	for resourceType, def := range defs {
 		resources = append(resources, &ResourceTestData{
 			ResourceType:    resourceType,
 			Slug:           def.CafPrefix,
@@ -39,7 +38,8 @@ func GetAllResourceTestData() []*ResourceTestData {
 }
 
 func GetResourceByType(resourceType string) (*ResourceTestData, bool) {
-	if def, ok := models.ResourceDefinitions[resourceType]; ok {
+	defs := loadResourceDefinitions()
+	if def, ok := defs[resourceType]; ok {
 		return &ResourceTestData{
 			ResourceType:    resourceType,
 			Slug:           def.CafPrefix,
