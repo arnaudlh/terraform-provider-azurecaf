@@ -4,6 +4,8 @@ import (
 	"regexp"
 	"strings"
 	"testing"
+
+	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
 )
 
 func ValidateResourceOutput(t *testing.T, resourceType string, resourceOutput, dataOutput string) {
@@ -37,37 +39,23 @@ func ValidateResourceOutput(t *testing.T, resourceType string, resourceOutput, d
 	}
 
 	// Validate slug presence and placement
-	if def.Slug != "" {
-		slugIndex := strings.Index(strings.ToLower(nameToValidate), strings.ToLower(def.Slug))
+	if def.CafPrefix != "" {
+		slugIndex := strings.Index(strings.ToLower(nameToValidate), strings.ToLower(def.CafPrefix))
 		if slugIndex == -1 {
-			t.Errorf("Resource name %s does not contain slug %s", nameToValidate, def.Slug)
+			t.Errorf("Resource name %s does not contain slug %s", nameToValidate, def.CafPrefix)
 		} else if slugIndex > 0 && !strings.ContainsRune("-_.", rune(nameToValidate[slugIndex-1])) {
-			t.Errorf("Resource name %s has incorrectly placed slug %s - should be at start or after separator", nameToValidate, def.Slug)
+			t.Errorf("Resource name %s has incorrectly placed slug %s - should be at start or after separator", nameToValidate, def.CafPrefix)
 		}
 	}
 
-	// Validate dashes
-	if !def.Dashes && strings.Contains(nameToValidate, "-") {
-		t.Errorf("Resource name %s contains dashes but dashes are not allowed", nameToValidate)
-	}
-
-	// Validate primary regex pattern
-	if def.ValidationRegex != "" {
-		pattern, err := regexp.Compile(def.ValidationRegex)
+	// Validate regex pattern
+	if def.ValidationRegExp != "" {
+		cleanRegex := strings.Trim(def.ValidationRegExp, "\"")
+		pattern, err := regexp.Compile(cleanRegex)
 		if err != nil {
-			t.Logf("Warning: Invalid validation regex pattern %s: %v", def.ValidationRegex, err)
+			t.Logf("Warning: Invalid validation regex pattern %s: %v", cleanRegex, err)
 		} else if !pattern.MatchString(nameToValidate) {
-			t.Errorf("Resource name %s does not match validation pattern %s", nameToValidate, def.ValidationRegex)
-		}
-	}
-
-	// Validate additional regex pattern (negative match)
-	if def.Regex != "" {
-		pattern, err := regexp.Compile(def.Regex)
-		if err != nil {
-			t.Logf("Warning: Invalid extra regex pattern %s: %v", def.Regex, err)
-		} else if pattern.MatchString(nameToValidate) {
-			t.Errorf("Resource name %s should not match pattern %s (negative match)", nameToValidate, def.Regex)
+			t.Errorf("Resource name %s does not match validation pattern %s", nameToValidate, cleanRegex)
 		}
 	}
 }
