@@ -23,14 +23,15 @@ func ValidateResourceOutput(t *testing.T, resourceType string, resourceOutput, d
 		return
 	}
 
-	nameToValidate := resourceOutput
+nameToValidate := resourceOutput
 
 	// Validate length constraints
-	if len(nameToValidate) < def.MinLength {
-		t.Errorf("Resource name %s length %d is less than minimum length %d", nameToValidate, len(nameToValidate), def.MinLength)
+	nameLength := len(nameToValidate)
+	if nameLength < def.MinLength {
+		t.Errorf("Resource name %s length %d is less than minimum length %d", nameToValidate, nameLength, def.MinLength)
 	}
-	if len(nameToValidate) > def.MaxLength {
-		t.Errorf("Resource name %s length %d exceeds maximum length %d", nameToValidate, len(nameToValidate), def.MaxLength)
+	if nameLength > def.MaxLength {
+		t.Errorf("Resource name %s length %d exceeds maximum length %d", nameToValidate, nameLength, def.MaxLength)
 	}
 
 	// Validate case sensitivity
