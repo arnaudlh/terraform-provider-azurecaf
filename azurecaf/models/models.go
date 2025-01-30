@@ -14,3 +14,13 @@ type ResourceStructure struct {
 
 var ResourceDefinitions = map[string]*ResourceStructure{}
 var ResourceMaps = map[string]string{}
+
+func GetResourceStructure(resourceType string) (*ResourceStructure, error) {
+    if resourceKey, existing := ResourceMaps[resourceType]; existing {
+        resourceType = resourceKey
+    }
+    if resource, resourceFound := ResourceDefinitions[resourceType]; resourceFound {
+        return resource, nil
+    }
+    return nil, fmt.Errorf("invalid resource type %s", resourceType)
+}
