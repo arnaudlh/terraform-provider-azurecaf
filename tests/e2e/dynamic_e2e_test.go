@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -24,15 +23,15 @@ func TestDynamicResourceDefinitions(t *testing.T) {
 	resourceCount := len(resourceDefs)
 	t.Logf("Found %d resource definitions", resourceCount)
 
-	for resourceType := range resourceDefs {
-		if ctx.Err() != nil {
-			t.Fatal("Test timeout exceeded")
-		}
+	// Create base test directory
+	baseDir, err := os.MkdirTemp("", "azurecaf-e2e-*")
+	if err != nil {
+		t.Fatalf("Failed to create base test dir: %v", err)
+	}
+	defer os.RemoveAll(baseDir)
 
-		t.Run(resourceType, func(t *testing.T) {
-			t.Logf("Testing resource type: %s", resourceType)
-			
-			config := fmt.Sprintf(`
+	// Write provider configuration
+	providerConfig := `
 terraform {
   required_providers {
     azurecaf = {
@@ -42,8 +41,28 @@ terraform {
   }
 }
 
-provider "azurecaf" {}
+provider "azurecaf" {}`
 
+	if err := os.WriteFile(filepath.Join(baseDir, "provider.tf"), []byte(providerConfig), 0644); err != nil {
+		t.Fatalf("Failed to write provider config: %v", err)
+	}
+
+	// Initialize provider once
+	cmd := exec.Command("terraform", "init")
+	cmd.Dir = baseDir
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("Failed to initialize Terraform: %v\n%s", err, out)
+	}
+
+	for resourceType, def := range resourceDefs {
+		if ctx.Err() != nil {
+			t.Fatal("Test timeout exceeded")
+		}
+
+		t.Run(resourceType, func(t *testing.T) {
+			t.Logf("Testing resource type: %s", resourceType)
+			
+			config := fmt.Sprintf(`
 resource "azurecaf_name" "test" {
   name          = "test-%s"
   resource_type = "%s"
@@ -75,35 +94,21 @@ output "data_result" {
 }
 `, strings.ReplaceAll(resourceType, "_", "-"), resourceType, resourceType)
 
-			// Create temp dir for test
-			tmpDir, err := os.MkdirTemp("", "azurecaf-test-*")
-			if err != nil {
-				t.Fatalf("Failed to create temp dir: %v", err)
-			}
-			defer os.RemoveAll(tmpDir)
-
-			// Write config
-			if err := os.WriteFile(filepath.Join(tmpDir, "main.tf"), []byte(config), 0644); err != nil {
+			// Write resource config
+			if err := os.WriteFile(filepath.Join(baseDir, "main.tf"), []byte(config), 0644); err != nil {
 				t.Fatalf("Failed to write config: %v", err)
-			}
-
-			// Initialize Terraform
-			cmd := exec.Command("terraform", "init")
-			cmd.Dir = tmpDir
-			if out, err := cmd.CombinedOutput(); err != nil {
-				t.Fatalf("Failed to initialize Terraform: %v\n%s", err, out)
 			}
 
 			// Apply configuration
 			cmd = exec.Command("terraform", "apply", "-auto-approve")
-			cmd.Dir = tmpDir
+			cmd.Dir = baseDir
 			if out, err := cmd.CombinedOutput(); err != nil {
 				t.Fatalf("Failed to apply Terraform: %v\n%s", err, out)
 			}
 
 			// Get outputs
 			cmd = exec.Command("terraform", "output", "-json")
-			cmd.Dir = tmpDir
+			cmd.Dir = baseDir
 			output, err := cmd.Output()
 			if err != nil {
 				t.Fatalf("Failed to get outputs: %v", err)
@@ -119,29 +124,7 @@ output "data_result" {
 			resourceOutput := outputs["resource_result"].Value
 			dataOutput := outputs["data_result"].Value
 
-			// Create test data from resource definition
 			testutils.ValidateResourceOutput(t, resourceType, resourceOutput, dataOutput)
 		})
 	}
-}
-
-func copyFile(src, dst string) error {
-	sourceFile, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer sourceFile.Close()
-
-	destFile, err := os.Create(dst)
-	if err != nil {
-		return err
-	}
-	defer destFile.Close()
-
-	_, err = io.Copy(destFile, sourceFile)
-	if err != nil {
-		return err
-	}
-
-	return destFile.Chmod(0755)
 }

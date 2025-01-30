@@ -5,13 +5,20 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
-	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/testutils"
 )
 
-func GetResourceDefinitions() map[string]*models.ResourceStructure {
-	defs := make(map[string]*models.ResourceStructure)
+type ResourceDefinition struct {
+	Name            string `json:"name"`
+	CafPrefix       string `json:"caf_prefix"`
+	ValidationRegExp string `json:"validation_regexp"`
+	MinLength      int    `json:"min_length"`
+	MaxLength      int    `json:"max_length"`
+	LowerCase      bool   `json:"lowercase"`
+	Scope          string `json:"scope"`
+}
+
+func GetResourceDefinitions() map[string]*ResourceDefinition {
+	defs := make(map[string]*ResourceDefinition)
 	
 	jsonPath := filepath.Join("..", "..", "resourceDefinition.json")
 	data, err := os.ReadFile(jsonPath)
@@ -31,6 +38,8 @@ func GetResourceDefinitions() map[string]*models.ResourceStructure {
 	return defs
 }
 
-func GetResourceByType(resourceType string) (*testutils.ResourceTestData, bool) {
-	return testutils.GetResourceByType(resourceType)
+func GetResourceByType(resourceType string) (*ResourceDefinition, bool) {
+	defs := GetResourceDefinitions()
+	def, ok := defs[resourceType]
+	return def, ok
 }

@@ -4,8 +4,6 @@ import (
 	"regexp"
 	"strings"
 	"testing"
-
-	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
 )
 
 func ValidateResourceOutput(t *testing.T, resourceType string, resourceOutput, dataOutput string) {
@@ -13,7 +11,7 @@ func ValidateResourceOutput(t *testing.T, resourceType string, resourceOutput, d
 	t.Logf("Resource output: %s", resourceOutput)
 	t.Logf("Data source output: %s", dataOutput)
 
-	def, ok := GetResourceDefinitions()[resourceType]
+	def, ok := GetResourceByType(resourceType)
 	if !ok {
 		t.Fatalf("Resource type %s not found in definitions", resourceType)
 	}
