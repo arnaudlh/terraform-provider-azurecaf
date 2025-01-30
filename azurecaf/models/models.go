@@ -1,5 +1,10 @@
 package models
 
+import (
+    "fmt"
+    "regexp"
+)
+
 type ResourceStructure struct {
     ResourceTypeName  string `json:"name"`
     CafPrefix        string `json:"slug,omitempty"`
@@ -23,4 +28,19 @@ func GetResourceStructure(resourceType string) (*ResourceStructure, error) {
         return resource, nil
     }
     return nil, fmt.Errorf("invalid resource type %s", resourceType)
+}
+
+func ValidateResourceType(resourceType string) (*ResourceStructure, error) {
+    resource, err := GetResourceStructure(resourceType)
+    if err != nil {
+        return nil, err
+    }
+
+    if resource.ValidationRegExp != "" {
+        if _, err := regexp.Compile(resource.ValidationRegExp); err != nil {
+            return nil, fmt.Errorf("invalid validation regex pattern for resource type %s: %v", resourceType, err)
+        }
+    }
+
+    return resource, nil
 }
