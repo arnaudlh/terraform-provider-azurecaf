@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"strings"
 
-	models "github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
+	models "github.com/aztfmod/terraform-provider-azurecaf/azurecaf/models"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"

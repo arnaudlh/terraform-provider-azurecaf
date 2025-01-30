@@ -1,7 +1,7 @@
 package schemas
 
 import (
-	models "github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
+	models "github.com/aztfmod/terraform-provider-azurecaf/azurecaf/models"
 )
 
 func getResourceMaps() []string {

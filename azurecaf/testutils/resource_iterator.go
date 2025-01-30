@@ -3,7 +3,7 @@ package testutils
 import (
 	"sort"
 
-	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
+	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/models"
 )
 
 type ResourceTestData struct {
