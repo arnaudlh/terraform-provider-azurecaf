@@ -38,7 +38,4 @@ jobs:
       - name: Run E2E Tests
         run: |
           cd tests/e2e
-          terraform init
-          terraform plan
-          terraform apply -auto-approve
-          terraform destroy -auto-approve
+          TF_LOG=DEBUG go test -v ./... -run TestDynamicResourceDefinitions -timeout 30m

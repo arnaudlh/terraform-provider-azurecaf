@@ -5,10 +5,10 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"time"
+	"regexp"
+	"strings"
 
 	models "github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
-	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/utils"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
@@ -99,37 +99,41 @@ func dataName() *schema.Resource {
 
 func dataNameRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	name := d.Get("name").(string)
-	prefixes := convertInterfaceToString(d.Get("prefixes").([]interface{}))
-	suffixes := convertInterfaceToString(d.Get("suffixes").([]interface{}))
-	separator := d.Get("separator").(string)
 	resourceType := d.Get("resource_type").(string)
-	cleanInput := d.Get("clean_input").(bool)
-	passthrough := d.Get("passthrough").(bool)
-	useSlug := d.Get("use_slug").(bool)
-	randomLength := d.Get("random_length").(int)
-	randomSeed := int64(d.Get("random_seed").(int))
 
-	if randomSeed == 0 {
-		randomSeed = time.Now().UnixMicro()
-		if err := d.Set("random_seed", randomSeed); err != nil {
-			return diag.FromErr(err)
-		}
+	// Get resource definition for validation
+	resource, ok := models.ResourceDefinitions[resourceType]
+	if !ok {
+		return diag.Errorf("resource type %s not found", resourceType)
 	}
 
-	randomSuffix := utils.RandSeq(randomLength, randomSeed)
-
-	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
-	result, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
-	id := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s\t%s", resourceType, result)))
+	// Validate name against resource pattern
+	validationRegEx, err := regexp.Compile(resource.ValidationRegExp)
 	if err != nil {
-		return diag.FromErr(err)
+		return diag.Errorf("invalid regex pattern for %s: %v", resourceType, err)
 	}
 
-	if err := d.Set("result", result); err != nil {
-		return diag.FromErr(err)
+	// Validate length constraints
+	if len(name) > resource.MaxLength {
+		return diag.Errorf("name length %d exceeds maximum length %d for resource type %s", len(name), resource.MaxLength, resourceType)
 	}
 
+	// Validate case requirements
+	if resource.LowerCase && name != strings.ToLower(name) {
+		return diag.Errorf("name must be lowercase for resource type %s", resourceType)
+	}
+
+	// Validate against regex pattern
+	if !validationRegEx.MatchString(name) {
+		return diag.Errorf("invalid name for %s: %s does not match pattern %s", resourceType, name, resource.ValidationRegExp)
+	}
+
+	id := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s\t%s", resourceType, name)))
 	d.SetId(id)
-	var diags diag.Diagnostics
-	return diags
+
+	if err := d.Set("result", name); err != nil {
+		return diag.FromErr(err)
+	}
+
+	return diag.Diagnostics{}
 }
