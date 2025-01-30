@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
-func V4() *schema.Resource {
+func V4_Schema() *schema.Resource {
 	baseSchema := BaseSchema()
 	resourceMapsKeys := getResourceMaps()
 
