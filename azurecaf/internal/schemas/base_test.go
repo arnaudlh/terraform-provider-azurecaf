@@ -6,7 +6,14 @@ import (
 )
 
 func TestV4_Schema(t *testing.T) {
-	s := V4_Schema()
+	resource := V4_Schema()
+	if resource == nil {
+		t.Fatal("V4_Schema() returned nil")
+	}
+	if resource.Schema == nil {
+		t.Fatal("V4_Schema().Schema is nil")
+	}
+	s := resource.Schema
 	
 	// Test required fields
 	requiredFields := []string{"name", "resource_type"}

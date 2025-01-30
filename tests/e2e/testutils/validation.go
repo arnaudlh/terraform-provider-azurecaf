@@ -9,6 +9,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
+// ValidateResourceOutput validates the output of a resource against a data source
+func ValidateResourceOutput(t *testing.T, resourceType string, resourceOutput string, dataOutput string) {
+	if resourceOutput != dataOutput {
+		t.Errorf("Resource output %q does not match data source output %q for resource type %s", resourceOutput, dataOutput, resourceType)
+	}
+}
+
 // ValidateResourceName checks if a resource name matches the expected pattern
 func ValidateResourceName(t *testing.T, resourceName string, pattern string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
