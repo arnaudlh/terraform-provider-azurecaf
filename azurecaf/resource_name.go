@@ -68,12 +68,16 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 		return fmt.Errorf("failed to get resource name: %s", err.Error())
 	}
 	
-	// Get existing results or create new map
-	results, ok := d.Get("results").(map[string]interface{})
-	if !ok {
-		results = make(map[string]interface{})
+	// Convert existing results to string map
+	existingResults := make(map[string]string)
+	if raw, ok := d.Get("results").(map[string]interface{}); ok {
+		for k, v := range raw {
+			if str, ok := v.(string); ok {
+				existingResults[k] = str
+			}
+		}
 	}
-	results[resourceType] = result
+	existingResults[resourceType] = result
 	return nil
 }
 
@@ -135,17 +139,21 @@ func getNameResult(d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	id := b64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s\t%s", resourceType, result)))
 	d.SetId(id)
 
-	// Get existing results or create new map
-	results, ok := d.Get("results").(map[string]interface{})
-	if !ok {
-		results = make(map[string]interface{})
+	// Convert existing results to string map
+	existingResults := make(map[string]string)
+	if raw, ok := d.Get("results").(map[string]interface{}); ok {
+		for k, v := range raw {
+			if str, ok := v.(string); ok {
+				existingResults[k] = str
+			}
+		}
 	}
-	results[resourceType] = result
+	existingResults[resourceType] = result
 
 	if err := d.Set("result", result); err != nil {
 		return diag.FromErr(err)
 	}
-	if err := d.Set("results", results); err != nil {
+	if err := d.Set("results", existingResults); err != nil {
 		return diag.FromErr(err)
 	}
 

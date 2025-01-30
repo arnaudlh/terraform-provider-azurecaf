@@ -36,6 +36,14 @@ func testAccCafNamingValidation(id string, name string, expectedLength int, pref
 		if !strings.Contains(result, name) {
 			return fmt.Errorf("got %s which doesn't contain the name %s", result, name)
 		}
+
+		// Verify results map contains the same value as result
+		resourceType := attrs["resource_type"]
+		if resultFromMap, ok := attrs["results."+resourceType]; ok {
+			if resultFromMap != result {
+				return fmt.Errorf("results map value %s does not match result %s", resultFromMap, result)
+			}
+		}
 		return nil
 	}
 }
@@ -444,6 +452,7 @@ resource "azurecaf_name" "classic_rg" {
 	random_seed     = 1
 	random_length   = 5
 	clean_input     = true
+	use_slug       = true
 }
 
 resource "azurecaf_name" "classic_ca_invalid" {
@@ -452,6 +461,7 @@ resource "azurecaf_name" "classic_ca_invalid" {
 	random_seed     = 1
 	random_length   = 5
 	clean_input     = true
+	use_slug       = true
 }
 
 resource "azurecaf_name" "classic_cae_invalid" {
@@ -460,6 +470,7 @@ resource "azurecaf_name" "classic_cae_invalid" {
 	random_seed     = 1
 	random_length   = 5
 	clean_input     = true
+	use_slug       = true
 }
 
 resource "azurecaf_name" "classic_acr_invalid" {
@@ -470,6 +481,7 @@ resource "azurecaf_name" "classic_acr_invalid" {
 	random_seed     = 1
 	random_length   = 5
 	clean_input     = true
+	use_slug       = true
 }
 
 resource "azurecaf_name" "passthrough" {
@@ -479,6 +491,7 @@ resource "azurecaf_name" "passthrough" {
 	suffixes        = ["su1", "su2"]
 	random_seed     = 1
 	random_length   = 5
+	use_slug       = true
 	clean_input     = true
 	passthrough     = true
 }
