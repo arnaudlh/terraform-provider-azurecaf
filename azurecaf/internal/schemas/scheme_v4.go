@@ -6,20 +6,21 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+	"github.com/hashicorp/go-cty/cty"
 )
 
 func V4() *schema.Resource {
 	baseSchema := BaseSchema()
 	resourceMapsKeys := getResourceMaps()
 
-	schema := make(map[string]*schema.Schema)
+	schemaMap := make(map[string]*schema.Schema)
 	for k, v := range baseSchema {
 		newSchema := *v
 		newSchema.ForceNew = false
-		schema[k] = &newSchema
+		schemaMap[k] = &newSchema
 	}
 
-	schema["resource_types"] = &schema.Schema{
+	schemaMap["resource_types"] = &schema.Schema{
 		Type:     schema.TypeList,
 		Elem: &schema.Schema{
 			Type:         schema.TypeString,
@@ -30,15 +31,8 @@ func V4() *schema.Resource {
 	}
 
 	return &schema.Resource{
-		Schema:         schema,
+		Schema:         schemaMap,
 		SchemaVersion: 4,
-		StateUpgraders: []schema.StateUpgrader{
-			{
-				Type:    V3().Schema,
-				Upgrade: ResourceNameStateUpgradeV4,
-				Version: 3,
-			},
-		},
 		Create: resourceNameCreate,
 		Read:   resourceNameRead,
 		Update: resourceNameUpdate,
@@ -48,6 +42,9 @@ func V4() *schema.Resource {
 				return fmt.Errorf("resource name validation failed: %v", err)
 			}
 			return nil
+		},
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 	}
 }
