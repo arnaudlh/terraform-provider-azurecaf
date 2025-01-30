@@ -37,7 +37,7 @@ func resourceName() *schema.Resource {
 				Version: 3,
 			},
 		},
-		Schema:        schemas.V4_Schema(),
+		Schema:        schemas.V4_Schema().Schema,
 		CustomizeDiff: getDifference,
 	}
 }
