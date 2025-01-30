@@ -1,14 +1,257 @@
 package schemas
 
 import (
+	"context"
+	"encoding/base64"
 	"fmt"
 	"regexp"
 	"strings"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	models "github.com/aztfmod/terraform-provider-azurecaf/azurecaf/models"
 )
 
-func V4_Schema() map[string]*schema.Schema {
+// ResourceOperations contains the CRUD operations for all schema versions
+// ResourceOperations contains the CRUD operations for all schema versions
+var (
+	resourceNameCreate = func(d *schema.ResourceData, m interface{}) error {
+		if err := ValidateResourceNameInSchema(d); err != nil {
+			return err
+		}
+		name := d.Get("name").(string)
+		resourceType := d.Get("resource_type").(string)
+		if resourceType != "" {
+			if resource, err := models.GetResourceStructure(resourceType); err == nil {
+				if err := ValidateResourceName(name, resource); err != nil {
+					return err
+				}
+			}
+		}
+		d.SetId(name)
+		return resourceNameRead(d, m)
+	}
+
+	resourceNameRead = func(d *schema.ResourceData, m interface{}) error {
+		return nil
+	}
+
+	resourceNameUpdate = func(d *schema.ResourceData, m interface{}) error {
+		if err := ValidateResourceNameInSchema(d); err != nil {
+			return err
+		}
+		name := d.Get("name").(string)
+		resourceType := d.Get("resource_type").(string)
+		if resourceType != "" {
+			if resource, err := models.GetResourceStructure(resourceType); err == nil {
+				if err := ValidateResourceName(name, resource); err != nil {
+					return err
+				}
+			}
+		}
+		return resourceNameRead(d, m)
+	}
+
+	resourceNameDelete = func(d *schema.ResourceData, m interface{}) error {
+		d.SetId("")
+		return nil
+	}
+)
+
+// getResourceMaps returns a list of all supported resource types
+func getResourceMaps() []string {
+	resourceMapsKeys := make([]string, 0, len(models.ResourceDefinitions))
+	for k := range models.ResourceDefinitions {
+		resourceMapsKeys = append(resourceMapsKeys, k)
+	}
+	return resourceMapsKeys
+}
+
+// ValidateResourceName validates a resource name against its defined constraints
+func ValidateResourceName(name string, resource *models.ResourceStructure) error {
+	if name == "" {
+		return nil
+	}
+
+	nameLen := len(name)
+	if nameLen < resource.MinLength || (resource.MaxLength > 0 && nameLen > resource.MaxLength) {
+		return fmt.Errorf("resource name %s length must be between %d and %d", name, resource.MinLength, resource.MaxLength)
+	}
+
+	if resource.LowerCase && name != strings.ToLower(name) {
+		return fmt.Errorf("resource name %s must be lowercase", name)
+	}
+
+	if resource.ValidationRegExp != "" {
+		pattern, err := regexp.Compile(resource.ValidationRegExp)
+		if err != nil {
+			return fmt.Errorf("invalid validation regex pattern: %v", err)
+		}
+		if !pattern.MatchString(name) {
+			return fmt.Errorf("resource name %s does not match required pattern %s", name, resource.ValidationRegExp)
+		}
+	}
+
+	return nil
+}
+
+// ValidateResourceNameSchema validates a resource name against its schema constraints
+func ValidateResourceNameSchema(resourceType, name string) error {
+	resource, err := models.ValidateResourceType(resourceType)
+	if err != nil {
+		return err
+	}
+
+	if resource.ValidationRegExp != "" {
+		pattern, err := regexp.Compile(resource.ValidationRegExp)
+		if err != nil {
+			return fmt.Errorf("invalid validation regex pattern for resource type %s: %v", resourceType, err)
+		}
+		if !pattern.MatchString(name) {
+			return fmt.Errorf("resource name %s does not match required pattern: %s", name, resource.ValidationRegExp)
+		}
+	}
+
+	if resource.LowerCase && name != strings.ToLower(name) {
+		return fmt.Errorf("resource name %s must be lowercase", name)
+	}
+
+	nameLen := len(name)
+	if nameLen < resource.MinLength || (resource.MaxLength > 0 && nameLen > resource.MaxLength) {
+		return fmt.Errorf("resource name %s length must be between %d and %d", name, resource.MinLength, resource.MaxLength)
+	}
+
+	if resource.CafPrefix != "" {
+		prefix := strings.ToLower(resource.CafPrefix)
+		if !strings.HasPrefix(strings.ToLower(name), prefix) {
+			return fmt.Errorf("resource name %s must start with prefix %s", name, prefix)
+		}
+	}
+
+	return nil
+}
+
+// ValidateResourceNameWithSlug validates a resource name with its slug placement
+func ValidateResourceNameWithSlug(resourceType, name string) error {
+	if err := ValidateResourceNameSchema(resourceType, name); err != nil {
+		return err
+	}
+
+	resource, _ := models.ValidateResourceType(resourceType)
+	if resource.CafPrefix != "" {
+		prefix := strings.ToLower(resource.CafPrefix)
+		nameLower := strings.ToLower(name)
+		if !strings.Contains(nameLower, prefix) {
+			return fmt.Errorf("resource name %s must contain slug %s", name, prefix)
+		}
+
+		slugIndex := strings.Index(nameLower, prefix)
+		if slugIndex > 0 {
+			prevChar := rune(name[slugIndex-1])
+			if !strings.ContainsRune("-_.", prevChar) {
+				return fmt.Errorf("resource name %s has incorrectly placed slug %s - should be at start or after separator (-, _, or .)", name, prefix)
+			}
+		}
+	}
+
+	return nil
+}
+
+// ValidateResourceNameInSchema validates a resource name against schema constraints
+func ValidateResourceNameInSchema(d *schema.ResourceData) error {
+	resourceType := d.Get("resource_type").(string)
+	name := d.Get("name").(string)
+	useSlug := true
+	if v, ok := d.GetOk("use_slug"); ok {
+		useSlug = v.(bool)
+	}
+
+	if resourceType != "" {
+		resource, err := models.GetResourceStructure(resourceType)
+		if err != nil {
+			return err
+		}
+
+		if err := ValidateResourceName(name, resource); err != nil {
+			return err
+		}
+
+		if useSlug && resource.CafPrefix != "" {
+			expectedPrefix := resource.CafPrefix
+			nameLower := strings.ToLower(name)
+			prefixLower := strings.ToLower(expectedPrefix)
+
+			// Check if the name contains the prefix
+			if !strings.Contains(nameLower, prefixLower) {
+				return fmt.Errorf("resource name %s must contain the slug '%s' for resource type '%s'", name, expectedPrefix, resourceType)
+			}
+
+			// Validate prefix placement
+			slugIndex := strings.Index(nameLower, prefixLower)
+			if slugIndex > 0 {
+				prevChar := rune(name[slugIndex-1])
+				if !strings.ContainsRune("-_.", prevChar) {
+					return fmt.Errorf("resource name %s has incorrectly placed slug '%s' - should be at start or after separator (-, _, or .)", name, expectedPrefix)
+				}
+			}
+
+			// Validate that prefix is followed by a separator
+			slugEndIndex := slugIndex + len(prefixLower)
+			if slugEndIndex < len(name) {
+				nextChar := rune(name[slugEndIndex])
+				if !strings.ContainsRune("-_.", nextChar) {
+					return fmt.Errorf("resource name %s must have a separator (-, _, or .) after the slug '%s'", name, expectedPrefix)
+				}
+			}
+		}
+
+		// Additional validation for regex pattern
+		if resource.ValidationRegExp != "" {
+			pattern, err := regexp.Compile(resource.ValidationRegExp)
+			if err != nil {
+				return fmt.Errorf("invalid validation regex pattern for resource type %s: %v", resourceType, err)
+			}
+			if !pattern.MatchString(name) {
+				return fmt.Errorf("resource name %s does not match required pattern %s for resource type %s", name, resource.ValidationRegExp, resourceType)
+			}
+		}
+	}
+
+	return nil
+}
+
+// ValidateResourceNameInSchemaWithPrefix validates a resource name with prefix against schema constraints
+func ValidateResourceNameInSchemaWithPrefix(d *schema.ResourceData) error {
+	resourceType := d.Get("resource_type").(string)
+	name := d.Get("name").(string)
+	prefixes, ok := d.Get("prefixes").([]interface{})
+	if ok && len(prefixes) > 0 {
+		prefix := prefixes[0].(string)
+		if !strings.HasPrefix(name, prefix) {
+			return fmt.Errorf("resource name %s must start with prefix %s", name, prefix)
+		}
+	}
+	return ValidateResourceNameWithSlug(resourceType, name)
+}
+
+// ValidateResourceNameInSchemaWithTypes validates a resource name against schema constraints for multiple resource types
+func ValidateResourceNameInSchemaWithTypes(d *schema.ResourceData) error {
+	resourceTypes, ok := d.Get("resource_types").([]interface{})
+	if !ok || len(resourceTypes) == 0 {
+		return fmt.Errorf("resource_types must be provided")
+	}
+
+	name := d.Get("name").(string)
+	for _, rt := range resourceTypes {
+		resourceType := rt.(string)
+		if err := ValidateResourceNameWithSlug(resourceType, name); err != nil {
+			return fmt.Errorf("validation failed for resource type %s: %v", resourceType, err)
+		}
+	}
+	return nil
+}
+
+// BaseSchema returns the base schema for all resource types
+func BaseSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"name": {
 			Type:        schema.TypeString,
@@ -27,6 +270,17 @@ func V4_Schema() map[string]*schema.Schema {
 				if strings.TrimSpace(v) == "" {
 					es = append(es, fmt.Errorf("name cannot be only whitespace"))
 					return
+				}
+
+				// Get resource type from schema
+				d := schema.TestResourceDataRaw(nil, BaseSchema(), map[string]interface{}{
+					"name":          v,
+					"resource_type": "",
+				})
+				if rt, ok := d.GetOk("resource_type"); ok {
+					if err := ValidateResourceNameWithSlug(rt.(string), v); err != nil {
+						es = append(es, err)
+					}
 				}
 				return
 			},

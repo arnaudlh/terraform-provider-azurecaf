@@ -4,102 +4,61 @@ import (
 	"context"
 	b64 "encoding/base64"
 	"fmt"
+	"regexp"
 	"strings"
 
+	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/models"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func V3() *schema.Resource {
+	baseSchema := BaseSchema()
 	resourceMapsKeys := getResourceMaps()
+
+	schema := make(map[string]*schema.Schema)
+	for k, v := range baseSchema {
+		newSchema := *v
+		newSchema.ForceNew = true
+		schema[k] = &newSchema
+	}
+
+	schema["resource_types"] = &schema.Schema{
+		Type: schema.TypeList,
+		Elem: &schema.Schema{
+			Type:         schema.TypeString,
+			ValidateFunc: validation.StringInSlice(resourceMapsKeys, false),
+		},
+		Optional: true,
+		ForceNew: true,
+	}
+
+	schema["use_slug"] = &schema.Schema{
+		Type:     schema.TypeBool,
+		Optional: true,
+		ForceNew: true,
+		Default:  true,
+	}
+
 	return &schema.Resource{
-		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-				Default:  "",
+		Schema: schema,
+		SchemaVersion: 3,
+		StateUpgraders: []schema.StateUpgrader{
+			{
+				Type:    V2().Schema,
+				Upgrade: ResourceNameStateUpgradeV3,
+				Version: 2,
 			},
-			"prefixes": {
-				Type: schema.TypeList,
-				Elem: &schema.Schema{
-					Type:         schema.TypeString,
-					ValidateFunc: validation.NoZeroValues,
-				},
-				Optional: true,
-				ForceNew: true,
-			},
-			"suffixes": {
-				Type: schema.TypeList,
-				Elem: &schema.Schema{
-					Type:         schema.TypeString,
-					ValidateFunc: validation.NoZeroValues,
-				},
-				Optional: true,
-				ForceNew: true,
-			},
-			"random_length": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.IntAtLeast(0),
-				Default:      0,
-			},
-			"result": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"results": {
-				Type: schema.TypeMap,
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
-				},
-				Computed: true,
-			},
-			"separator": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-				Default:  "-",
-			},
-			"clean_input": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				ForceNew: true,
-				Default:  true,
-			},
-			"passthrough": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				ForceNew: true,
-				Default:  false,
-			},
-			"resource_type": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validation.StringInSlice(resourceMapsKeys, false),
-				ForceNew:     true,
-			},
-			"resource_types": {
-				Type: schema.TypeList,
-				Elem: &schema.Schema{
-					Type:         schema.TypeString,
-					ValidateFunc: validation.StringInSlice(resourceMapsKeys, false),
-				},
-				Optional: true,
-				ForceNew: true,
-			},
-			"random_seed": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				ForceNew: true,
-			},
-			"use_slug": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				ForceNew: true,
-				Default:  true,
-			},
+		},
+		Create: resourceNameCreate,
+		Read:   resourceNameRead,
+		Update: resourceNameUpdate,
+		Delete: resourceNameDelete,
+		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, m interface{}) error {
+			if err := ValidateResourceNameInSchema(d); err != nil {
+				return err
+			}
+			return nil
 		},
 	}
 }
@@ -109,7 +68,6 @@ func ResourceNameStateUpgradeV3(ctx context.Context, rawState map[string]interfa
 		return nil, nil
 	}
 
-	// Handle results field
 	results := rawState["results"]
 	content := make(map[string]interface{})
 	if results != nil {
@@ -119,7 +77,6 @@ func ResourceNameStateUpgradeV3(ctx context.Context, rawState map[string]interfa
 		}
 	}
 
-	// Handle resource_type and result fields safely
 	resourceType, ok := rawState["resource_type"].(string)
 	if !ok {
 		resourceType = ""
@@ -129,7 +86,6 @@ func ResourceNameStateUpgradeV3(ctx context.Context, rawState map[string]interfa
 		result = ""
 	}
 
-	// Only update content if we have valid resource_type and result
 	if resourceType != "" && result != "" {
 		if _, ok := content[resourceType]; !ok {
 			content[resourceType] = result
@@ -138,7 +94,6 @@ func ResourceNameStateUpgradeV3(ctx context.Context, rawState map[string]interfa
 
 	rawState["results"] = content
 
-	// Generate ID only if we have content
 	if len(content) > 0 {
 		ids := make([]string, 0, len(content))
 		for k, v := range content {

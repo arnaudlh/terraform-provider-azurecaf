@@ -2,96 +2,62 @@ package schemas
 
 import (
 	"context"
+	"fmt"
+	"regexp"
+	"strings"
 
+	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/models"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func V2() *schema.Resource {
+	baseSchema := BaseSchema()
 	resourceMapsKeys := getResourceMaps()
+
+	schema := make(map[string]*schema.Schema)
+	for k, v := range baseSchema {
+		newSchema := *v
+		newSchema.ForceNew = false
+		schema[k] = &newSchema
+	}
+
+	schema["resource_types"] = &schema.Schema{
+		Type: schema.TypeList,
+		Elem: &schema.Schema{
+			Type:         schema.TypeString,
+			ValidateFunc: validation.StringInSlice(resourceMapsKeys, false),
+		},
+		Optional: true,
+		ForceNew: false,
+	}
+
 	return &schema.Resource{
-		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: false,
-				Default:  "",
-			},
-			"prefixes": {
-				Type: schema.TypeList,
-				Elem: &schema.Schema{
-					Type:         schema.TypeString,
-					ValidateFunc: validation.NoZeroValues,
-				},
-				Optional: true,
-				ForceNew: false,
-			},
-			"suffixes": {
-				Type: schema.TypeList,
-				Elem: &schema.Schema{
-					Type:         schema.TypeString,
-					ValidateFunc: validation.NoZeroValues,
-				},
-				Optional: true,
-				ForceNew: false,
-			},
-			"random_length": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				ForceNew:     false,
-				ValidateFunc: validation.IntAtLeast(0),
-				Default:      0,
-			},
-			"result": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"results": {
-				Type: schema.TypeMap,
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
-				},
-				Computed: true,
-			},
-			"separator": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: false,
-				Default:  "-",
-			},
-			"clean_input": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				ForceNew: false,
-				Default:  true,
-			},
-			"passthrough": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				ForceNew: true,
-				Default:  false,
-			},
-			"resource_type": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validation.StringInSlice(resourceMapsKeys, false),
-				ForceNew:     false,
-			},
-			"resource_types": {
-				Type: schema.TypeList,
-				Elem: &schema.Schema{
-					Type:         schema.TypeString,
-					ValidateFunc: validation.StringInSlice(resourceMapsKeys, false),
-				},
-				Optional: true,
-				ForceNew: false,
-			},
-			"random_seed": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				ForceNew: false,
+		Schema: schema,
+		SchemaVersion: 2,
+		StateUpgraders: []schema.StateUpgrader{
+			{
+				Type:    V1().Schema,
+				Upgrade: ResourceNameStateUpgradeV2,
+				Version: 1,
 			},
 		},
+		Create: resourceNameCreate,
+		Read:   resourceNameRead,
+		Update: resourceNameUpdate,
+		Delete: resourceNameDelete,
+		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, m interface{}) error {
+			if err := ValidateResourceNameInSchema(d); err != nil {
+				return err
+			}
+			return nil
+		},
+	}
+}
+
+func V1() *schema.Resource {
+	return &schema.Resource{
+		Schema: BaseSchema(),
 	}
 }
 
