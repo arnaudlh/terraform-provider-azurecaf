@@ -4,10 +4,8 @@ import (
 	"context"
 	b64 "encoding/base64"
 	"fmt"
-	"regexp"
 	"strings"
 
-	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/models"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
@@ -24,13 +22,13 @@ func V3() *schema.Resource {
 	}
 
 	schema["resource_types"] = &schema.Schema{
-		Type: schema.TypeList,
+		Type:     schema.TypeList,
 		Elem: &schema.Schema{
-			Type: schema.TypeString,
+			Type:         schema.TypeString,
+			ValidateFunc: validation.StringInSlice(resourceMapsKeys, false),
 		},
-		Optional:     true,
-		ForceNew:     true,
-		ValidateFunc: validation.StringInSlice(resourceMapsKeys, false),
+		Optional: true,
+		ForceNew: true,
 	}
 
 	schema["use_slug"] = &schema.Schema{
@@ -41,7 +39,7 @@ func V3() *schema.Resource {
 	}
 
 	return &schema.Resource{
-		Schema: schema,
+		Schema:         schema,
 		SchemaVersion: 3,
 		StateUpgraders: []schema.StateUpgrader{
 			{

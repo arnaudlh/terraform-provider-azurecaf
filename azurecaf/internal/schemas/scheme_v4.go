@@ -3,10 +3,7 @@ package schemas
 import (
 	"context"
 	"fmt"
-	"regexp"
-	"strings"
 
-	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/models"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
@@ -23,17 +20,17 @@ func V4() *schema.Resource {
 	}
 
 	schema["resource_types"] = &schema.Schema{
-		Type: schema.TypeList,
+		Type:     schema.TypeList,
 		Elem: &schema.Schema{
-			Type: schema.TypeString,
+			Type:         schema.TypeString,
+			ValidateFunc: validation.StringInSlice(resourceMapsKeys, false),
 		},
-		Optional:     true,
-		ForceNew:     false,
-		ValidateFunc: validation.StringInSlice(resourceMapsKeys, false),
+		Optional: true,
+		ForceNew: false,
 	}
 
 	return &schema.Resource{
-		Schema: schema,
+		Schema:         schema,
 		SchemaVersion: 4,
 		StateUpgraders: []schema.StateUpgrader{
 			{
