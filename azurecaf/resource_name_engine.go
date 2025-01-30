@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	models "github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/models"
+	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/models"
 )
 
 func cleanSlice(names []string, resourceDefinition *models.ResourceStructure) []string {
