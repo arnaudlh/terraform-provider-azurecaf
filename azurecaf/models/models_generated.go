@@ -6,7 +6,7 @@
 
 package models
 
-// ResourceDefinitions are a map of difinitions for the resources supported
+// ResourceDefinitions are a map of definitions for the resources supported
 var ResourceDefinitions = map[string]ResourceStructure{
 	"aks_node_pool_linux": {
 		ResourceTypeName: "aks_node_pool_linux",
