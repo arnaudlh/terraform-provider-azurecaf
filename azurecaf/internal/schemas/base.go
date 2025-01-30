@@ -157,12 +157,25 @@ func ValidateResourceNameWithSlug(resourceType, name string) error {
 }
 
 // ValidateResourceNameInSchema validates a resource name against schema constraints
-func ValidateResourceNameInSchema(d *schema.ResourceData) error {
-	resourceType := d.Get("resource_type").(string)
-	name := d.Get("name").(string)
-	useSlug := true
-	if v, ok := d.GetOk("use_slug"); ok {
-		useSlug = v.(bool)
+func ValidateResourceNameInSchema(d interface{}) error {
+	var resourceType, name string
+	var useSlug bool = true
+
+	switch v := d.(type) {
+	case *schema.ResourceData:
+		resourceType = v.Get("resource_type").(string)
+		name = v.Get("name").(string)
+		if v, ok := v.GetOk("use_slug"); ok {
+			useSlug = v.(bool)
+		}
+	case *schema.ResourceDiff:
+		resourceType = v.Get("resource_type").(string)
+		name = v.Get("name").(string)
+		if v, ok := v.GetOk("use_slug"); ok {
+			useSlug = v.(bool)
+		}
+	default:
+		return fmt.Errorf("unsupported schema type for validation")
 	}
 
 	if resourceType != "" {
@@ -180,12 +193,10 @@ func ValidateResourceNameInSchema(d *schema.ResourceData) error {
 			nameLower := strings.ToLower(name)
 			prefixLower := strings.ToLower(expectedPrefix)
 
-			// Check if the name contains the prefix
 			if !strings.Contains(nameLower, prefixLower) {
 				return fmt.Errorf("resource name %s must contain the slug '%s' for resource type '%s'", name, expectedPrefix, resourceType)
 			}
 
-			// Validate prefix placement
 			slugIndex := strings.Index(nameLower, prefixLower)
 			if slugIndex > 0 {
 				prevChar := rune(name[slugIndex-1])
@@ -194,7 +205,6 @@ func ValidateResourceNameInSchema(d *schema.ResourceData) error {
 				}
 			}
 
-			// Validate that prefix is followed by a separator
 			slugEndIndex := slugIndex + len(prefixLower)
 			if slugEndIndex < len(name) {
 				nextChar := rune(name[slugEndIndex])
@@ -204,7 +214,6 @@ func ValidateResourceNameInSchema(d *schema.ResourceData) error {
 			}
 		}
 
-		// Additional validation for regex pattern
 		if resource.ValidationRegExp != "" {
 			pattern, err := regexp.Compile(resource.ValidationRegExp)
 			if err != nil {
@@ -251,159 +260,70 @@ func ValidateResourceNameInSchemaWithTypes(d *schema.ResourceData) error {
 }
 
 // BaseSchema returns the base schema for all resource types
+func validateResourceTypes(i interface{}, k string) ([]string, []error) {
+	var errs []error
+	v, ok := i.([]interface{})
+	if !ok {
+		return nil, []error{fmt.Errorf("expected type of %s to be []interface{}", k)}
+	}
+	resourceMapsKeys := getResourceMaps()
+	for _, rt := range v {
+		resourceType := rt.(string)
+		if !stringInSlice(resourceType, resourceMapsKeys) {
+			errs = append(errs, fmt.Errorf("resource type %s is not supported", resourceType))
+		}
+	}
+	return nil, errs
+}
+
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
+}
+
 func BaseSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"name": {
-			Type:        schema.TypeString,
-			Required:    true,
-			Description: "The base name to use for the Azure resource.",
-			ValidateFunc: func(i interface{}, k string) (ws []string, es []error) {
-				v, ok := i.(string)
-				if !ok {
-					es = append(es, fmt.Errorf("expected type of %s to be string", k))
-					return
-				}
-				if v == "" {
-					es = append(es, fmt.Errorf("name cannot be empty"))
-					return
-				}
-				if strings.TrimSpace(v) == "" {
-					es = append(es, fmt.Errorf("name cannot be only whitespace"))
-					return
-				}
-
-				// Get resource type from schema
-				d := schema.TestResourceDataRaw(nil, BaseSchema(), map[string]interface{}{
-					"name":          v,
-					"resource_type": "",
-				})
-				if rt, ok := d.GetOk("resource_type"); ok {
-					if err := ValidateResourceNameWithSlug(rt.(string), v); err != nil {
-						es = append(es, err)
-					}
-				}
-				return
-			},
-		},
-		"resource_type": {
 			Type:     schema.TypeString,
-			Required: true,
-			ValidateFunc: func(i interface{}, k string) (ws []string, es []error) {
-				v, ok := i.(string)
-				if !ok {
-					es = append(es, fmt.Errorf("expected type of %s to be string", k))
-					return
-				}
-				if v == "" {
-					es = append(es, fmt.Errorf("resource_type cannot be empty"))
-					return
-				}
-				if strings.TrimSpace(v) == "" {
-					es = append(es, fmt.Errorf("resource_type cannot be only whitespace"))
-					return
-				}
-
-				resource, err := models.ValidateResourceType(v)
-				if err != nil {
-					es = append(es, fmt.Errorf("invalid resource type %s: %v", v, err))
-					return
-				}
-
-				// Validate regex patterns
-				if resource.ValidationRegExp != "" {
-					pattern, err := regexp.Compile(resource.ValidationRegExp)
-					if err != nil {
-						es = append(es, fmt.Errorf("invalid validation regex pattern for resource type %s: %v", v, err))
-						return
-					}
-					if !pattern.MatchString(v) {
-						es = append(es, fmt.Errorf("resource type %s does not match required pattern: %s", v, resource.ValidationRegExp))
-						return
-					}
-					ws = append(ws, fmt.Sprintf("Resource type %s will be validated against pattern: %s", v, resource.ValidationRegExp))
-				}
-				if resource.RegEx != "" {
-					pattern, err := regexp.Compile(resource.RegEx)
-					if err != nil {
-						es = append(es, fmt.Errorf("invalid regex pattern for resource type %s: %v", v, err))
-						return
-					}
-					if !pattern.MatchString(v) {
-						es = append(es, fmt.Errorf("resource type %s does not match required pattern: %s", v, resource.RegEx))
-						return
-					}
-					ws = append(ws, fmt.Sprintf("Resource type %s has additional regex validation: %s", v, resource.RegEx))
-				}
-
-				// Validate length constraints
-				if resource.MinLength < 0 {
-					es = append(es, fmt.Errorf("invalid minimum length for resource type %s: %d", v, resource.MinLength))
-					return
-				}
-				if resource.MaxLength > 0 && resource.MaxLength < resource.MinLength {
-					es = append(es, fmt.Errorf("invalid maximum length for resource type %s: max=%d is less than min=%d", v, resource.MaxLength, resource.MinLength))
-					return
-				}
-				if len(v) < resource.MinLength {
-					es = append(es, fmt.Errorf("resource type %s is too short: min=%d, got=%d", v, resource.MinLength, len(v)))
-					return
-				}
-				if resource.MaxLength > 0 && len(v) > resource.MaxLength {
-					es = append(es, fmt.Errorf("resource type %s is too long: max=%d, got=%d", v, resource.MaxLength, len(v)))
-					return
-				}
-				if resource.MinLength > 0 || resource.MaxLength > 0 {
-					ws = append(ws, fmt.Sprintf("Resource type %s length constraints: min=%d, max=%d", v, resource.MinLength, resource.MaxLength))
-				}
-
-				// Validate CAF prefix
-				if resource.CafPrefix != "" {
-					if !strings.HasPrefix(strings.ToLower(v), strings.ToLower(resource.CafPrefix)) {
-						es = append(es, fmt.Errorf("resource type %s requires prefix %s", v, resource.CafPrefix))
-						return
-					}
-					ws = append(ws, fmt.Sprintf("Resource type %s requires prefix: %s", v, resource.CafPrefix))
-				}
-
-				// Add validation warnings for other constraints
-				if resource.LowerCase {
-					if v != strings.ToLower(v) {
-						es = append(es, fmt.Errorf("resource type %s requires lowercase characters only", v))
-						return
-					}
-					ws = append(ws, fmt.Sprintf("Resource type %s requires lowercase characters only", v))
-				}
-				if resource.Dashes {
-					if !strings.Contains(v, "-") {
-						ws = append(ws, fmt.Sprintf("Resource type %s allows dashes in the name", v))
-					}
-				}
-				if resource.Scope != "" {
-					ws = append(ws, fmt.Sprintf("Resource type %s has scope: %s", v, resource.Scope))
-				}
-				return
-			},
-			Description: "The type of Azure resource to create a name for. Must be one of the supported resource types.",
+			Optional: true,
+			Default:  "",
 		},
 		"prefixes": {
-			Type:     schema.TypeList,
+			Type: schema.TypeList,
+			Elem: &schema.Schema{
+				Type:         schema.TypeString,
+				ValidateFunc: validation.NoZeroValues,
+			},
 			Optional: true,
-			Elem:     &schema.Schema{Type: schema.TypeString},
 		},
 		"suffixes": {
-			Type:     schema.TypeList,
+			Type: schema.TypeList,
+			Elem: &schema.Schema{
+				Type:         schema.TypeString,
+				ValidateFunc: validation.NoZeroValues,
+			},
 			Optional: true,
-			Elem:     &schema.Schema{Type: schema.TypeString},
 		},
 		"random_length": {
-			Type:     schema.TypeInt,
-			Optional: true,
-			Default:  0,
+			Type:         schema.TypeInt,
+			Optional:     true,
+			ValidateFunc: validation.IntAtLeast(0),
+			Default:      0,
 		},
-		"random_seed": {
-			Type:     schema.TypeInt,
-			Optional: true,
-			Default:  0,
+		"result": {
+			Type:     schema.TypeString,
+			Computed: true,
+		},
+		"results": {
+			Type: schema.TypeMap,
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+			Computed: true,
 		},
 		"separator": {
 			Type:     schema.TypeString,
@@ -420,25 +340,14 @@ func BaseSchema() map[string]*schema.Schema {
 			Optional: true,
 			Default:  false,
 		},
-		"use_slug": {
-			Type:     schema.TypeBool,
+		"resource_type": {
+			Type:         schema.TypeString,
+			Optional:     true,
+			ValidateFunc: validation.StringInSlice(getResourceMaps(), false),
+		},
+		"random_seed": {
+			Type:     schema.TypeInt,
 			Optional: true,
-			Default:  true,
-		},
-		"result": {
-			Type:     schema.TypeString,
-			Computed: true,
-		},
-		"results": {
-			Type:     schema.TypeMap,
-			Computed: true,
-			Elem: &schema.Schema{
-				Type: schema.TypeString,
-			},
-		},
-		"random_string": {
-			Type:     schema.TypeString,
-			Computed: true,
 		},
 	}
 }

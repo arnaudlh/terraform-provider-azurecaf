@@ -26,11 +26,11 @@ func V3() *schema.Resource {
 	schema["resource_types"] = &schema.Schema{
 		Type: schema.TypeList,
 		Elem: &schema.Schema{
-			Type:         schema.TypeString,
-			ValidateFunc: validation.StringInSlice(resourceMapsKeys, false),
+			Type: schema.TypeString,
 		},
-		Optional: true,
-		ForceNew: true,
+		Optional:     true,
+		ForceNew:     true,
+		ValidateFunc: validation.StringInSlice(resourceMapsKeys, false),
 	}
 
 	schema["use_slug"] = &schema.Schema{
@@ -56,7 +56,7 @@ func V3() *schema.Resource {
 		Delete: resourceNameDelete,
 		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, m interface{}) error {
 			if err := ValidateResourceNameInSchema(d); err != nil {
-				return err
+				return fmt.Errorf("resource name validation failed: %v", err)
 			}
 			return nil
 		},
