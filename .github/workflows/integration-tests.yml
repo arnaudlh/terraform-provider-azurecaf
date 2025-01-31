@@ -22,8 +22,8 @@ jobs:
       - name: Run Integration Tests
         run: |
           mkdir -p test-results
-          go test -v -tags=integration -json ./azurecaf/... | tee test-results/integration-tests.json
-          go tool test2json < test-results/integration-tests.json > test-results/integration-tests-report.json
+          go test -v -tags=integration ./azurecaf/... 2>&1 | tee test-results/integration-tests.log
+          cat test-results/integration-tests.log | go tool test2json > test-results/integration-tests-report.json
 
       - name: Generate Test Report
         uses: dorny/test-reporter@v1

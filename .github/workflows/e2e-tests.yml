@@ -35,8 +35,8 @@ jobs:
         run: |
           mkdir -p test-results
           cd tests/e2e
-          go test -v -json ./... | tee ../../test-results/e2e-tests.json
-          go tool test2json < ../../test-results/e2e-tests.json > ../../test-results/e2e-tests-report.json
+          go test -v ./... 2>&1 | tee ../../test-results/e2e-tests.log
+          cat ../../test-results/e2e-tests.log | go tool test2json > ../../test-results/e2e-tests-report.json
         env:
           TF_ACC: "1"
 

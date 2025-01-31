@@ -22,8 +22,8 @@ jobs:
       - name: Run Unit Tests
         run: |
           mkdir -p test-results
-          go test -v -coverprofile=coverage.out -json ./azurecaf/... | tee test-results/unit-tests.json
-          go tool test2json < test-results/unit-tests.json > test-results/unit-tests-report.json
+          go test -v -coverprofile=coverage.out ./azurecaf/... 2>&1 | tee test-results/unit-tests.log
+          cat test-results/unit-tests.log | go tool test2json > test-results/unit-tests-report.json
 
       - name: Generate Test Report
         uses: dorny/test-reporter@v1
