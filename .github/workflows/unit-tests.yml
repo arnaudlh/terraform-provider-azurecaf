@@ -20,7 +20,9 @@ jobs:
           cache: false
 
       - name: Install go-junit-report
-        run: go install github.com/jstemmer/go-junit-report/v2@latest
+        run: |
+          go install github.com/jstemmer/go-junit-report/v2@latest
+          export PATH=$PATH:$(go env GOPATH)/bin
 
       - name: Run Unit Tests
         run: |
