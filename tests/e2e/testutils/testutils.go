@@ -21,10 +21,10 @@ type ResourceDefinition struct {
     Scope           string `json:"scope,omitempty"`
 }
 
-func GetResourceDefinitions() (map[string]ResourceDefinition, error) {
+func GetResourceDefinitions() map[string]interface{} {
     wd, err := os.Getwd()
     if err != nil {
-        return nil, fmt.Errorf("failed to get working directory: %v", err)
+        panic(fmt.Sprintf("failed to get working directory: %v", err))
     }
 
     var jsonPath string
@@ -37,58 +37,59 @@ func GetResourceDefinitions() (map[string]ResourceDefinition, error) {
     }
 
     if jsonPath == "" {
-        return nil, fmt.Errorf("resourceDefinition.json not found in any parent directory")
+        panic("resourceDefinition.json not found in any parent directory")
     }
 
     data, err := os.ReadFile(jsonPath)
     if err != nil {
-        return nil, fmt.Errorf("failed to read resource definitions: %v", err)
+        panic(fmt.Sprintf("failed to read resource definitions: %v", err))
     }
 
-    var definitionsArray []ResourceDefinition
+    var definitionsArray []map[string]interface{}
     if err := json.Unmarshal(data, &definitionsArray); err != nil {
-        return nil, fmt.Errorf("failed to parse resource definitions: %v", err)
+        panic(fmt.Sprintf("failed to parse resource definitions: %v", err))
     }
 
-    definitions := make(map[string]ResourceDefinition)
+    definitions := make(map[string]interface{})
     for _, def := range definitionsArray {
-        definitions[def.ResourceTypeName] = def
+        if name, ok := def["name"].(string); ok {
+            definitions[name] = def
+        }
     }
 
-    return definitions, nil
+    return definitions
 }
 
-func ValidateResourceOutput(t *testing.T, resourceType, resourceOutput, dataOutput string) error {
+func ValidateResourceOutput(t *testing.T, resourceType, resourceOutput, dataOutput string) {
     if resourceOutput != dataOutput {
-        return fmt.Errorf("resource output (%s) does not match data source output (%s)", resourceOutput, dataOutput)
+        t.Errorf("Resource output (%s) does not match data source output (%s)", resourceOutput, dataOutput)
+        return
     }
 
-    defs, err := GetResourceDefinitions()
-    if err != nil {
-        return fmt.Errorf("failed to get resource definitions: %v", err)
-    }
-
-    def, ok := defs[resourceType]
+    defs := GetResourceDefinitions()
+    def, ok := defs[resourceType].(map[string]interface{})
     if !ok {
-        return fmt.Errorf("resource type %s not found in definitions", resourceType)
+        t.Fatalf("Resource type %s not found in definitions", resourceType)
+        return
     }
 
-    if def.ValidationRegExp != "" {
-        pattern, err := regexp.Compile(def.ValidationRegExp)
+    if pattern, ok := def["validation_regexp"].(string); ok && pattern != "" {
+        re, err := regexp.Compile(pattern)
         if err != nil {
-            return fmt.Errorf("invalid validation regex for %s: %v", resourceType, err)
+            t.Fatalf("Invalid validation regex for %s: %v", resourceType, err)
+            return
         }
 
-        if !pattern.MatchString(resourceOutput) {
-            return fmt.Errorf("resource output %q does not match validation pattern %q", resourceOutput, def.ValidationRegExp)
-        }
-    }
-
-    if def.CafPrefix != "" && def.LowerCase {
-        if resourceOutput != "" && !regexp.MustCompile("^"+def.CafPrefix+"(-|$)").MatchString(resourceOutput) {
-            return fmt.Errorf("resource output %q does not start with expected prefix %q", resourceOutput, def.CafPrefix)
+        if !re.MatchString(resourceOutput) {
+            t.Errorf("Resource output %q does not match validation pattern %q", resourceOutput, pattern)
         }
     }
 
-    return nil
+    if prefix, ok := def["slug"].(string); ok && prefix != "" {
+        if lowercase, ok := def["lowercase"].(bool); ok && lowercase {
+            if resourceOutput != "" && !regexp.MustCompile("^"+prefix+"(-|$)").MatchString(resourceOutput) {
+                t.Errorf("Resource output %q does not start with expected prefix %q", resourceOutput, prefix)
+            }
+        }
+    }
 }
