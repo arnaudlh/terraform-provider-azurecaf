@@ -28,6 +28,7 @@ require (
 	github.com/mitchellh/go-wordwrap v1.0.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
+	github.com/stretchr/testify v1.8.3 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
@@ -41,7 +42,4 @@ require (
 	google.golang.org/protobuf v1.35.1 // indirect
 )
 
-replace (
-	github.com/aztfmod/terraform-provider-azurecaf => ../..
-	github.com/aztfmod/terraform-provider-azurecaf/tests/e2e/testutils => ./testutils
-)
+replace github.com/aztfmod/terraform-provider-azurecaf => ../..

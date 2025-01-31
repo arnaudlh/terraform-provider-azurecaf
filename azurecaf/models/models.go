@@ -34,9 +34,15 @@ func init() {
     // Try to find resourceDefinition.json in multiple locations
     var jsonPath string
     searchPaths := []string{
-        filepath.Join(wd, "resourceDefinition.json"),                    // Current directory
-        filepath.Join(filepath.Dir(wd), "resourceDefinition.json"),      // Parent directory
-        "/home/ubuntu/.terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/2.0.0-preview5/linux_amd64/resourceDefinition.json", // Plugin directory
+        filepath.Join(wd, "resourceDefinition.json"),
+        filepath.Join(filepath.Dir(wd), "resourceDefinition.json"),
+        filepath.Join(filepath.Dir(filepath.Dir(wd)), "resourceDefinition.json"),
+        filepath.Join(filepath.Dir(filepath.Dir(filepath.Dir(wd))), "resourceDefinition.json"),
+        "/home/ubuntu/.terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/2.0.0-preview5/linux_amd64/resourceDefinition.json",
+        "/home/runner/work/terraform-provider-azurecaf/terraform-provider-azurecaf/resourceDefinition.json",
+        "/home/runner/work/terraform-provider-azurecaf/terraform-provider-azurecaf/tests/e2e/resourceDefinition.json",
+        filepath.Join(os.Getenv("HOME"), "repos/terraform-provider-azurecaf/resourceDefinition.json"),
+        filepath.Join(os.Getenv("HOME"), "repos/terraform-provider-azurecaf/tests/e2e/resourceDefinition.json"),
     }
 
     for _, path := range searchPaths {
