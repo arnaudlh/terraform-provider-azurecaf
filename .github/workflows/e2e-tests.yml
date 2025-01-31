@@ -35,7 +35,7 @@ jobs:
         run: |
           mkdir -p test-results
           cd tests/e2e
-          go test -v -json ./... > ../../test-results/e2e-tests-report.json
+          go test -v ./... 2>&1 | go-junit-report > ../../test-results/e2e-tests-report.xml
         env:
           TF_ACC: "1"
           GO111MODULE: "on"
@@ -45,8 +45,8 @@ jobs:
         if: success() || failure()
         with:
           name: E2E Tests Report
-          path: test-results/e2e-tests-report.json
-          reporter: go-json
+          path: test-results/e2e-tests-report.xml
+          reporter: java-junit
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
