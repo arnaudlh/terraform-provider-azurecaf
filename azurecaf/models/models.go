@@ -31,10 +31,15 @@ func init() {
         panic(fmt.Sprintf("failed to get working directory: %v", err))
     }
 
-    // Try to find resourceDefinition.json by walking up directories
+    // Try to find resourceDefinition.json in multiple locations
     var jsonPath string
-    for dir := wd; dir != "/"; dir = filepath.Dir(dir) {
-        path := filepath.Join(dir, "resourceDefinition.json")
+    searchPaths := []string{
+        filepath.Join(wd, "resourceDefinition.json"),                    // Current directory
+        filepath.Join(filepath.Dir(wd), "resourceDefinition.json"),      // Parent directory
+        "/home/ubuntu/.terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/2.0.0-preview5/linux_amd64/resourceDefinition.json", // Plugin directory
+    }
+
+    for _, path := range searchPaths {
         if _, err := os.Stat(path); err == nil {
             jsonPath = path
             break
@@ -42,7 +47,7 @@ func init() {
     }
 
     if jsonPath == "" {
-        panic("resourceDefinition.json not found in any parent directory")
+        panic("resourceDefinition.json not found in search paths")
     }
 
     data, err := os.ReadFile(jsonPath)

@@ -2,62 +2,14 @@
 package testutils
 
 import (
-    "encoding/json"
-    "fmt"
-    "os"
-    "path/filepath"
     "regexp"
     "testing"
+
+    "github.com/aztfmod/terraform-provider-azurecaf/azurecaf/models"
 )
 
-type ResourceDefinition struct {
-    ResourceTypeName  string `json:"name"`
-    CafPrefix        string `json:"slug,omitempty"`
-    MinLength        int    `json:"min_length"`
-    MaxLength        int    `json:"max_length"`
-    LowerCase        bool   `json:"lowercase,omitempty"`
-    RegEx            string `json:"regex,omitempty"`
-    ValidationRegExp string `json:"validation_regexp,omitempty"`
-    Scope           string `json:"scope,omitempty"`
-}
-
-func GetResourceDefinitions() map[string]interface{} {
-    wd, err := os.Getwd()
-    if err != nil {
-        panic(fmt.Sprintf("failed to get working directory: %v", err))
-    }
-
-    var jsonPath string
-    for dir := wd; dir != "/"; dir = filepath.Dir(dir) {
-        path := filepath.Join(dir, "resourceDefinition.json")
-        if _, err := os.Stat(path); err == nil {
-            jsonPath = path
-            break
-        }
-    }
-
-    if jsonPath == "" {
-        panic("resourceDefinition.json not found in any parent directory")
-    }
-
-    data, err := os.ReadFile(jsonPath)
-    if err != nil {
-        panic(fmt.Sprintf("failed to read resource definitions: %v", err))
-    }
-
-    var definitionsArray []map[string]interface{}
-    if err := json.Unmarshal(data, &definitionsArray); err != nil {
-        panic(fmt.Sprintf("failed to parse resource definitions: %v", err))
-    }
-
-    definitions := make(map[string]interface{})
-    for _, def := range definitionsArray {
-        if name, ok := def["name"].(string); ok {
-            definitions[name] = def
-        }
-    }
-
-    return definitions
+func GetResourceDefinitions() map[string]*models.ResourceStructure {
+    return models.ResourceDefinitions
 }
 
 func ValidateResourceOutput(t *testing.T, resourceType, resourceOutput, dataOutput string) {
@@ -67,29 +19,27 @@ func ValidateResourceOutput(t *testing.T, resourceType, resourceOutput, dataOutp
     }
 
     defs := GetResourceDefinitions()
-    def, ok := defs[resourceType].(map[string]interface{})
+    def, ok := defs[resourceType]
     if !ok {
         t.Fatalf("Resource type %s not found in definitions", resourceType)
         return
     }
 
-    if pattern, ok := def["validation_regexp"].(string); ok && pattern != "" {
-        re, err := regexp.Compile(pattern)
+    if def.ValidationRegExp != "" {
+        re, err := regexp.Compile(def.ValidationRegExp)
         if err != nil {
             t.Fatalf("Invalid validation regex for %s: %v", resourceType, err)
             return
         }
 
         if !re.MatchString(resourceOutput) {
-            t.Errorf("Resource output %q does not match validation pattern %q", resourceOutput, pattern)
+            t.Errorf("Resource output %q does not match validation pattern %q", resourceOutput, def.ValidationRegExp)
         }
     }
 
-    if prefix, ok := def["slug"].(string); ok && prefix != "" {
-        if lowercase, ok := def["lowercase"].(bool); ok && lowercase {
-            if resourceOutput != "" && !regexp.MustCompile("^"+prefix+"(-|$)").MatchString(resourceOutput) {
-                t.Errorf("Resource output %q does not start with expected prefix %q", resourceOutput, prefix)
-            }
+    if def.CafPrefix != "" && def.LowerCase {
+        if resourceOutput != "" && !regexp.MustCompile("^"+def.CafPrefix+"(-|$)").MatchString(resourceOutput) {
+            t.Errorf("Resource output %q does not start with expected prefix %q", resourceOutput, def.CafPrefix)
         }
     }
 }

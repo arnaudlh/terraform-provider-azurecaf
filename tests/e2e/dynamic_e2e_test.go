@@ -7,6 +7,7 @@ import (
     "os"
     "os/exec"
     "path/filepath"
+    "strings"
     "testing"
     "time"
 
@@ -22,8 +23,8 @@ func TestDynamicResourceDefinitions(t *testing.T) {
     defer cancel()
 
     t.Log("Loading resource definitions...")
-    defs := testutils.GetResourceDefinitions()
-    t.Logf("Found %d resource definitions", len(defs))
+    resourceDefs := testutils.GetResourceDefinitions()
+    t.Logf("Found %d resource definitions", len(resourceDefs))
 
     // Create base test directory
     baseDir, err := os.MkdirTemp("", "azurecaf-e2e-*")
@@ -48,6 +49,21 @@ provider "azurecaf" {}`
         t.Fatalf("Failed to write provider config: %v", err)
     }
 
+    // Create dev override configuration
+    devConfig := fmt.Sprintf(`provider_installation {
+  dev_overrides {
+    "aztfmod/azurecaf" = "%s"
+  }
+  direct {}
+}`, filepath.Join(os.Getenv("HOME"), ".terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/2.0.0-preview5/linux_amd64"))
+
+    if err := os.WriteFile(filepath.Join(baseDir, ".terraformrc"), []byte(devConfig), 0644); err != nil {
+        t.Fatalf("Failed to write dev config: %v", err)
+    }
+
+    // Set development override environment variable
+    os.Setenv("TF_CLI_CONFIG_FILE", filepath.Join(baseDir, ".terraformrc"))
+
     // Initialize Terraform
     cmd := exec.CommandContext(ctx, "terraform", "init")
     cmd.Dir = baseDir
@@ -55,7 +71,7 @@ provider "azurecaf" {}`
         t.Fatalf("Failed to initialize Terraform: %v\n%s", err, out)
     }
 
-    for resourceType := range defs {
+    for resourceType := range resourceDefs {
         if ctx.Err() != nil {
             t.Fatal("Test timeout exceeded")
         }
@@ -64,28 +80,31 @@ provider "azurecaf" {}`
             t.Logf("Testing resource type: %s", resourceType)
             
             // Generate test configuration
+            // Create a safe resource name by replacing non-alphanumeric characters
+            safeResourceType := strings.ReplaceAll(strings.ReplaceAll(resourceType, "-", "_"), ".", "_")
+            
             config := fmt.Sprintf(`
-resource "azurecaf_name" "test" {
-  name          = "test-%s"
-  resource_type = "%s"
+resource "azurecaf_name" "test_%[1]s" {
+  name          = "test-%[2]s"
+  resource_type = "%[2]s"
   random_length = 5
   clean_input   = true
 }
 
-data "azurecaf_name" "test" {
-  name          = azurecaf_name.test.result
-  resource_type = "%s"
+data "azurecaf_name" "test_%[1]s" {
+  name          = azurecaf_name.test_%[1]s.result
+  resource_type = "%[2]s"
   random_length = 5
   clean_input   = true
 }
 
-output "resource_output" {
-  value = azurecaf_name.test.result
+output "resource_output_%[1]s" {
+  value = azurecaf_name.test_%[1]s.result
 }
 
-output "data_output" {
-  value = data.azurecaf_name.test.result
-}`, resourceType, resourceType, resourceType)
+output "data_output_%[1]s" {
+  value = data.azurecaf_name.test_%[1]s.result
+}`, safeResourceType, resourceType)
 
             configPath := filepath.Join(baseDir, fmt.Sprintf("%s.tf", resourceType))
             if err := os.WriteFile(configPath, []byte(config), 0644); err != nil {
@@ -107,15 +126,15 @@ output "data_output" {
                 t.Fatalf("Failed to get outputs for %s: %v", resourceType, err)
             }
 
-            var outputs struct {
-                ResourceOutput struct{ Value string }
-                DataOutput    struct{ Value string }
-            }
+            resourceOutputKey := fmt.Sprintf("resource_output_%s", safeResourceType)
+            dataOutputKey := fmt.Sprintf("data_output_%s", safeResourceType)
+            
+            var outputs map[string]struct{ Value string }
             if err := json.Unmarshal(output, &outputs); err != nil {
                 t.Fatalf("Failed to parse outputs for %s: %v", resourceType, err)
             }
 
-            testutils.ValidateResourceOutput(t, resourceType, outputs.ResourceOutput.Value, outputs.DataOutput.Value)
+            testutils.ValidateResourceOutput(t, resourceType, outputs[resourceOutputKey].Value, outputs[dataOutputKey].Value)
         })
     }
 }
