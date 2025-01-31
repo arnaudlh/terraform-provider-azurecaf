@@ -433,32 +433,7 @@ func ValidateResourceNameInSchemaWithTypes(d *schema.ResourceData) error {
 }
 
 // BaseSchema returns the base schema for all resource types
-// validateResourceTypes is used by BaseSchema for resource_type validation
-func validateResourceTypes(i interface{}, k string) ([]string, []error) {
-	var errs []error
-	v, ok := i.([]interface{})
-	if !ok {
-		return nil, []error{fmt.Errorf("expected type of %s to be []interface{}", k)}
-	}
-	resourceMapsKeys := getResourceMaps()
-	for _, rt := range v {
-		resourceType := rt.(string)
-		if !stringInSlice(resourceType, resourceMapsKeys) {
-			errs = append(errs, fmt.Errorf("resource type %s is not supported", resourceType))
-		}
-	}
-	return nil, errs
-}
 
-// stringInSlice is used by validateResourceTypes for resource type validation
-func stringInSlice(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
-			return true
-		}
-	}
-	return false
-}
 
 func BaseSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
