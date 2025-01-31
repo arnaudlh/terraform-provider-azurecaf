@@ -31,6 +31,9 @@ jobs:
           mv terraform-provider-azurecaf ~/.terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/2.0.0-preview5/linux_amd64/terraform-provider-azurecaf_v2.0.0-preview5
           chmod +x ~/.terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/2.0.0-preview5/linux_amd64/terraform-provider-azurecaf_v2.0.0-preview5
 
+      - name: Install go-junit-report
+        run: go install github.com/jstemmer/go-junit-report/v2@latest
+
       - name: Run E2E Tests
         run: |
           mkdir -p test-results
