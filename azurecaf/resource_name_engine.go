@@ -19,11 +19,27 @@ func cleanString(name string, resourceDefinition *models.ResourceStructure) stri
 	if name == "" {
 		return ""
 	}
-	myRegex, _ := regexp.Compile(resourceDefinition.RegEx)
-	if myRegex.FindString(name) == "" {
+	if resourceDefinition == nil {
 		return name
 	}
-	return myRegex.ReplaceAllString(name, "")
+	
+	// First validate the input using ValidationRegExp if present
+	if resourceDefinition.ValidationRegExp != "" {
+		validationRegex, err := regexp.Compile(resourceDefinition.ValidationRegExp)
+		if err == nil && !validationRegex.MatchString(name) {
+			return ""
+		}
+	}
+	
+	// Then clean the string using RegEx if present
+	if resourceDefinition.RegEx != "" {
+		cleanRegex, err := regexp.Compile(resourceDefinition.RegEx)
+		if err == nil {
+			return cleanRegex.ReplaceAllString(name, "")
+		}
+	}
+	
+	return name
 }
 
 func concatenateParameters(separator string, parameters ...[]string) string {
@@ -72,38 +88,38 @@ func composeName(separator string,
 	currentlength := 0
 
 	for i := 0; i < len(namePrecedence); i++ {
-		initialized := 0
+		separatorLen := 0
 		if len(contents) > 0 {
-			initialized = len(separator)
+			separatorLen = len(separator)
 		}
 		switch c := namePrecedence[i]; c {
 		case "name":
 			if len(name) > 0 {
-				if currentlength+len(name)+initialized <= maxlength {
+				if currentlength+len(name)+separatorLen <= maxlength {
 					contents = append(contents, name)
-					currentlength = currentlength + len(name) + initialized
+					currentlength = currentlength + len(name) + separatorLen
 				}
 			}
 		case "slug":
 			if len(slug) > 0 {
-				if currentlength+len(slug)+initialized <= maxlength {
+				if currentlength+len(slug)+separatorLen <= maxlength {
 					contents = append([]string{slug}, contents...)
-					currentlength = currentlength + len(slug) + initialized
+					currentlength = currentlength + len(slug) + separatorLen
 				}
 			}
 		case "random":
 			if len(randomSuffix) > 0 {
-				if currentlength+len(randomSuffix)+initialized <= maxlength {
+				if currentlength+len(randomSuffix)+separatorLen <= maxlength {
 					contents = append(contents, randomSuffix)
-					currentlength = currentlength + len(randomSuffix) + initialized
+					currentlength = currentlength + len(randomSuffix) + separatorLen
 				}
 			}
 		case "suffixes":
 			if len(suffixes) > 0 {
 				if len(suffixes[0]) > 0 {
-					if currentlength+len(suffixes[0])+initialized <= maxlength {
+					if currentlength+len(suffixes[0])+separatorLen <= maxlength {
 						contents = append(contents, suffixes[0])
-						currentlength = currentlength + len(suffixes[0]) + initialized
+						currentlength = currentlength + len(suffixes[0]) + separatorLen
 					}
 				}
 				suffixes = suffixes[1:]
@@ -114,9 +130,9 @@ func composeName(separator string,
 		case "prefixes":
 			if len(prefixes) > 0 {
 				if len(prefixes[len(prefixes)-1]) > 0 {
-					if currentlength+len(prefixes[len(prefixes)-1])+initialized <= maxlength {
+					if currentlength+len(prefixes[len(prefixes)-1])+separatorLen <= maxlength {
 						contents = append([]string{prefixes[len(prefixes)-1]}, contents...)
-						currentlength = currentlength + len(prefixes[len(prefixes)-1]) + initialized
+						currentlength = currentlength + len(prefixes[len(prefixes)-1]) + separatorLen
 					}
 				}
 				prefixes = prefixes[:len(prefixes)-1]
@@ -175,7 +191,7 @@ func getResourceName(resourceTypeName string, separator string,
 	}
 
 	slug := ""
-	if useSlug {
+	if useSlug && !passthrough {
 		slug = getSlug(resourceTypeName)
 	}
 

@@ -462,8 +462,7 @@ func BaseSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"name": {
 			Type:     schema.TypeString,
-			Optional: true,
-			Default:  "",
+			Required: true,
 		},
 		"prefixes": {
 			Type: schema.TypeList,
@@ -516,7 +515,7 @@ func BaseSchema() map[string]*schema.Schema {
 		},
 		"resource_type": {
 			Type:         schema.TypeString,
-			Optional:     true,
+			Required:     true,
 			ValidateFunc: validation.StringInSlice(getResourceMaps(), false),
 		},
 		"random_seed": {
@@ -528,6 +527,11 @@ func BaseSchema() map[string]*schema.Schema {
 			Type:     schema.TypeBool,
 			Optional: true,
 			Default:  true,
+		},
+		"random_string": {
+			Type:     schema.TypeString,
+			Computed: true,
+			ForceNew: true,
 		},
 	}
 }

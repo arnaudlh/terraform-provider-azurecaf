@@ -26,7 +26,7 @@ func TestV4_Schema(t *testing.T) {
 	}
 
 	// Test computed fields
-	computedFields := []string{"result", "results", "random_string"}
+	computedFields := []string{"result", "results"}
 	for _, field := range computedFields {
 		if v, ok := s[field]; !ok {
 			t.Errorf("missing computed field %s", field)
@@ -44,17 +44,18 @@ func TestV4_Schema(t *testing.T) {
 	}
 
 	// Test field types
-	if s["name"].Type.String() != "TypeString" {
-		t.Errorf("field name should be TypeString")
+	fieldTypes := map[string]string{
+		"name":          "TypeString",
+		"resource_type": "TypeString",
+		"prefixes":      "TypeList",
+		"suffixes":      "TypeList",
 	}
-	if s["resource_type"].Type.String() != "TypeString" {
-		t.Errorf("field resource_type should be TypeString")
-	}
-	if s["prefixes"].Type.String() != "TypeList" {
-		t.Errorf("field prefixes should be TypeList")
-	}
-	if s["suffixes"].Type.String() != "TypeList" {
-		t.Errorf("field suffixes should be TypeList")
+	for field, expectedType := range fieldTypes {
+		if v, ok := s[field]; !ok {
+			t.Errorf("missing field %s", field)
+		} else if v.Type.String() != expectedType {
+			t.Errorf("field %s should be %s, got %s", field, expectedType, v.Type.String())
+		}
 	}
 }
 

@@ -8,7 +8,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 	"testing"
 	"time"
 
@@ -21,8 +20,7 @@ func TestDynamicResourceDefinitions(t *testing.T) {
 
 	t.Log("Loading resource definitions...")
 	resourceDefs := testutils.GetResourceDefinitions()
-	resourceCount := len(resourceDefs)
-	t.Logf("Found %d resource definitions", resourceCount)
+	t.Logf("Found %d resource definitions", len(resourceDefs))
 
 	// Create base test directory
 	baseDir, err := os.MkdirTemp("", "azurecaf-e2e-*")
@@ -107,12 +105,12 @@ provider "azurecaf" {}`
 		t.Fatalf("Failed to initialize Terraform: %v\n%s", err, out)
 	}
 
-	for resourceType, def := range resourceDefs {
+	for resourceType := range resourceDefs {
 		if ctx.Err() != nil {
 			t.Fatal("Test timeout exceeded")
 		}
 
-	t.Run(resourceType, func(t *testing.T) {
+		t.Run(resourceType, func(t *testing.T) {
 			t.Logf("Testing resource type: %s", resourceType)
 			
 			// Generate unique resource names based on resource type hash to avoid conflicts

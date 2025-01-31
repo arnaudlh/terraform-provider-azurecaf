@@ -15,18 +15,22 @@ type ResourceTestData struct {
 }
 
 func GetAllResourceTestData() []*ResourceTestData {
-	defs := loadResourceDefinitions()
+	defs := GetResourceDefinitions()
 	resources := make([]*ResourceTestData, 0, len(defs))
 	
-	for resourceType, def := range defs {
+	for resourceType, defRaw := range defs {
+		def, ok := defRaw.(map[string]interface{})
+		if !ok {
+			continue
+		}
 		resources = append(resources, &ResourceTestData{
 			ResourceType:    resourceType,
-			Slug:           def.CafPrefix,
-			ValidationRegex: def.ValidationRegExp,
-			MinLength:      def.MinLength,
-			MaxLength:      def.MaxLength,
-			LowerCase:      def.LowerCase,
-			Scope:          def.Scope,
+			Slug:           def["slug"].(string),
+			ValidationRegex: def["validation_regexp"].(string),
+			MinLength:      int(def["min_length"].(float64)),
+			MaxLength:      int(def["max_length"].(float64)),
+			LowerCase:      def["lowercase"].(bool),
+			Scope:          def["scope"].(string),
 		})
 	}
 
@@ -38,16 +42,20 @@ func GetAllResourceTestData() []*ResourceTestData {
 }
 
 func GetResourceByType(resourceType string) (*ResourceTestData, bool) {
-	defs := loadResourceDefinitions()
-	if def, ok := defs[resourceType]; ok {
+	defs := GetResourceDefinitions()
+	if defRaw, ok := defs[resourceType]; ok {
+		def, ok := defRaw.(map[string]interface{})
+		if !ok {
+			return nil, false
+		}
 		return &ResourceTestData{
 			ResourceType:    resourceType,
-			Slug:           def.CafPrefix,
-			ValidationRegex: def.ValidationRegExp,
-			MinLength:      def.MinLength,
-			MaxLength:      def.MaxLength,
-			LowerCase:      def.LowerCase,
-			Scope:          def.Scope,
+			Slug:           def["slug"].(string),
+			ValidationRegex: def["validation_regexp"].(string),
+			MinLength:      int(def["min_length"].(float64)),
+			MaxLength:      int(def["max_length"].(float64)),
+			LowerCase:      def["lowercase"].(bool),
+			Scope:          def["scope"].(string),
 		}, true
 	}
 	return nil, false

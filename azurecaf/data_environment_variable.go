@@ -28,6 +28,11 @@ func dataEnvironmentVariable() *schema.Resource {
 				Description: "Value of the environment variable.",
 				Sensitive:   true,
 			},
+			"default_value": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Default value to use if the environment variable is not set.",
+			},
 		},
 	}
 }
@@ -39,10 +44,13 @@ func resourceAction(ctx context.Context, d *schema.ResourceData, meta interface{
 	value, ok := os.LookupEnv(name)
 
 	if !ok {
-		if failsIfEmpty := d.Get("fails_if_empty").(bool); failsIfEmpty {
+		if defaultValue, exists := d.GetOk("default_value"); exists {
+			value = defaultValue.(string)
+		} else if failsIfEmpty := d.Get("fails_if_empty").(bool); failsIfEmpty {
 			return diag.Errorf("Value is not set for environment variable: %s", name)
+		} else {
+			value = ""
 		}
-		value = ""
 	}
 
 	d.SetId(name)

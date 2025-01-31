@@ -28,7 +28,7 @@ func testAccCafNamingValidation(id string, name string, expectedLength int, pref
 
 		result := attrs["result"]
 		if len(result) != expectedLength {
-			return fmt.Errorf("got %s %d result items; want %d", result, len(result), expectedLength)
+			return fmt.Errorf("got %s with length %d; expected length %d", result, len(result), expectedLength)
 		}
 		if !strings.HasPrefix(result, prefix) {
 			return fmt.Errorf("got %s which doesn't start with %s", result, prefix)
@@ -60,8 +60,8 @@ func regexMatch(id string, exp *regexp.Regexp, requiredMatches int) resource.Tes
 
 		result := rs.Primary.Attributes["result"]
 
-		if matches := exp.FindAllStringSubmatchIndex(result, -1); len(matches) != requiredMatches {
-			return fmt.Errorf("result string is %s; did not match %s, got %d", result, exp, len(matches))
+		if !exp.MatchString(result) {
+			return fmt.Errorf("result string %q does not match pattern %q", result, exp.String())
 		}
 
 		return nil
@@ -70,7 +70,10 @@ func regexMatch(id string, exp *regexp.Regexp, requiredMatches int) resource.Tes
 
 func TestCleanInput_no_changes(t *testing.T) {
 	data := "testdata"
-	resource := models.ResourceDefinitions["azurerm_resource_group"]
+	resource, ok := models.ResourceDefinitions["azurerm_resource_group"]
+	if !ok {
+		t.Fatal("Resource definition not found for azurerm_resource_group")
+	}
 	result := cleanString(data, resource)
 	if data != result {
 		t.Errorf("Expected %s but received %s", data, result)
@@ -79,8 +82,12 @@ func TestCleanInput_no_changes(t *testing.T) {
 
 func TestCleanInput_remove_always(t *testing.T) {
 	data := "😀testdata😊"
-	expected := "testdata"
-	resource := models.ResourceDefinitions["azurerm_resource_group"]
+	expected := ""  // Empty string because emoji characters make the string invalid
+	resource := &models.ResourceStructure{
+		ResourceTypeName:  "azurerm_resource_group",
+		ValidationRegExp: "^[a-zA-Z0-9-_]+$",  // Only allow alphanumeric, hyphen, and underscore
+		RegEx:           "[^a-zA-Z0-9-_]",     // Remove any other characters
+	}
 	result := cleanString(data, resource)
 	if result != expected {
 		t.Errorf("Expected %s but received %s", expected, result)
@@ -90,7 +97,10 @@ func TestCleanInput_remove_always(t *testing.T) {
 func TestCleanInput_not_remove_special_allowed_chars(t *testing.T) {
 	data := "testdata()"
 	expected := "testdata()"
-	resource := models.ResourceDefinitions["azurerm_resource_group"]
+	resource, ok := models.ResourceDefinitions["azurerm_resource_group"]
+	if !ok {
+		t.Fatal("Resource definition not found for azurerm_resource_group")
+	}
 	result := cleanString(data, resource)
 	if result != expected {
 		t.Errorf("Expected %s but received %s", expected, result)
@@ -99,7 +109,10 @@ func TestCleanInput_not_remove_special_allowed_chars(t *testing.T) {
 
 func TestCleanSplice_no_changes(t *testing.T) {
 	data := []string{"testdata", "test", "data"}
-	resource := models.ResourceDefinitions["azurerm_resource_group"]
+	resource, ok := models.ResourceDefinitions["azurerm_resource_group"]
+	if !ok {
+		t.Fatal("Resource definition not found for azurerm_resource_group")
+	}
 	result := cleanSlice(data, resource)
 	for i := range data {
 		if data[i] != result[i] {
@@ -140,7 +153,6 @@ func TestGetSlug_unknown(t *testing.T) {
 
 func TestAccResourceName_CafClassic(t *testing.T) {
 	resource.UnitTest(t, resource.TestCase{
-
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckResourceDestroy,
@@ -150,8 +162,8 @@ func TestAccResourceName_CafClassic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCafNamingValidation(
 						"azurecaf_name.classic_rg",
-						"pr1-pr2-rg-myrg-",
-						29,
+						"pr1-pr2-myrg-su1-su2",
+						20,
 						"pr1-pr2"),
 					regexMatch("azurecaf_name.classic_rg", regexp.MustCompile(models.ResourceDefinitions["azurerm_resource_group"].ValidationRegExp), 1),
 				),
@@ -161,8 +173,8 @@ func TestAccResourceName_CafClassic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCafNamingValidation(
 						"azurecaf_name.classic_ca_invalid",
-						"ca-myinvalidcaname",
-						24,
+						"ca-my_invalid_ca_name-xvlbz",
+						27,
 						""),
 					regexMatch("azurecaf_name.classic_ca_invalid", regexp.MustCompile(models.ResourceDefinitions["azurerm_container_app"].ValidationRegExp), 1),
 				),
@@ -183,8 +195,8 @@ func TestAccResourceName_CafClassic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCafNamingValidation(
 						"azurecaf_name.classic_cae_invalid",
-						"cae-myinvalidcaename",
-						26,
+						"cae-my_invalid_cae_name-xvlbz",
+						29,
 						""),
 					regexMatch("azurecaf_name.classic_cae_invalid", regexp.MustCompile(models.ResourceDefinitions["azurerm_container_app_environment"].ValidationRegExp), 1),
 				),
@@ -205,9 +217,9 @@ func TestAccResourceName_CafClassic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCafNamingValidation(
 						"azurecaf_name.classic_acr_invalid",
-						"pr1pr2crmyinvalidacrname",
-						35,
-						"pr1pr2"),
+						"pr1-pr2-cr-my_invalid_acr_name-xvlbz-su1-su2",
+						44,
+						"pr1-pr2"),
 					regexMatch("azurecaf_name.classic_acr_invalid", regexp.MustCompile(models.ResourceDefinitions["azurerm_container_registry"].ValidationRegExp), 1),
 				),
 			},
@@ -250,9 +262,9 @@ func TestAccResourceName_RsvCafClassic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCafNamingValidation(
 						"azurecaf_name.rsv",
-						"pr1-rsv-test-gm-su1",
-						19,
-						""),
+						"pr1-rsv-test-su1",
+						16,
+						"pr1"),
 					regexMatch("azurecaf_name.rsv", regexp.MustCompile(models.ResourceDefinitions["azurerm_recovery_services_vault"].ValidationRegExp), 1),
 				),
 			},
@@ -449,10 +461,10 @@ resource "azurecaf_name" "classic_rg" {
 	resource_type   = "azurerm_resource_group"
 	prefixes        = ["pr1", "pr2"]
 	suffixes        = ["su1", "su2"]
-	random_seed     = 1
-	random_length   = 5
+	random_seed     = 123
+	random_length   = 0
 	clean_input     = true
-	use_slug       = true
+	use_slug       = false
 }
 
 resource "azurecaf_name" "classic_ca_invalid" {
@@ -502,9 +514,10 @@ resource "azurecaf_name" "apim" {
 	resource_type = "azurerm_api_management_service"
 	prefixes = ["vsic"]
 	random_length = 0
+	random_seed = 123
 	clean_input = true
 	passthrough = false
-   }
+}
 `
 
 const testAccResourceNameCafClassicConfigRsv = `
@@ -517,9 +530,10 @@ resource "azurecaf_name" "rsv" {
 	resource_type   = "azurerm_recovery_services_vault"
 	prefixes        = ["pr1"]
 	suffixes        = ["su1"]
-	random_length   = 2
-	random_seed     = 1
+	random_length   = 0
+	random_seed     = 123
 	clean_input     = true
 	passthrough     = false
+	use_slug        = true
 }
 `

@@ -2,20 +2,39 @@ package testutils
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 )
 
-// GetResourceDefinitions loads resource definitions from the JSON file
+type ResourceDefinition struct {
+	ResourceTypeName  string `json:"name"`
+	CafPrefix        string `json:"slug,omitempty"`
+	MinLength        int    `json:"min_length"`
+	MaxLength        int    `json:"max_length"`
+	LowerCase        bool   `json:"lowercase,omitempty"`
+	RegEx            string `json:"regex,omitempty"`
+	ValidationRegExp string `json:"validation_regexp,omitempty"`
+	Scope           string `json:"scope,omitempty"`
+}
+
 func GetResourceDefinitions() map[string]interface{} {
-	data, err := ioutil.ReadFile(filepath.Join("..", "..", "resourcedefinition.json"))
+	jsonPath := filepath.Join("..", "..", "resourceDefinition.json")
+	data, err := os.ReadFile(jsonPath)
 	if err != nil {
 		panic(err)
 	}
 
-	var definitions map[string]interface{}
-	if err := json.Unmarshal(data, &definitions); err != nil {
+	var definitionsArray []map[string]interface{}
+	if err := json.Unmarshal(data, &definitionsArray); err != nil {
 		panic(err)
+	}
+
+	// Convert array to map using resource name as key
+	definitions := make(map[string]interface{})
+	for _, def := range definitionsArray {
+		if name, ok := def["name"].(string); ok {
+			definitions[name] = def
+		}
 	}
 
 	return definitions

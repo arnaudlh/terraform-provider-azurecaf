@@ -43,24 +43,50 @@ func resourceName() *schema.Resource {
 }
 
 func getDifference(context context.Context, d *schema.ResourceDiff, resource interface{}) error {
-	name := d.Get("name").(string)
-	prefixes := convertInterfaceToString(d.Get("prefixes").([]interface{}))
-	suffixes := convertInterfaceToString(d.Get("suffixes").([]interface{}))
-	separator := d.Get("separator").(string)
-	resourceType := d.Get("resource_type").(string)
-	cleanInput := d.Get("clean_input").(bool)
-	passthrough := d.Get("passthrough").(bool)
-	useSlug := d.Get("use_slug").(bool)
-	randomLength := d.Get("random_length").(int)
-	randomSeed := int64(d.Get("random_seed").(int))
-	randomString := d.Get("random_string").(string)
-	randomSuffix := utils.RandSeq(randomLength, randomSeed)
+	name, ok := d.Get("name").(string)
+	if !ok {
+		return fmt.Errorf("name must be a string")
+	}
+	prefixesRaw := d.Get("prefixes")
+	var prefixes []string
+	if prefixesRaw != nil {
+		if arr, ok := prefixesRaw.([]interface{}); ok {
+			prefixes = convertInterfaceToString(arr)
+		}
+	}
+	suffixesRaw := d.Get("suffixes")
+	var suffixes []string
+	if suffixesRaw != nil {
+		if arr, ok := suffixesRaw.([]interface{}); ok {
+			suffixes = convertInterfaceToString(arr)
+		}
+	}
+	separator, ok := d.Get("separator").(string)
+	if !ok {
+		separator = "-"
+	}
+	resourceType, ok := d.Get("resource_type").(string)
+	if !ok {
+		return fmt.Errorf("resource_type must be a string")
+	}
+	cleanInput, _ := d.Get("clean_input").(bool)
+	passthrough, _ := d.Get("passthrough").(bool)
+	useSlug, _ := d.Get("use_slug").(bool)
+	randomLength, _ := d.Get("random_length").(int)
+	randomSeedRaw := d.Get("random_seed")
+	var randomSeed int64
+	if seedInt, ok := randomSeedRaw.(int); ok {
+		randomSeed = int64(seedInt)
+	}
+	randomString, _ := d.Get("random_string").(string)
+	var randomSuffix string
 	if len(randomString) > 0 {
 		randomSuffix = randomString
-	} else {
-	if err := d.SetNew("random_string", randomSuffix); err != nil {
-		return fmt.Errorf("failed to set random_string")
-	}
+	} else if randomLength > 0 {
+		randomSuffix = utils.RandSeq(randomLength, randomSeed)
+		if err := d.SetNew("random_string", randomSuffix); err != nil {
+			return fmt.Errorf("failed to set random_string: %v", err)
+		}
 	}
 	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
 	result, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
@@ -78,6 +104,13 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 		}
 	}
 	existingResults[resourceType] = result
+	if err := d.SetNew("result", result); err != nil {
+		return fmt.Errorf("failed to set result: %v", err)
+	}
+	if err := d.SetNew("results", existingResults); err != nil {
+		return fmt.Errorf("failed to set results: %v", err)
+	}
+	// Random string is already set above
 	return nil
 }
 
