@@ -2,9 +2,14 @@ name: Unit Tests
 
 on:
   push:
-    branches: [ '*' ]
+    branches: [ 'main', '3_0' ]
   pull_request:
-    branches: [ '*' ]
+    branches: [ 'main', '3_0' ]
+
+# Prevent duplicate workflow runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
