@@ -1,6 +1,7 @@
 package schemas
 
 import (
+	"context"
 	"reflect"
 	"testing"
 )
@@ -118,7 +119,7 @@ func TestResourceNameStateUpgradeV2(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			newData, err := ResourceNameStateUpgradeV2(nil, tt.oldData, nil)
+			newData, err := ResourceNameStateUpgradeV2(context.TODO(), tt.oldData, nil)
 			if err != nil {
 				t.Fatalf("error upgrading state: %s", err)
 			}
@@ -211,7 +212,7 @@ func TestResourceNameStateUpgradeV3(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			newData, err := ResourceNameStateUpgradeV3(nil, tt.oldData, nil)
+			newData, err := ResourceNameStateUpgradeV3(context.TODO(), tt.oldData, nil)
 			if err != nil {
 				t.Fatalf("error upgrading state: %s", err)
 			}
