@@ -21,11 +21,11 @@ dev-aztfmod-001
 ```hcl
 resource "azurecaf_name" "rg_example" {
   name            = "demogroup"
-    resource_type   = "azurerm_resource_group"
-    prefixes        = ["a", "b"]
-    suffixes        = ["y", "z"]
-    random_length   = 5
-    clean_input     = true
+  resource_type   = "azurerm_resource_group"
+  prefixes        = ["a", "b"]
+  suffixes        = ["y", "z"]
+  random_length   = 5
+  clean_input     = true
 }
 
 resource "azurerm_resource_group" "demo" {
@@ -45,7 +45,7 @@ The following arguments are supported:
 * **name** - (optional) the basename of the resource to create, the basename will be sanitized as per supported characters set for each Azure resources.
 * **prefixes** (optional) - a list of prefix to append as the first characters of the generated name - prefixes will be separated by the separator character
 * **suffixes** (optional) -  a list of additional suffix added after the basename, this is can be used to append resource index (eg. vm-001). Suffixes are separated by the separator character
-* **random_length** (optional) - default to ``0`` : configure additional characters to append to the generated resource name. Random characters will remain compliant with the set of allowed characters per resources and will be appended after the suffixes
+* **random_length** (optional) - default to ``0`` : configure additional characters to append to the generated resource name. Random characters will remain compliant with the set of allowed characters per resources and will be appended before suffix(ess).
 * **random_seed** (optional) - default to ``0`` : Define the seed to be used for random generator. 0 will not be respected and will generate a seed based in the unix time of the generation.
 * **resource_type** (optional) -  describes the type of azure resource you are requesting a name from (eg. azure container registry: azurerm_container_registry). See the Resource Type section
 * **resource_types** (optional) -  a list of additional resource type should you want to use the same settings for a set of resources
@@ -78,6 +78,7 @@ Current supported resource types:
 | azurerm_automation_account| aa| 6| 50| false| "^[a-zA-Z][a-zA-Z0-9-]{4,48}[a-zA-Z0-9]$"|
 | azurerm_automation_certificate| aacert| 1| 128| false| "^[^<>*%:.?\\+\\/]{0,127}[^<>*%:.?\\+\\/ ]$"|
 | azurerm_automation_credential| aacred| 1| 128| false| "^[^<>*%:.?\\+\\/]{0,127}[^<>*%:.?\\+\\/ ]$"|
+| azurerm_automation_job_schedule| aajs| 1| 128| false| "^[^<>*%:.?\\+\\/]{0,127}[^<>*%:.?\\+\\/ ]$"|
 | azurerm_automation_runbook| aarun| 1| 63| false| "^[a-zA-Z][a-zA-Z0-9-]{0,62}$"|
 | azurerm_automation_schedule| aasched| 1| 128| false| "^[^<>*%:.?\\+\\/]{0,127}[^<>*%:.?\\+\\/ ]$"|
 | azurerm_automation_variable| aavar| 1| 128| false| "^[^<>*%:.?\\+\\/]{0,127}[^<>*%:.?\\+\\/ ]$"|
@@ -108,6 +109,8 @@ Current supported resource types:
 | azurerm_windows_virtual_machine| vm| 1| 15| false| "^[^\\/\"\\[\\]:|<>+=;,?*@&_][^\\/\"\\[\\]:|<>+=;,?*@&]{0,13}[^\\/\"\\[\\]:|<>+=;,?*@&.-]$"|
 | azurerm_windows_virtual_machine_scale_set| vmss| 1| 15| false| "^[^\\/\"\\[\\]:|<>+=;,?*@&_][^\\/\"\\[\\]:|<>+=;,?*@&]{0,13}[^\\/\"\\[\\]:|<>+=;,?*@&.-]$"|
 | azurerm_containerGroups| cg| 1| 63| false| "^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]$"|
+| azurerm_container_app| ca| 1| 32| true| "^[a-z0-9][a-z0-9-]{0,30}[a-z0-9]$"|
+| azurerm_container_app_environment| cae| 1| 60| false| "^[0-9A-Za-z][0-9A-Za-z-]{0,58}[0-9a-zA-Z]$"|
 | azurerm_container_registry| cr| 1| 63| true| "^[a-zA-Z0-9]{1,63}$"|
 | azurerm_container_registry_webhook| crwh| 1| 50| false| "^[a-zA-Z0-9]{1,50}$"|
 | azurerm_kubernetes_cluster| aks| 1| 63| false| "^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]$"|

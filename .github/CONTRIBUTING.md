@@ -28,19 +28,18 @@ Please, find below the steps that should be followed to contribute:
 
 3. Check the requirements for your resource Name
 
-    You can check the requirements for your resource name in the [docs](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules) or by checking the error message returned when trying to create the resource on Azure with an invalid name
+    You can check the requirements for your resource name in the [docs](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules) or by checking the error message returned when trying to create the resource on Azure with an invalid name. Slug value can also be checked in the CAF [docs](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations).
 
 4. Choose the slug for the resource
 
-    Every resource in CAF does have a slug that associate with this resource this is 2 to 5 letters that identify that resource, for example, the slug for a `key vault` is `kv` for a storage account `st` What is important here it is to try to keep this short but meaningful and avoid collision with existing ones. Don't worry about knowing all existing ones if you choose one that exists already the tests will fail.
-
+    Every resource in CAF does have a slug that associate with this resource this is 2 to 5 letters that identify that resource, for example, the slug for a `key vault` is `kv` for a storage account `st` What is important here it is to try to keep this short but meaningful and avoid collision with existing ones. Don't worry about knowing all existing ones if you choose one that exists already the tests will fail. You can also check if the resource has an example abbreviation on this page: [doc](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations)
 5. Modify the `resourceDefinition.json`
 
     You should now add your resource to the resource definitions in the just add another resource on the list. You can use the existing resources as a template for your resource implementation
 
 6. Generate the definitions based on the `resourcedefinition.json` and test
 
-    You can run `make build` in case you have make installed in your system in case you don't you can run from the repository root `go generate` followed by `go fmt ./...` and them `go test ./...`
+    You can run `make build` in case you have make installed in your system in case you don't you can run from the repository root `go generate` followed by `go fmt ./...` and then `go test ./...`
 
 7. Update the README.MD with coverage
  

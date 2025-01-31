@@ -11,4 +11,4 @@ terraform
 **/*.log
 main
 __debug_bin
-**/.terraform.lock.hcl
+**/.terraform.lock.hcltest-results/
