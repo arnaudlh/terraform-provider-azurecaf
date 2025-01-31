@@ -45,7 +45,8 @@ jobs:
         run: |
           mkdir -p test-results
           cd tests/e2e
-          go test -v ./... 2>&1 | go-junit-report > ../../test-results/e2e-tests-report.xml
+          # Run tests and capture both output and generate report
+          go test -v ./... 2>&1 | tee >(go-junit-report > ../../test-results/e2e-tests-report.xml)
         env:
           TF_ACC: "1"
           GO111MODULE: "on"

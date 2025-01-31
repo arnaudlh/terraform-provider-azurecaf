@@ -171,6 +171,7 @@ output "data_output_%[1]s" {
                     return
                 }
                 stats.terraformErrors++
+                def := resourceDefs[resourceType]
                 t.Fatalf(`Terraform apply failed for resource type %q:
 Error: %v
 Resource Definition:
@@ -201,6 +202,7 @@ Terraform Output:
             // Validate that resource and data source outputs match
             if outputs[resourceOutputKey].Value != outputs[dataOutputKey].Value {
                 stats.matchErrors++
+                def := resourceDefs[resourceType]
                 t.Errorf(`Resource/Data source mismatch for type %q:
   - Resource Output: %q
   - Data Source Output: %q
