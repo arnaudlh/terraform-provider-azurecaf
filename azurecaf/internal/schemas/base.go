@@ -433,6 +433,7 @@ func ValidateResourceNameInSchemaWithTypes(d *schema.ResourceData) error {
 }
 
 // BaseSchema returns the base schema for all resource types
+// validateResourceTypes is used by BaseSchema for resource_type validation
 func validateResourceTypes(i interface{}, k string) ([]string, []error) {
 	var errs []error
 	v, ok := i.([]interface{})
@@ -449,6 +450,7 @@ func validateResourceTypes(i interface{}, k string) ([]string, []error) {
 	return nil, errs
 }
 
+// stringInSlice is used by validateResourceTypes for resource type validation
 func stringInSlice(a string, list []string) bool {
 	for _, b := range list {
 		if b == a {
