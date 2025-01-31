@@ -23,9 +23,21 @@ func TestDynamicResourceDefinitions(t *testing.T) {
     ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
     defer cancel()
 
+    stats := struct {
+        totalResources    int
+        passedValidation  int
+        failedValidation  int
+        skippedResources  int
+        terraformErrors   int
+        matchErrors       int
+    }{
+        totalResources: 0,
+    }
+
     t.Log("Loading resource definitions...")
     resourceDefs := models.ResourceDefinitions
-    t.Logf("Found %d resource definitions", len(resourceDefs))
+    stats.totalResources = len(resourceDefs)
+    t.Logf("Found %d resource definitions", stats.totalResources)
 
     // Initialize command variable for reuse
     var cmd *exec.Cmd
@@ -154,10 +166,20 @@ output "data_output_%[1]s" {
             cmd.Dir = testDir
             if out, err := cmd.CombinedOutput(); err != nil {
                 if resourceCtx.Err() == context.DeadlineExceeded {
-                    t.Skipf("Skipping %s due to timeout", resourceType)
+                    stats.skippedResources++
+                    t.Skipf("Skipping resource type %q due to timeout after 2 minutes", resourceType)
                     return
                 }
-                t.Fatalf("Failed to apply Terraform config for %s: %v\n%s", resourceType, err, out)
+                stats.terraformErrors++
+                t.Fatalf(`Terraform apply failed for resource type %q:
+Error: %v
+Resource Definition:
+  - Type: %s
+  - Prefix: %q
+  - Validation Pattern: %q
+Terraform Output:
+%s`, 
+                    resourceType, err, resourceType, def.CafPrefix, def.ValidationRegExp, out)
             }
 
             // Get outputs
@@ -178,8 +200,17 @@ output "data_output_%[1]s" {
 
             // Validate that resource and data source outputs match
             if outputs[resourceOutputKey].Value != outputs[dataOutputKey].Value {
-                t.Errorf("Resource output (%s) does not match data source output (%s)", 
-                    outputs[resourceOutputKey].Value, outputs[dataOutputKey].Value)
+                stats.matchErrors++
+                t.Errorf(`Resource/Data source mismatch for type %q:
+  - Resource Output: %q
+  - Data Source Output: %q
+  - Resource Type: %s
+  - Expected Prefix: %q`,
+                    resourceType,
+                    outputs[resourceOutputKey].Value,
+                    outputs[dataOutputKey].Value,
+                    resourceType,
+                    def.CafPrefix)
             }
 
             // Validate against resource definition
@@ -192,10 +223,39 @@ output "data_output_%[1]s" {
                 }
 
                 if !re.MatchString(outputs[resourceOutputKey].Value) {
-                    t.Errorf("Resource output %q does not match validation pattern %q", 
-                        outputs[resourceOutputKey].Value, def.ValidationRegExp)
+                    stats.failedValidation++
+                    t.Errorf(`Resource validation failed for type %q:
+Resource Definition:
+  - Prefix: %q
+  - Min Length: %d
+  - Max Length: %d
+  - Validation Pattern: %q
+Generated Output:
+  - Resource Output: %q
+  - Data Source Output: %q
+  - Expected Pattern: %q`,
+                        resourceType,
+                        def.CafPrefix,
+                        def.MinLength,
+                        def.MaxLength,
+                        def.ValidationRegExp,
+                        outputs[resourceOutputKey].Value,
+                        outputs[dataOutputKey].Value,
+                        def.ValidationRegExp)
+                } else {
+                    stats.passedValidation++
                 }
             }
         })
     }
+
+    // Print final test statistics
+    t.Logf("\n=== E2E Test Statistics ===")
+    t.Logf("Total Resources Tested: %d", stats.totalResources)
+    t.Logf("Passed Validation: %d (%.1f%%)", stats.passedValidation, float64(stats.passedValidation)/float64(stats.totalResources)*100)
+    t.Logf("Failed Validation: %d", stats.failedValidation)
+    t.Logf("Resource/Data Mismatches: %d", stats.matchErrors)
+    t.Logf("Skipped (Timeout): %d", stats.skippedResources)
+    t.Logf("Terraform Errors: %d", stats.terraformErrors)
+    t.Logf("========================")
 }
