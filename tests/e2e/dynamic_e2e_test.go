@@ -9,6 +9,7 @@ import (
     "os/exec"
     "path/filepath"
     "regexp"
+    "runtime"
     "strconv"
     "strings"
     "sync"
@@ -45,6 +46,11 @@ func TestDynamicResourceTypes(t *testing.T) {
     ctx, cancel := context.WithTimeout(context.Background(), 60*time.Minute)
     defer cancel()
 
+    // Create test results directory
+    if err := os.MkdirAll("../../test-results", 0755); err != nil {
+        t.Fatalf("Failed to create test results directory: %v", err)
+    }
+
     // Initialize test statistics with mutex protection
     var stats struct {
         sync.Mutex
@@ -57,19 +63,82 @@ func TestDynamicResourceTypes(t *testing.T) {
         startTime        time.Time
         endTime          time.Time
         resourceDirs     []string
+        results         []string
     }
     stats.startTime = time.Now()
     defer func() {
         stats.endTime = time.Now()
-        t.Logf("\n=== E2E Test Statistics ===")
-        t.Logf("Total Resources Tested: %d", stats.totalResources)
-        t.Logf("Passed Validation: %d (%.1f%%)", stats.passedValidation, float64(stats.passedValidation)/float64(stats.totalResources)*100)
-        t.Logf("Failed Validation: %d", stats.failedValidation)
-        t.Logf("Resource/Data Mismatches: %d", stats.matchErrors)
-        t.Logf("Skipped (Timeout): %d", stats.skippedResources)
-        t.Logf("Terraform Errors: %d", stats.terraformErrors)
-        t.Logf("Total Duration: %v", stats.endTime.Sub(stats.startTime))
-        t.Logf("========================")
+        duration := stats.endTime.Sub(stats.startTime)
+        passRate := float64(stats.passedValidation) / float64(stats.totalResources) * 100
+
+        summary := fmt.Sprintf(`
+=== E2E Test Statistics ===
+Total Resources Tested: %d
+Passed Validation: %d (%.1f%%)
+Failed Validation: %d
+Resource/Data Mismatches: %d
+Skipped (Timeout): %d
+Terraform Errors: %d
+Total Duration: %v
+========================
+`, stats.totalResources, stats.passedValidation, passRate, 
+           stats.failedValidation, stats.matchErrors, stats.skippedResources, 
+           stats.terraformErrors, duration)
+
+        t.Log(summary)
+
+        // Write test results to files
+        reportFile := "../../test-results/e2e-tests-report.xml"
+        jsonFile := "../../test-results/e2e-tests.json"
+
+        // Generate JUnit XML report
+        xmlReport := fmt.Sprintf(`<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+    <testsuite name="E2E Tests" tests="%d" failures="%d" errors="%d" skipped="%d" time="%.3f">
+        <properties>
+            <property name="go.version" value="%s"/>
+        </properties>
+        %s
+    </testsuite>
+</testsuites>`, stats.totalResources, stats.failedValidation, 
+                stats.terraformErrors, stats.skippedResources, 
+                duration.Seconds(), runtime.Version(), 
+                strings.Join(stats.results, "\n        "))
+
+        if err := os.WriteFile(reportFile, []byte(xmlReport), 0644); err != nil {
+            t.Logf("Warning: Failed to write XML report: %v", err)
+        }
+
+        // Generate JSON report
+        jsonReport := struct {
+            TotalResources   int     `json:"total_resources"`
+            PassedValidation int     `json:"passed_validation"`
+            PassRate        float64 `json:"pass_rate"`
+            FailedValidation int     `json:"failed_validation"`
+            Mismatches      int     `json:"mismatches"`
+            Skipped         int     `json:"skipped"`
+            TerraformErrors int     `json:"terraform_errors"`
+            Duration       float64 `json:"duration_seconds"`
+            Results        []string `json:"results"`
+        }{
+            TotalResources:   stats.totalResources,
+            PassedValidation: stats.passedValidation,
+            PassRate:        passRate,
+            FailedValidation: stats.failedValidation,
+            Mismatches:      stats.matchErrors,
+            Skipped:         stats.skippedResources,
+            TerraformErrors: stats.terraformErrors,
+            Duration:       duration.Seconds(),
+            Results:        stats.results,
+        }
+
+        if jsonData, err := json.MarshalIndent(jsonReport, "", "    "); err == nil {
+            if err := os.WriteFile(jsonFile, jsonData, 0644); err != nil {
+                t.Logf("Warning: Failed to write JSON report: %v", err)
+            }
+        } else {
+            t.Logf("Warning: Failed to marshal JSON report: %v", err)
+        }
 
         // Clean up test directories
         for _, dir := range stats.resourceDirs {
