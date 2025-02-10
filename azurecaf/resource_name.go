@@ -88,6 +88,13 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 			return fmt.Errorf("failed to set random_string: %v", err)
 		}
 	}
+	
+	// Preserve non-zero random_seed in state
+	if randomSeed != 0 {
+		if err := d.SetNew("random_seed", randomSeed); err != nil {
+			return fmt.Errorf("failed to preserve random_seed: %v", err)
+		}
+	}
 	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
 	result, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
 	if err != nil {
