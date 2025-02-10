@@ -16,7 +16,7 @@ type ResourceStructure struct {
     MaxLength        int    `json:"max_length"`
     LowerCase        bool   `json:"lowercase,omitempty"`
     RegEx           string `json:"regex,omitempty"`
-    ValidationRegExp string `json:"validation_regexp,omitempty"`
+    ValidationRegExp string `json:"validation_regex,omitempty"`
     Dashes          bool   `json:"dashes"`
     Scope           string `json:"scope,omitempty"`
 }
