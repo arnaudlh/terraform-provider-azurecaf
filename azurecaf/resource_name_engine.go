@@ -217,25 +217,49 @@ func getResourceName(resourceTypeName string, separator string,
 		resourceName = strings.ToLower(resourceName)
 	}
 
-	// If name doesn't match validation pattern and we have a random suffix, try to pad to minimum length
-	if !validationRegEx.MatchString(resourceName) && len(randomSuffix) > 0 {
-		// Extract minimum length from regex pattern (e.g., {4,48} -> 4)
-		minLengthRegex := regexp.MustCompile(`\{(\d+),`)
-		if matches := minLengthRegex.FindStringSubmatch(resource.ValidationRegExp); len(matches) > 1 {
-			if minLength, err := strconv.Atoi(matches[1]); err == nil {
-				// Add 2 for the required start and end characters
-				totalMinLength := minLength + 2
-				if len(resourceName) < totalMinLength {
-					// Pad with random characters to meet minimum length
-					paddingNeeded := totalMinLength - len(resourceName)
-					if len(randomSuffix) >= paddingNeeded {
-						resourceName = fmt.Sprintf("%s%s", resourceName, randomSuffix[:paddingNeeded])
+	// Extract minimum length from regex pattern (e.g., {4,48} -> 4)
+	minLengthRegex := regexp.MustCompile(`\{(\d+),`)
+	if matches := minLengthRegex.FindStringSubmatch(resource.ValidationRegExp); len(matches) > 1 {
+		if minLength, err := strconv.Atoi(matches[1]); err == nil {
+			// Add 2 for the required start and end characters (start letter + min content + end alphanumeric)
+			totalMinLength := minLength + 2
+			if len(resourceName) < totalMinLength {
+				// For short prefixes, we need to ensure we meet the minimum length
+				// while preserving the prefix and maintaining valid characters
+				paddingNeeded := totalMinLength - len(resourceName)
+				
+				// Generate a valid suffix that meets the requirements
+				validSuffix := make([]byte, paddingNeeded)
+				for i := 0; i < paddingNeeded; i++ {
+					if i == paddingNeeded-1 {
+						// Last character must be alphanumeric
+						validSuffix[i] = 'x'
+					} else if i == 0 && resourceName == "" {
+						// First character must be a letter if no prefix
+						validSuffix[i] = 'a'
 					} else {
-						resourceName = fmt.Sprintf("%s%s", resourceName, randomSuffix)
+						// Use random characters from suffix if available, otherwise use fallback
+						if len(randomSuffix) > i && randomSuffix[i] != '-' {
+							validSuffix[i] = randomSuffix[i]
+						} else {
+							validSuffix[i] = 'a'
+						}
 					}
 				}
+				
+				resourceName = resourceName + string(validSuffix)
 			}
 		}
+	}
+
+	// Validate the final name against the pattern
+	if !validationRegEx.MatchString(resourceName) {
+		return "", fmt.Errorf("invalid name for CAF naming %s %s, the pattern %s doesn't match %s", resource.ResourceTypeName, name, resource.ValidationRegExp, resourceName)
+	}
+
+	// Validate the final name against the pattern
+	if !validationRegEx.MatchString(resourceName) {
+		return "", fmt.Errorf("invalid name for CAF naming %s %s, the pattern %s doesn't match %s", resource.ResourceTypeName, name, resource.ValidationRegExp, resourceName)
 	}
 
 	if !validationRegEx.MatchString(resourceName) {
