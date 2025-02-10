@@ -61,8 +61,11 @@ func init() {
     for i := range definitionsArray {
         def := &definitionsArray[i]
         if def.ValidationRegExp != "" {
+            // Remove surrounding quotes and unescape internal quotes
             def.ValidationRegExp = strings.Trim(def.ValidationRegExp, "\"")
             def.ValidationRegExp = strings.ReplaceAll(def.ValidationRegExp, "\\\"", "\"")
+            // Remove any remaining escaped backslashes
+            def.ValidationRegExp = strings.ReplaceAll(def.ValidationRegExp, "\\\\", "\\")
         }
         ResourceDefinitions[def.ResourceTypeName] = def
         ResourceMaps[def.ResourceTypeName] = def.ResourceTypeName

@@ -490,17 +490,22 @@ output "data_output_%[1]s" {
             // Validate against resource definition
             def := resourceDefs[resourceType]
             if def != nil && def.ValidationRegExp != "" {
-                re, err := regexp.Compile(def.ValidationRegExp)
+                // Clean up validation regex by removing quotes and escaping
+                cleanRegex := strings.Trim(def.ValidationRegExp, "\"")
+                cleanRegex = strings.ReplaceAll(cleanRegex, "\\\"", "\"")
+                cleanRegex = strings.ReplaceAll(cleanRegex, "\\\\", "\\")
+                
+                re, err := regexp.Compile(cleanRegex)
                 if err != nil {
-                    return fmt.Errorf("invalid validation regex for %s: %v", resourceType, err)
+                    return fmt.Errorf("invalid validation regex for %s: %v\nPattern: %q", resourceType, err, cleanRegex)
                 }
 
                 if !re.MatchString(outputs[resourceOutputKey].Value) {
                     stats.Lock()
                     stats.failedValidation++
                     stats.Unlock()
-                    return fmt.Errorf("resource validation failed for type %q:\nResource Definition:\n  - Prefix: %q\n  - Min Length: %d\n  - Max Length: %d\n  - Validation Pattern: %q\nGenerated Output:\n  - Resource Output: %q\n  - Data Source Output: %q",
-                        resourceType, def.CafPrefix, def.MinLength, def.MaxLength, def.ValidationRegExp, outputs[resourceOutputKey].Value, outputs[dataOutputKey].Value)
+                    return fmt.Errorf("resource validation failed for type %q:\nResource Definition:\n  - Prefix: %q\n  - Min Length: %d\n  - Max Length: %d\n  - Validation Pattern: %q\nGenerated Output:\n  - Resource Output: %q\n  - Data Source Output: %q\nExpected Pattern: %q",
+                        resourceType, def.CafPrefix, def.MinLength, def.MaxLength, def.ValidationRegExp, outputs[resourceOutputKey].Value, outputs[dataOutputKey].Value, cleanRegex)
                 }
                 
                 stats.Lock()
