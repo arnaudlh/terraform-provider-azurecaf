@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+    <testsuite name="E2E Tests" tests="352" failures="0" errors="0" skipped="0" time="53.423">
+        <properties>
+            <property name="go.version" value="go1.22.0"/>
+        </properties>
+        
+    </testsuite>
+</testsuites>

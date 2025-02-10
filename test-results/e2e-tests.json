@@ -1,0 +1,11 @@
+{
+    "total_resources": 352,
+    "passed_validation": 352,
+    "pass_rate": 100,
+    "failed_validation": 0,
+    "mismatches": 0,
+    "skipped": 0,
+    "terraform_errors": 0,
+    "duration_seconds": 53.422521319,
+    "results": null
+}

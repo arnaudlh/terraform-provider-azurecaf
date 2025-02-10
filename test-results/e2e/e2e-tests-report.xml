@@ -1,0 +1,1167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="353" errors="353">
+	<testsuite name="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" tests="353" failures="0" errors="353" id="0" hostname="fv-az1278-617" time="600.010" timestamp="2025-02-10T06:59:49Z">
+		<testcase name="TestDynamicResourceDefinitions" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:37: Loading resource definitions...
+    dynamic_e2e_test.go:40: Found 352 resource definitions]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_mssql_elasticpool" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_mssql_elasticpool]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_private_dns_resolver" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_private_dns_resolver]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_postgresql_flexible_server" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_postgresql_flexible_server]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_protection_backup_policy_disk" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_protection_backup_policy_disk]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_recovery_services_vault" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_recovery_services_vault]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_storage_container" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_storage_container]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_storage_sync_group" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_storage_sync_group]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_template_deployment" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_template_deployment]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_availability_set" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_availability_set]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory_linked_service_cosmosdb" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory_linked_service_cosmosdb]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory_linked_service_web" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory_linked_service_web]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_iothub" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_iothub]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_iothub_shared_access_policy" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_iothub_shared_access_policy]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory_dataset_postgresql" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory_dataset_postgresql]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_network_security_group_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_network_security_group_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_servicebus_namespace_authorization_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_servicebus_namespace_authorization_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_api_management_certificate" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_api_management_certificate]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_dns_zone" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_dns_zone]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_private_dns_zone" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_private_dns_zone]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_virtual_desktop_host_pool" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_virtual_desktop_host_pool]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_automation_variable" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_automation_variable]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_virtual_machine" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_virtual_machine]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory_dataset_delimited_text" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory_dataset_delimited_text]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_virtual_network_peering" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_virtual_network_peering]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_shared_image_gallery" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_shared_image_gallery]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_express_route_circuit" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_express_route_circuit]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_servicebus_queue" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_servicebus_queue]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_redhat_openshift_domain" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_redhat_openshift_domain]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory_linked_service_azure_function" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory_linked_service_azure_function]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_route_server" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_route_server]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_eventhub_namespace_authorization_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_eventhub_namespace_authorization_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_storage_account" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_storage_account]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_storage_table" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_storage_table]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_digital_twins_endpoint_eventhub" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_digital_twins_endpoint_eventhub]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_windows_virtual_machine" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_windows_virtual_machine]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_protection_backup_policy_postgresql" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_protection_backup_policy_postgresql]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory_trigger_schedule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory_trigger_schedule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_lake_store_firewall_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_lake_store_firewall_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_hdinsight_interactive_query_cluster" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_hdinsight_interactive_query_cluster]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/aks_node_pool_linux" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: aks_node_pool_linux]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_monitor_metric_alert" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_monitor_metric_alert]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_function_app_slot" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_function_app_slot]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_automation_hybrid_runbook_worker_group" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_automation_hybrid_runbook_worker_group]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory_dataset_cosmosdb_sqlapi" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory_dataset_cosmosdb_sqlapi]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_public_ip_prefix" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_public_ip_prefix]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_storage_sync" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_storage_sync]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_log_analytics_storage_insights" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_log_analytics_storage_insights]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_logic_app_workflow" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_logic_app_workflow]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_logic_app_action_http" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_logic_app_action_http]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_communication_service" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_communication_service]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_synapse_integration_runtime_self_hosted" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_synapse_integration_runtime_self_hosted]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_search_service" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_search_service]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_kusto_database" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_kusto_database]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_synapse_spark_pool" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_synapse_spark_pool]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_servicebus_subscription" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_servicebus_subscription]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_monitor_diagnostic_setting" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_monitor_diagnostic_setting]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_mariadb_firewall_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_mariadb_firewall_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_mysql_server" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_mysql_server]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_postgresql_server" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_postgresql_server]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_stream_analytics_stream_input_iothub" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_stream_analytics_stream_input_iothub]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_role_assignment" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_role_assignment]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_redhat_openshift_cluster" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_redhat_openshift_cluster]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_postgresql_database" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_postgresql_database]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_stream_analytics_output_servicebus_topic" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_stream_analytics_output_servicebus_topic]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_machine_learning_workspace" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_machine_learning_workspace]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_relay_namespace" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_relay_namespace]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_log_analytics_workspace" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_log_analytics_workspace]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_portal_dashboard" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_portal_dashboard]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_lb_probe" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_lb_probe]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_cdn_frontdoor_origin" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_cdn_frontdoor_origin]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_hdinsight_kafka_cluster" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_hdinsight_kafka_cluster]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_eventhub_authorization_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_eventhub_authorization_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_stream_analytics_job" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_stream_analytics_job]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_stream_analytics_output_mssql" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_stream_analytics_output_mssql]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_frontdoor" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_frontdoor]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_point_to_site_vpn_gateway" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_point_to_site_vpn_gateway]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_signalr_service" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_signalr_service]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_synapse_sql_pool_workload_classifier" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_synapse_sql_pool_workload_classifier]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_private_endpoint" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_private_endpoint]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_servicebus_namespace" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_servicebus_namespace]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_eventgrid_topic" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_eventgrid_topic]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_database_migration_service" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_database_migration_service]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory_dataset_http" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory_dataset_http]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_virtual_network_gateway" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_virtual_network_gateway]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_storage_share_directory" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_storage_share_directory]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_network_security_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_network_security_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_api_management_group" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_api_management_group]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_lb_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_lb_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_app_service_environment" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_app_service_environment]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_synapse_workspace" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_synapse_workspace]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_consumption_budget_subscription" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_consumption_budget_subscription]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory_linked_service_azure_databricks" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory_linked_service_azure_databricks]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_lake_store" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_lake_store]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_iothub_consumer_group" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_iothub_consumer_group]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_mssql_mi" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_mssql_mi]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_mariadb_virtual_network_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_mariadb_virtual_network_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_healthcare_dicom_service" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_healthcare_dicom_service]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_web_pubsub" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_web_pubsub]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_vpn_gateway_connection" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_vpn_gateway_connection]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_resource_group_policy_assignment" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_resource_group_policy_assignment]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_api_management_service" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_api_management_service]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_traffic_manager_profile" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_traffic_manager_profile]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_eventhub_consumer_group" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_eventhub_consumer_group]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_virtual_desktop_workspace" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_virtual_desktop_workspace]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_function_app" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_function_app]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_linux_virtual_machine_scale_set" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_linux_virtual_machine_scale_set]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_virtual_desktop_application_group" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_virtual_desktop_application_group]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_automation_schedule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_automation_schedule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_cdn_frontdoor_secret" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_cdn_frontdoor_secret]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_web_application_firewall_policy" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_web_application_firewall_policy]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_sql_server" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_sql_server]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_dashboard" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_dashboard]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_logic_app_trigger_http_request" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_logic_app_trigger_http_request]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_mysql_flexible_server_firewall_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_mysql_flexible_server_firewall_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_kusto_eventhub_data_connection" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_kusto_eventhub_data_connection]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_iothub_dps_certificate" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_iothub_dps_certificate]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_lb" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_lb]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_route_table" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_route_table]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_subscription_policy_assignment" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_subscription_policy_assignment]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory_linked_service_data_lake_storage_gen2" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory_linked_service_data_lake_storage_gen2]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_vpn_site" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_vpn_site]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_healthcare_medtech_service" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_healthcare_medtech_service]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_eventhub_namespace_disaster_recovery_config" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_eventhub_namespace_disaster_recovery_config]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_stream_analytics_output_blob" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_stream_analytics_output_blob]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_notification_hub_authorization_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_notification_hub_authorization_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_application_insights" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_application_insights]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_postgresql_flexible_server_firewall_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_postgresql_flexible_server_firewall_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory_linked_service_sql_server" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory_linked_service_sql_server]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_iothub_dps" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_iothub_dps]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_key_vault_secret" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_key_vault_secret]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_api_management_gateway" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_api_management_gateway]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_web_pubsub_hub" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_web_pubsub_hub]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_automation_certificate" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_automation_certificate]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_dedicated_host_group" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_dedicated_host_group]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_virtual_machine_scale_set" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_virtual_machine_scale_set]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory_linked_service_postgresql" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory_linked_service_postgresql]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_local_network_gateway" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_local_network_gateway]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_user_assigned_identity" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_user_assigned_identity]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_monitor_activity_log_alert" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_monitor_activity_log_alert]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_monitor_autoscale_setting" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_monitor_autoscale_setting]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_redis_firewall_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_redis_firewall_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_containerGroups" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_containerGroups]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_mysql_firewall_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_mysql_firewall_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_hdinsight_hadoop_cluster" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_hdinsight_hadoop_cluster]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_servicebus_topic_authorization_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_servicebus_topic_authorization_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_monitor_scheduled_query_rules_alert" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_monitor_scheduled_query_rules_alert]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_redis_cache" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_redis_cache]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_cdn_frontdoor_security_policy" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_cdn_frontdoor_security_policy]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_cdn_endpoint" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_cdn_endpoint]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_logic_app_action_custom" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_logic_app_action_custom]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_aadb2c_directory" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_aadb2c_directory]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory_dataset_mysql" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory_dataset_mysql]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_storage_data_lake_gen2_filesystem" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_storage_data_lake_gen2_filesystem]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_netapp_volume" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_netapp_volume]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_netapp_snapshot" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_netapp_snapshot]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_databricks_workspace" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_databricks_workspace]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_hdinsight_hbase_cluster" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_hdinsight_hbase_cluster]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_stream_analytics_output_eventhub" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_stream_analytics_output_eventhub]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_app_configuration" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_app_configuration]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_cdn_frontdoor_rule_set" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_cdn_frontdoor_rule_set]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_cdn_profile" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_cdn_profile]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_disk_encryption_set" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_disk_encryption_set]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_windows_virtual_machine_scale_set" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_windows_virtual_machine_scale_set]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_stream_analytics_stream_input_eventhub" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_stream_analytics_stream_input_eventhub]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_route" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_route]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_batch_pool" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_batch_pool]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_bot_channel_directline" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_bot_channel_directline]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_cdn_frontdoor_route" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_cdn_frontdoor_route]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_dev_test_linux_virtual_machine" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_dev_test_linux_virtual_machine]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_iothub_certificate" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_iothub_certificate]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_storage_blob" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_storage_blob]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_servicebus_queue_authorization_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_servicebus_queue_authorization_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_synapse_linked_service" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_synapse_linked_service]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_cdn_frontdoor_firewall_policy" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_cdn_frontdoor_firewall_policy]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_container_registry_webhook" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_container_registry_webhook]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory_dataset_azure_blob" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory_dataset_azure_blob]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory_linked_service_sftp" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory_linked_service_sftp]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_hdinsight_spark_cluster" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_hdinsight_spark_cluster]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_iot_security_solution" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_iot_security_solution]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_mssql_database" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_mssql_database]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_private_dns_resolver_forwarding_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_private_dns_resolver_forwarding_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_cdn_frontdoor_custom_domain" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_cdn_frontdoor_custom_domain]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_mariadb_server" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_mariadb_server]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory_dataset_json" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory_dataset_json]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_hdinsight_ml_services_cluster" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_hdinsight_ml_services_cluster]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_hdinsight_storm_cluster" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_hdinsight_storm_cluster]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_private_dns_resolver_virtual_network_link" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_private_dns_resolver_virtual_network_link]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_synapse_sql_pool_" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_synapse_sql_pool ]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_api_management_logger" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_api_management_logger]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_federated_identity_credential" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_federated_identity_credential]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/aks_node_pool_windows" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: aks_node_pool_windows]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_monitor_data_collection_endpoint" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_monitor_data_collection_endpoint]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_netapp_pool" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_netapp_pool]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_notification_hub_namespace" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_notification_hub_namespace]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_kusto_cluster" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_kusto_cluster]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_protection_backup_vault" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_protection_backup_vault]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_log_analytics_cluster" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_log_analytics_cluster]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_app_service" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_app_service]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_api_management_api_operation_tag" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_api_management_api_operation_tag]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_shared_image" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_shared_image]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_bastion_host" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_bastion_host]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_sql_failover_group" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_sql_failover_group]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_notification_hub" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_notification_hub]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_key_vault" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_key_vault]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_subnet" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_subnet]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_virtual_hub_connection" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_virtual_hub_connection]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_cognitive_deployment" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_cognitive_deployment]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_postgresql_firewall_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_postgresql_firewall_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_database_migration_project" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_database_migration_project]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_healthcare_fhir_service" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_healthcare_fhir_service]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_healthcare_workspace" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_healthcare_workspace]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_synapse_sql_pool" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_synapse_sql_pool]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_monitor_private_link_scope" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_monitor_private_link_scope]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_bot_channel_ms_teams" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_bot_channel_ms_teams]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_linux_web_app" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_linux_web_app]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_consumption_budget_resource_group" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_consumption_budget_resource_group]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_sql_elasticpool" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_sql_elasticpool]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_servicebus_subscription_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_servicebus_subscription_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_cosmosdb_account" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_cosmosdb_account]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_ip_group" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_ip_group]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_synapse_firewall_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_synapse_firewall_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_vm_windows_computer_name_prefix" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_vm_windows_computer_name_prefix]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_mysql_virtual_network_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_mysql_virtual_network_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory_pipeline" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory_pipeline]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_protection_backup_policy_postgresql_flexible_server" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_protection_backup_policy_postgresql_flexible_server]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_dev_test_lab" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_dev_test_lab]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_mssql_server" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_mssql_server]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_image" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_image]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory_linked_service_azure_blob_storage" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory_linked_service_azure_blob_storage]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_firewall_policy" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_firewall_policy]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_stream_analytics_reference_input_blob" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_stream_analytics_reference_input_blob]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_digital_twins_endpoint_eventgrid" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_digital_twins_endpoint_eventgrid]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_iotcentral_application" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_iotcentral_application]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_key_vault_key" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_key_vault_key]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_storage_queue" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_storage_queue]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_storage_share" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_storage_share]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_purview_account" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_purview_account]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_vmware_private_cloud" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_vmware_private_cloud]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory_integration_runtime_managed" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory_integration_runtime_managed]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_lake_analytics_account" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_lake_analytics_account]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_network_watcher" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_network_watcher]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_static_site" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_static_site]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_digital_twins_instance" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_digital_twins_instance]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_virtual_machine_portal_name" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_virtual_machine_portal_name]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_iot_security_device_group" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_iot_security_device_group]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_logic_app_integration_account" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_logic_app_integration_account]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_lb_nat_pool" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_lb_nat_pool]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_synapse_integration_runtime_azure" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_synapse_integration_runtime_azure]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_dev_test_windows_virtual_machine" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_dev_test_windows_virtual_machine]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_frontdoor_firewall_policy" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_frontdoor_firewall_policy]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_lb_nat_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_lb_nat_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_automation_credential" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_automation_credential]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_kubernetes_cluster" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_kubernetes_cluster]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_kubernetes_fleet_manager" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_kubernetes_fleet_manager]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory_linked_service_key_vault" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory_linked_service_key_vault]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_protection_backup_policy_blob_storage" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_protection_backup_policy_blob_storage]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_servicebus_topic" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_servicebus_topic]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_powerbi_embedded" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_powerbi_embedded]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_application_insights_web_test" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_application_insights_web_test]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_integration_service_environment" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_integration_service_environment]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_logic_app_trigger_recurrence" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_logic_app_trigger_recurrence]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_private_dns_resolver_inbound_endpoint" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_private_dns_resolver_inbound_endpoint]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_eventgrid_domain" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_eventgrid_domain]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory_linked_service_mysql" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory_linked_service_mysql]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_network_interface" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_network_interface]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_snapshots" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_snapshots]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_maps_account" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_maps_account]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_resource_group" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_resource_group]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_batch_application" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_batch_application]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_managed_disk" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_managed_disk]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_windows_web_app" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_windows_web_app]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_healthcare_service" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_healthcare_service]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_netapp_account" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_netapp_account]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_machine_learning_compute_instance" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_machine_learning_compute_instance]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_api_management" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_api_management]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_lb_outbound_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_lb_outbound_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_batch_certificate" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_batch_certificate]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_cdn_frontdoor_origin_group" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_cdn_frontdoor_origin_group]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_cdn_frontdoor_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_cdn_frontdoor_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_container_app_environment" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_container_app_environment]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_eventgrid_event_subscription" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_eventgrid_event_subscription]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_mariadb_database" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_mariadb_database]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_mysql_flexible_server" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_mysql_flexible_server]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_postgresql_flexible_server_database" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_postgresql_flexible_server_database]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_analysis_services_server" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_analysis_services_server]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_role_definition" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_role_definition]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_bot_channel_slack" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_bot_channel_slack]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_bot_connection" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_bot_connection]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_vmware_express_route_authorization" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_vmware_express_route_authorization]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_key_vault_certificate" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_key_vault_certificate]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_stream_analytics_stream_input_blob" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_stream_analytics_stream_input_blob]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_maintenance_configuration" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_maintenance_configuration]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_application_gateway" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_application_gateway]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_network_security_group" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_network_security_group]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_private_dns_resolver_dns_forwarding_ruleset" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_private_dns_resolver_dns_forwarding_ruleset]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_logic_app_trigger_custom" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_logic_app_trigger_custom]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_digital_twins_endpoint_servicebus" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_digital_twins_endpoint_servicebus]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_bot_channels_registration" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_bot_channels_registration]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_eventhub" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_eventhub]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_stream_analytics_function_javascript_udf" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_stream_analytics_function_javascript_udf]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_synapse_sql_pool_vulnerability_assessment_baseline" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_synapse_sql_pool_vulnerability_assessment_baseline]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_synapse_sql_pool_workload_group" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_synapse_sql_pool_workload_group]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_automation_runbook" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_automation_runbook]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_dedicated_host" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_dedicated_host]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_firewall" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_firewall]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_api_management_backend" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_api_management_backend]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_application_security_group" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_application_security_group]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_synapse_managed_private_endpoint" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_synapse_managed_private_endpoint]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_batch_account" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_batch_account]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_cdn_frontdoor_profile" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_cdn_frontdoor_profile]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_linux_virtual_machine" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_linux_virtual_machine]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_recovery_services_vault_backup_police" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_recovery_services_vault_backup_police]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_sql_firewall_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_sql_firewall_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_bot_web_app" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_bot_web_app]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_postgresql_virtual_network_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_postgresql_virtual_network_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory_dataset_sql_server_table" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory_dataset_sql_server_table]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_app_service_plan" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_app_service_plan]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_private_dns_zone_virtual_network_link" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_private_dns_zone_virtual_network_link]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_cdn_frontdoor_endpoint" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_cdn_frontdoor_endpoint]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_relay_hybrid_connection" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_relay_hybrid_connection]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_api_management_api" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_api_management_api]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_factory_linked_service_azure_sql_database" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_factory_linked_service_azure_sql_database]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_hdinsight_rserver_cluster" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_hdinsight_rserver_cluster]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_private_dns_resolver_outbound_endpoint" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_private_dns_resolver_outbound_endpoint]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_synapse_private_link_hub" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_synapse_private_link_hub]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_virtual_wan" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_virtual_wan]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_bot_channel_Email" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_bot_channel_Email]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_container_registry" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_container_registry]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_iothub_dps_shared_access_policy" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_iothub_dps_shared_access_policy]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_nginx_deployment" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_nginx_deployment]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_cognitive_account" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_cognitive_account]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_service_fabric_cluster" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_service_fabric_cluster]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_lb_backend_address_pool" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_lb_backend_address_pool]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_load_test" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_load_test]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_container_app" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_container_app]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_mysql_flexible_server_database" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_mysql_flexible_server_database]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_eventhub_namespace" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_eventhub_namespace]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_monitor_action_group" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_monitor_action_group]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_lb_backend_pool" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_lb_backend_pool]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_express_route_gateway" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_express_route_gateway]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_eventgrid_domain_topic" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_eventgrid_domain_topic]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_automation_account" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_automation_account]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_automation_job_schedule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_automation_job_schedule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_mysql_database" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_mysql_database]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_virtual_network" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_virtual_network]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_stream_analytics_output_servicebus_queue" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_stream_analytics_output_servicebus_queue]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_vmware_cluster" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_vmware_cluster]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_custom_provider" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_custom_provider]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_data_lake_analytics_firewall_rule" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_data_lake_analytics_firewall_rule]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_public_ip" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_public_ip]]></error>
+		</testcase>
+		<testcase name="TestDynamicResourceDefinitions/azurerm_virtual_hub" classname="github.com/aztfmod/terraform-provider-azurecaf/tests/e2e" time="0.000">
+			<error message="No test result found"><![CDATA[    dynamic_e2e_test.go:84: Testing resource type: azurerm_virtual_hub
+panic: test timed out after 10m0s
+running tests:
+	TestDynamicResourceDefinitions (10m0s)
+	TestDynamicResourceDefinitions/azurerm_virtual_hub (1s)
+
+goroutine 2826 [running]:
+testing.(*M).startAlarm.func1()
+	/opt/hostedtoolcache/go/1.22.11/x64/src/testing/testing.go:2366 +0x385
+created by time.goFunc
+	/opt/hostedtoolcache/go/1.22.11/x64/src/time/sleep.go:177 +0x2d
+
+goroutine 1 [chan receive, 9 minutes]:
+testing.(*T).Run(0xc000214000, {0x879f82?, 0x0?}, 0x8a7c10)
+	/opt/hostedtoolcache/go/1.22.11/x64/src/testing/testing.go:1750 +0x3ab
+testing.runTests.func1(0xc000214000)
+	/opt/hostedtoolcache/go/1.22.11/x64/src/testing/testing.go:2161 +0x37
+testing.tRunner(0xc000214000, 0xc000031c70)
+	/opt/hostedtoolcache/go/1.22.11/x64/src/testing/testing.go:1689 +0xfb
+testing.runTests(0xc0000a4a08, {0xbcb1a0, 0x1, 0x1}, {0x1?, 0x506ece?, 0xbd9940?})
+	/opt/hostedtoolcache/go/1.22.11/x64/src/testing/testing.go:2159 +0x445
+testing.(*M).Run(0xc0000a1040)
+	/opt/hostedtoolcache/go/1.22.11/x64/src/testing/testing.go:2027 +0x68b
+main.main()
+	_testmain.go:47 +0x16c
+
+goroutine 19 [chan receive]:
+testing.(*T).Run(0xc0002141a0, {0xc0000dcc48?, 0xc000058ed0?}, 0xc0001e8000)
+	/opt/hostedtoolcache/go/1.22.11/x64/src/testing/testing.go:1750 +0x3ab
+github.com/aztfmod/terraform-provider-azurecaf/tests/e2e.TestDynamicResourceDefinitions(0xc0002141a0)
+	/home/runner/work/terraform-provider-azurecaf/terraform-provider-azurecaf/tests/e2e/dynamic_e2e_test.go:83 +0x3fe
+testing.tRunner(0xc0002141a0, 0x8a7c10)
+	/opt/hostedtoolcache/go/1.22.11/x64/src/testing/testing.go:1689 +0xfb
+created by testing.(*T).Run in goroutine 1
+	/opt/hostedtoolcache/go/1.22.11/x64/src/testing/testing.go:1742 +0x390
+
+goroutine 20 [chan receive, 9 minutes]:
+github.com/aztfmod/terraform-provider-azurecaf/tests/e2e.TestDynamicResourceDefinitions.func1()
+	/home/runner/work/terraform-provider-azurecaf/terraform-provider-azurecaf/tests/e2e/dynamic_e2e_test.go:54 +0x3f
+created by github.com/aztfmod/terraform-provider-azurecaf/tests/e2e.TestDynamicResourceDefinitions in goroutine 19
+	/home/runner/work/terraform-provider-azurecaf/terraform-provider-azurecaf/tests/e2e/dynamic_e2e_test.go:53 +0x2da
+
+goroutine 2824 [IO wait]:
+internal/poll.runtime_pollWait(0x7f3f6224d438, 0x72)
+	/opt/hostedtoolcache/go/1.22.11/x64/src/runtime/netpoll.go:345 +0x85
+internal/poll.(*pollDesc).wait(0xc000072480?, 0xc0000a2cae?, 0x1)
+	/opt/hostedtoolcache/go/1.22.11/x64/src/internal/poll/fd_poll_runtime.go:84 +0x27
+internal/poll.(*pollDesc).waitRead(...)
+	/opt/hostedtoolcache/go/1.22.11/x64/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0xc000072480, {0xc0000a2cae, 0x352, 0x352})
+	/opt/hostedtoolcache/go/1.22.11/x64/src/internal/poll/fd_unix.go:164 +0x27a
+os.(*File).read(...)
+	/opt/hostedtoolcache/go/1.22.11/x64/src/os/file_posix.go:29
+os.(*File).Read(0xc00009a5e0, {0xc0000a2cae?, 0x0?, 0x28?})
+	/opt/hostedtoolcache/go/1.22.11/x64/src/os/file.go:118 +0x52
+bytes.(*Buffer).ReadFrom(0xc00009d260, {0x9211a0, 0xc00031c080})
+	/opt/hostedtoolcache/go/1.22.11/x64/src/bytes/buffer.go:211 +0x98
+io.copyBuffer({0x921560, 0xc00009d260}, {0x9211a0, 0xc00031c080}, {0x0, 0x0, 0x0})
+	/opt/hostedtoolcache/go/1.22.11/x64/src/io/io.go:415 +0x151
+io.Copy(...)
+	/opt/hostedtoolcache/go/1.22.11/x64/src/io/io.go:388
+os.genericWriteTo(0xc00009a5e0?, {0x921560, 0xc00009d260})
+	/opt/hostedtoolcache/go/1.22.11/x64/src/os/file.go:269 +0x58
+os.(*File).WriteTo(0xc00009a5e0, {0x921560, 0xc00009d260})
+	/opt/hostedtoolcache/go/1.22.11/x64/src/os/file.go:247 +0x9c
+io.copyBuffer({0x921560, 0xc00009d260}, {0x921200, 0xc00009a5e0}, {0x0, 0x0, 0x0})
+	/opt/hostedtoolcache/go/1.22.11/x64/src/io/io.go:411 +0x9d
+io.Copy(...)
+	/opt/hostedtoolcache/go/1.22.11/x64/src/io/io.go:388
+os/exec.(*Cmd).writerDescriptor.func1()
+	/opt/hostedtoolcache/go/1.22.11/x64/src/os/exec/exec.go:580 +0x34
+os/exec.(*Cmd).Start.func2(0xc00044e840?)
+	/opt/hostedtoolcache/go/1.22.11/x64/src/os/exec/exec.go:733 +0x2c
+created by os/exec.(*Cmd).Start in goroutine 2823
+	/opt/hostedtoolcache/go/1.22.11/x64/src/os/exec/exec.go:732 +0x9ab
+
+goroutine 2823 [syscall]:
+syscall.Syscall6(0xf7, 0x1, 0x9d67, 0xc0000db8f0, 0x1000004, 0x0, 0x0)
+	/opt/hostedtoolcache/go/1.22.11/x64/src/syscall/syscall_linux.go:91 +0x39
+os.(*Process).blockUntilWaitable(0xc000024600)
+	/opt/hostedtoolcache/go/1.22.11/x64/src/os/wait_waitid.go:32 +0x76
+os.(*Process).wait(0xc000024600)
+	/opt/hostedtoolcache/go/1.22.11/x64/src/os/exec_unix.go:22 +0x25
+os.(*Process).Wait(...)
+	/opt/hostedtoolcache/go/1.22.11/x64/src/os/exec.go:134
+os/exec.(*Cmd).Wait(0xc00045a180)
+	/opt/hostedtoolcache/go/1.22.11/x64/src/os/exec/exec.go:906 +0x45
+os/exec.(*Cmd).Run(0xc00045a180)
+	/opt/hostedtoolcache/go/1.22.11/x64/src/os/exec/exec.go:610 +0x2d
+os/exec.(*Cmd).CombinedOutput(0xc00045a180)
+	/opt/hostedtoolcache/go/1.22.11/x64/src/os/exec/exec.go:1021 +0x85
+github.com/aztfmod/terraform-provider-azurecaf/tests/e2e.TestDynamicResourceDefinitions.func2(0xc000192000)
+	/home/runner/work/terraform-provider-azurecaf/terraform-provider-azurecaf/tests/e2e/dynamic_e2e_test.go:151 +0x686
+testing.tRunner(0xc000192000, 0xc0001e8000)
+	/opt/hostedtoolcache/go/1.22.11/x64/src/testing/testing.go:1689 +0xfb
+created by testing.(*T).Run in goroutine 19
+	/opt/hostedtoolcache/go/1.22.11/x64/src/testing/testing.go:1742 +0x390
+
+goroutine 2825 [select]:
+os/exec.(*Cmd).watchCtx(0xc00045a180, 0xc00001e240)
+	/opt/hostedtoolcache/go/1.22.11/x64/src/os/exec/exec.go:773 +0xb5
+created by os/exec.(*Cmd).Start in goroutine 2823
+	/opt/hostedtoolcache/go/1.22.11/x64/src/os/exec/exec.go:759 +0x973]]></error>
+		</testcase>
+	</testsuite>
+</testsuites>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="38" failures="5" skipped="2">
+	<testsuite name="github.com/aztfmod/terraform-provider-azurecaf/azurecaf" tests="20" failures="5" errors="0" id="0" hostname="fv-az1118-845" skipped="2" time="0.050" timestamp="2025-02-10T10:21:09Z">
+		<testcase name="TestAccDataSourceEnvironmentVariable_basic" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf" time="0.000">
+			<skipped message="Skipped"><![CDATA[    data_environment_variable_test.go:14: Acceptance tests skipped unless env 'TF_ACC' set]]></skipped>
+		</testcase>
+		<testcase name="TestAccDataSourceEnvironmentVariable_default" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf" time="0.000">
+			<skipped message="Skipped"><![CDATA[    data_environment_variable_test.go:29: Acceptance tests skipped unless env 'TF_ACC' set]]></skipped>
+		</testcase>
+		<testcase name="TestProvider" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf" time="0.000"></testcase>
+		<testcase name="TestProvider_impl" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf" time="0.000"></testcase>
+		<testcase name="TestGenerateRandomString" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf" time="0.000"></testcase>
+		<testcase name="TestGenerateRandomString/generate_5_char_string" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf" time="0.000"></testcase>
+		<testcase name="TestGenerateRandomString/generate_10_char_string" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf" time="0.000"></testcase>
+		<testcase name="TestGenerateRandomString/zero_length" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf" time="0.000"></testcase>
+		<testcase name="TestConcatenateParameters" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf" time="0.000"></testcase>
+		<testcase name="TestConcatenateParameters/join_with_hyphen" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf" time="0.000"></testcase>
+		<testcase name="TestConcatenateParameters/empty_separator" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf" time="0.000"></testcase>
+		<testcase name="TestConcatenateParameters/single_part" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf" time="0.000"></testcase>
+		<testcase name="TestCleanInput_no_changes" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf" time="0.000">
+			<failure message="Failed"><![CDATA[    resource_name_test.go:75: Resource definition not found for azurerm_resource_group]]></failure>
+		</testcase>
+		<testcase name="TestCleanInput_remove_always" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf" time="0.000"></testcase>
+		<testcase name="TestCleanInput_not_remove_special_allowed_chars" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf" time="0.000">
+			<failure message="Failed"><![CDATA[    resource_name_test.go:102: Resource definition not found for azurerm_resource_group]]></failure>
+		</testcase>
+		<testcase name="TestCleanSplice_no_changes" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf" time="0.000">
+			<failure message="Failed"><![CDATA[    resource_name_test.go:114: Resource definition not found for azurerm_resource_group]]></failure>
+		</testcase>
+		<testcase name="TestConcatenateParameters_azurerm_public_ip_prefix" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf" time="0.000"></testcase>
+		<testcase name="TestGetSlug" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf" time="0.000">
+			<failure message="Failed"><![CDATA[    resource_name_test.go:141: Expected rg but received ]]></failure>
+		</testcase>
+		<testcase name="TestGetSlug_unknown" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf" time="0.000"></testcase>
+		<testcase name="TestAccResourceName_CafClassic" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf" time="0.000">
+			<failure message="Failed"></failure>
+		</testcase>
+		<system-out><![CDATA[go: downloading github.com/hashicorp/terraform-plugin-sdk/v2 v2.36.0
+go: downloading github.com/google/go-cmp v0.6.0
+go: downloading github.com/hashicorp/go-cty v1.4.1-0.20200414143053-d3edf31b6320
+go: downloading github.com/hashicorp/terraform-plugin-go v0.26.0
+go: downloading github.com/hashicorp/terraform-plugin-log v0.9.0
+go: downloading github.com/mitchellh/copystructure v1.2.0
+go: downloading github.com/mitchellh/go-testing-interface v1.14.1
+go: downloading github.com/mitchellh/mapstructure v1.5.0
+go: downloading github.com/hashicorp/go-uuid v1.0.3
+go: downloading github.com/mitchellh/reflectwalk v1.0.2
+go: downloading github.com/hashicorp/go-hclog v1.6.3
+go: downloading github.com/hashicorp/terraform-exec v0.22.0
+go: downloading github.com/hashicorp/terraform-json v0.24.0
+go: downloading golang.org/x/text v0.21.0
+go: downloading github.com/vmihailenco/msgpack v4.0.4+incompatible
+go: downloading github.com/hashicorp/go-version v1.7.0
+go: downloading github.com/vmihailenco/msgpack/v5 v5.4.1
+go: downloading github.com/hashicorp/hcl/v2 v2.23.0
+go: downloading github.com/zclconf/go-cty v1.16.2
+go: downloading github.com/fatih/color v1.16.0
+go: downloading github.com/mattn/go-isatty v0.0.20
+go: downloading github.com/hashicorp/hc-install v0.9.1
+go: downloading github.com/hashicorp/go-plugin v1.6.2
+go: downloading github.com/hashicorp/logutils v1.0.0
+go: downloading github.com/vmihailenco/tagparser/v2 v2.0.0
+go: downloading github.com/agext/levenshtein v1.2.2
+go: downloading github.com/apparentlymart/go-textseg/v15 v15.0.0
+go: downloading github.com/apparentlymart/go-textseg v1.0.0
+go: downloading github.com/mitchellh/go-wordwrap v1.0.0
+go: downloading golang.org/x/sys v0.29.0
+go: downloading github.com/mattn/go-colorable v0.1.13
+go: downloading github.com/hashicorp/go-multierror v1.1.1
+go: downloading github.com/hashicorp/go-checkpoint v0.5.0
+go: downloading google.golang.org/grpc v1.69.4
+go: downloading github.com/golang/protobuf v1.5.4
+go: downloading github.com/hashicorp/yamux v0.1.1
+go: downloading github.com/oklog/run v1.0.0
+go: downloading github.com/hashicorp/errwrap v1.0.0
+go: downloading golang.org/x/mod v0.22.0
+go: downloading github.com/ProtonMail/go-crypto v1.1.3
+go: downloading github.com/hashicorp/go-cleanhttp v0.5.2
+go: downloading github.com/hashicorp/terraform-registry-address v0.2.4
+go: downloading google.golang.org/protobuf v1.36.3
+go: downloading golang.org/x/net v0.34.0
+go: downloading google.golang.org/genproto/googleapis/rpc v0.0.0-20241015192408-796eee8c2d53
+go: downloading github.com/hashicorp/go-retryablehttp v0.7.7
+go: downloading github.com/hashicorp/terraform-svchost v0.1.1
+go: downloading golang.org/x/crypto v0.32.0
+go: downloading github.com/cloudflare/circl v1.3.7
+2025/02/10 10:21:09 [WARN] resourceDefinition.json not found in search paths
+2025/02/10 10:21:09 [INFO] Initializing Azure CAF provider
+2025/02/10 10:21:09 [DEBUG] Provider schema initialized with resources: map[azurecaf_name:0xc0001b4800]
+2025/02/10 10:21:09 [DEBUG] Provider schema initialized with data sources: map[azurecaf_environment_variable:0xc0001b4a00 azurecaf_name:0xc0001b4900]
+panic: runtime error: invalid memory address or nil pointer dereference [recovered]
+	panic: runtime error: invalid memory address or nil pointer dereference
+[signal SIGSEGV: segmentation violation code=0x1 addr=0x48 pc=0xcc79a8]
+
+goroutine 26 [running]:
+testing.tRunner.func1.2({0xd97fc0, 0x16834d0})
+	/opt/hostedtoolcache/go/1.22.11/x64/src/testing/testing.go:1631 +0x24a
+testing.tRunner.func1()
+	/opt/hostedtoolcache/go/1.22.11/x64/src/testing/testing.go:1634 +0x377
+panic({0xd97fc0?, 0x16834d0?})
+	/opt/hostedtoolcache/go/1.22.11/x64/src/runtime/panic.go:770 +0x132
+github.com/aztfmod/terraform-provider-azurecaf/azurecaf.TestAccResourceName_CafClassic(0xc000326820)
+	/home/runner/work/terraform-provider-azurecaf/terraform-provider-azurecaf/azurecaf/resource_name_test.go:168 +0xa8
+testing.tRunner(0xc000326820, 0xf1e200)
+	/opt/hostedtoolcache/go/1.22.11/x64/src/testing/testing.go:1689 +0xfb
+created by testing.(*T).Run in goroutine 1
+	/opt/hostedtoolcache/go/1.22.11/x64/src/testing/testing.go:1742 +0x390]]></system-out>
+	</testsuite>
+	<testsuite name="github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/schemas" tests="9" failures="0" errors="0" id="1" hostname="fv-az1118-845" time="0.050" timestamp="2025-02-10T10:21:09Z">
+		<properties>
+			<property name="coverage.statements.pct" value="10.60"></property>
+		</properties>
+		<testcase name="TestV4_Schema" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/schemas" time="0.000"></testcase>
+		<testcase name="TestResourceNameStateUpgradeV2" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/schemas" time="0.000"></testcase>
+		<testcase name="TestResourceNameStateUpgradeV2/basic_upgrade" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/schemas" time="0.000"></testcase>
+		<testcase name="TestResourceNameStateUpgradeV2/empty_fields" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/schemas" time="0.000"></testcase>
+		<testcase name="TestResourceNameStateUpgradeV2/with_computed_fields" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/schemas" time="0.000"></testcase>
+		<testcase name="TestResourceNameStateUpgradeV3" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/schemas" time="0.000"></testcase>
+		<testcase name="TestResourceNameStateUpgradeV3/basic_upgrade" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/schemas" time="0.000"></testcase>
+		<testcase name="TestResourceNameStateUpgradeV3/empty_fields" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/schemas" time="0.000"></testcase>
+		<testcase name="TestResourceNameStateUpgradeV3/with_use_slug" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/schemas" time="0.000"></testcase>
+		<system-out><![CDATA[2025/02/10 10:21:09 [WARN] resourceDefinition.json not found in search paths]]></system-out>
+	</testsuite>
+	<testsuite name="github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/utils" tests="9" failures="0" errors="0" id="2" hostname="fv-az1118-845" time="0.003" timestamp="2025-02-10T10:21:09Z">
+		<properties>
+			<property name="coverage.statements.pct" value="100.00"></property>
+		</properties>
+		<testcase name="TestRandSeq" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/utils" time="0.000"></testcase>
+		<testcase name="TestRandSeq/zero_length" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/utils" time="0.000"></testcase>
+		<testcase name="TestRandSeq/positive_length" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/utils" time="0.000"></testcase>
+		<testcase name="TestRandSeq/different_seed" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/utils" time="0.000"></testcase>
+		<testcase name="TestRandSeq/long_string" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/utils" time="0.000"></testcase>
+		<testcase name="TestRandSeq/negative_length" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/utils" time="0.000"></testcase>
+		<testcase name="TestRandSeq/max_length" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/utils" time="0.000"></testcase>
+		<testcase name="TestRandSeqDeterministic" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/utils" time="0.000"></testcase>
+		<testcase name="TestRandSeqUniqueness" classname="github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/utils" time="0.000"></testcase>
+	</testsuite>
+	<testsuite name="" tests="0" failures="0" errors="0" id="3" hostname="fv-az1118-845" time="0.000" timestamp="2025-02-10T10:21:09Z">
+		<system-out><![CDATA[	github.com/aztfmod/terraform-provider-azurecaf/azurecaf/models		coverage: 0.0% of statements
+	github.com/aztfmod/terraform-provider-azurecaf/azurecaf/testutils		coverage: 0.0% of statements]]></system-out>
+	</testsuite>
+</testsuites>
