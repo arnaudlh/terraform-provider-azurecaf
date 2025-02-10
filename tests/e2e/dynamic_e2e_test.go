@@ -123,31 +123,35 @@ func TestDynamicResourceTypes(t *testing.T) {
         t.Fatalf("Failed to create test directory: %v", err)
     }
     defer func() {
-        if err := os.RemoveAll(testDir); err != nil {
-            t.Logf("Warning: Failed to clean up test directory: %v", err)
+        if cleanupErr := os.RemoveAll(testDir); cleanupErr != nil {
+            t.Logf("Warning: Failed to clean up test directory: %v", cleanupErr)
         }
     }()
 
-    // Clean up old test directories to prevent disk space issues
-    entries, dirErr := os.ReadDir(".")
-    if dirErr == nil {
-        for _, entry := range entries {
-            if entry.IsDir() && strings.HasPrefix(entry.Name(), "azurecaf-e2e-") {
-                if dirPath := filepath.Join(".", entry.Name()); dirPath != testDir {
-                    os.RemoveAll(dirPath)
-                }
-            }
-        }
-    }
-    
     // Create plugin and cache directories with proper permissions
     pluginDir := filepath.Join(testDir, "terraform.d", "plugins", "registry.terraform.io", "aztfmod", "azurecaf", "2.0.0-preview5", "linux_amd64")
-    if err := os.MkdirAll(pluginDir, 0755); err != nil && !os.IsExist(err) {
+    if err := os.MkdirAll(pluginDir, 0755); err != nil {
         t.Fatalf("Failed to create plugin directory: %v", err)
     }
 
+    // Build provider binary once
+    providerBinary := filepath.Join(pluginDir, "terraform-provider-azurecaf_v2.0.0-preview5")
+    buildCmd := exec.Command("go", "build", "-o", providerBinary, "../..")
+    buildCmd.Env = append(os.Environ(),
+        "CGO_ENABLED=0",
+        "GOOS=linux",
+        "GOARCH=amd64",
+    )
+    if out, err := buildCmd.CombinedOutput(); err != nil {
+        t.Fatalf("Failed to build provider: %v\nOutput: %s", err, out)
+    }
+    if err := os.Chmod(providerBinary, 0755); err != nil {
+        t.Fatalf("Failed to make provider binary executable: %v", err)
+    }
+
+    // Create cache directory
     cacheDir := filepath.Join(testDir, "terraform.d", "plugin-cache")
-    if err := os.MkdirAll(cacheDir, 0755); err != nil && !os.IsExist(err) {
+    if err := os.MkdirAll(cacheDir, 0755); err != nil {
         t.Fatalf("Failed to create cache directory: %v", err)
     }
 
@@ -194,28 +198,31 @@ func TestDynamicResourceTypes(t *testing.T) {
     var wg sync.WaitGroup
 
     // Create shared provider directory in current directory to avoid /tmp
-    sharedPluginDir := filepath.Join(".", "terraform.d", "plugins", "registry.terraform.io", "aztfmod", "azurecaf", "2.0.0-preview5", "linux_amd64")
-    if err := os.MkdirAll(sharedPluginDir, 0755); err != nil {
-        t.Fatalf("Failed to create shared plugin directory: %v", err)
-    }
+    var sharedProviderBinary string
+    {
+        sharedPluginDir := filepath.Join(".", "terraform.d", "plugins", "registry.terraform.io", "aztfmod", "azurecaf", "2.0.0-preview5", "linux_amd64")
+        if err := os.MkdirAll(sharedPluginDir, 0755); err != nil {
+            t.Fatalf("Failed to create shared plugin directory: %v", err)
+        }
 
-    // Build provider once and share it
-    providerBinary := filepath.Join(sharedPluginDir, "terraform-provider-azurecaf_v2.0.0-preview5")
-    buildCmd := exec.Command("go", "build", "-o", providerBinary)
-    buildCmd.Dir = filepath.Join("..", "..")
-    buildCmd.Env = append(os.Environ(),
-        "CGO_ENABLED=0",
-        "GOOS=linux",
-        "GOARCH=amd64",
-        "TMPDIR=.",  // Use current directory for temporary files
-    )
-    if out, err := buildCmd.CombinedOutput(); err != nil {
-        t.Fatalf("Failed to build provider: %v\nOutput: %s", err, out)
+        // Build provider once and share it
+        sharedProviderBinary = filepath.Join(sharedPluginDir, "terraform-provider-azurecaf_v2.0.0-preview5")
+        buildCmd := exec.Command("go", "build", "-o", sharedProviderBinary)
+        buildCmd.Dir = filepath.Join("..", "..")
+        buildCmd.Env = append(os.Environ(),
+            "CGO_ENABLED=0",
+            "GOOS=linux",
+            "GOARCH=amd64",
+            "TMPDIR=.",  // Use current directory for temporary files
+        )
+        if out, err := buildCmd.CombinedOutput(); err != nil {
+            t.Fatalf("Failed to build provider: %v\nOutput: %s", err, out)
+        }
+        if err := os.Chmod(sharedProviderBinary, 0755); err != nil {
+            t.Fatalf("Failed to make provider binary executable: %v", err)
+        }
+        t.Log("Successfully built shared provider binary")
     }
-    if err := os.Chmod(providerBinary, 0755); err != nil {
-        t.Fatalf("Failed to make provider binary executable: %v", err)
-    }
-    t.Log("Successfully built shared provider binary")
 
     // Set TMPDIR for all terraform operations
     os.Setenv("TMPDIR", ".")
@@ -235,29 +242,29 @@ func TestDynamicResourceTypes(t *testing.T) {
     }
     
     // Set up provider configuration with proper directory structure
-    providerDir := filepath.Join(testDir, "terraform.d", "plugins", "registry.terraform.io", "aztfmod", "azurecaf", "2.0.0-preview5", "linux_amd64")
-    if err := os.RemoveAll(providerDir); err != nil && !os.IsNotExist(err) {
-        t.Logf("Warning: Failed to clean up provider directory: %v", err)
-    }
-    if err := os.MkdirAll(providerDir, 0755); err != nil {
-        t.Fatalf("Failed to create provider directory: %v", err)
-    }
+    {
+        providerDir := filepath.Join(testDir, "terraform.d", "plugins", "registry.terraform.io", "aztfmod", "azurecaf", "2.0.0-preview5", "linux_amd64")
+        if cleanErr := os.RemoveAll(providerDir); cleanErr != nil && !os.IsNotExist(cleanErr) {
+            t.Logf("Warning: Failed to clean up provider directory: %v", cleanErr)
+        }
+        if mkdirErr := os.MkdirAll(providerDir, 0755); mkdirErr != nil {
+            t.Fatalf("Failed to create provider directory: %v", mkdirErr)
+        }
 
-    // Create plugin cache directory with full provider path structure
-    pluginCacheDir := filepath.Join(testDir, "terraform.d", "plugin-cache", "registry.terraform.io", "aztfmod", "azurecaf", "2.0.0-preview5", "linux_amd64")
-    if err := os.RemoveAll(pluginCacheDir); err != nil && !os.IsNotExist(err) {
-        t.Logf("Warning: Failed to clean up plugin cache directory: %v", err)
-    }
-    if err := os.MkdirAll(pluginCacheDir, 0755); err != nil {
-        t.Fatalf("Failed to create plugin cache directory: %v", err)
-    }
+        // Create plugin cache directory with full provider path structure
+        pluginCacheDir := filepath.Join(testDir, "terraform.d", "plugin-cache", "registry.terraform.io", "aztfmod", "azurecaf", "2.0.0-preview5", "linux_amd64")
+        if cleanErr := os.RemoveAll(pluginCacheDir); cleanErr != nil && !os.IsNotExist(cleanErr) {
+            t.Logf("Warning: Failed to clean up plugin cache directory: %v", cleanErr)
+        }
+        if mkdirErr := os.MkdirAll(pluginCacheDir, 0755); mkdirErr != nil {
+            t.Fatalf("Failed to create plugin cache directory: %v", mkdirErr)
+        }
 
-    // Provider binary is already built and shared, no need to rebuild
-
-    // Copy resource definition to provider directory
-    resourceDefPath := filepath.Join("..", "..", "resourceDefinition.json")
-    if err := copyFile(resourceDefPath, filepath.Join(providerDir, "resourceDefinition.json")); err != nil {
-        t.Fatalf("Failed to copy resource definitions: %v", err)
+        // Copy resource definition to provider directory
+        resourceDefPath := filepath.Join("..", "..", "resourceDefinition.json")
+        if copyErr := copyFile(resourceDefPath, filepath.Join(providerDir, "resourceDefinition.json")); copyErr != nil {
+            t.Fatalf("Failed to copy resource definitions: %v", copyErr)
+        }
     }
 
     // Verify resource definitions are loaded
@@ -374,16 +381,19 @@ output "data_output_%[1]s" {
                 t.Fatalf("Failed to create resource test directory: %v", err)
             }
             
-            // Create symlink to shared provider binary
+            // Create resource plugin directory
             resourcePluginDir := filepath.Join(resourceTestDir, "terraform.d", "plugins", "registry.terraform.io", "aztfmod", "azurecaf", "2.0.0-preview5", "linux_amd64")
-            if err := os.MkdirAll(resourcePluginDir, 0755); err != nil {
-                t.Fatalf("Failed to create resource plugin directory: %v", err)
+            if mkdirErr := os.MkdirAll(resourcePluginDir, 0755); mkdirErr != nil {
+                t.Fatalf("Failed to create resource plugin directory: %v", mkdirErr)
             }
             
-            // Use symlink to shared provider binary
+            // Copy provider binary to resource directory
             resourceProviderBinary := filepath.Join(resourcePluginDir, "terraform-provider-azurecaf_v2.0.0-preview5")
-            if err := os.Symlink(providerBinary, resourceProviderBinary); err != nil && !os.IsExist(err) {
-                t.Fatalf("Failed to create symlink to provider binary: %v", err)
+            if copyErr := copyFile(sharedProviderBinary, resourceProviderBinary); copyErr != nil {
+                t.Fatalf("Failed to copy provider binary: %v", copyErr)
+            }
+            if chmodErr := os.Chmod(resourceProviderBinary, 0755); chmodErr != nil {
+                t.Fatalf("Failed to make provider binary executable: %v", chmodErr)
             }
             
             stats.Lock()
