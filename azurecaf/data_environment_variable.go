@@ -9,17 +9,19 @@ import (
 
 func dataEnvironmentVariable() *schema.Resource {
 	return &schema.Resource{
-		ReadContext: resourceAction,
+		ReadContext: dataEnvironmentVariableRead,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
+				ForceNew:    true,
 				Description: "Name of the environment variable.",
 			},
 			"fails_if_empty": {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Default:     false,
+				ForceNew:    true,
 				Description: "Throws an error if the environment variable is not set (default: false).",
 			},
 			"value": {
@@ -31,13 +33,14 @@ func dataEnvironmentVariable() *schema.Resource {
 			"default_value": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				ForceNew:    true,
 				Description: "Default value to use if the environment variable is not set.",
 			},
 		},
 	}
 }
 
-func resourceAction(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func dataEnvironmentVariableRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
 	name := d.Get("name").(string)

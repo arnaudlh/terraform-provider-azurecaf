@@ -3,8 +3,8 @@ package models
 import (
     "encoding/json"
     "fmt"
+    "log"
     "os"
-    "path/filepath"
     "regexp"
     "strings"
 )
@@ -26,63 +26,48 @@ var ResourceMaps = map[string]string{}
 
 func init() {
     // Load resource definitions from JSON file
-    wd, err := os.Getwd()
-    if err != nil {
-        panic(fmt.Sprintf("failed to get working directory: %v", err))
-    }
-
-    // Try to find resourceDefinition.json in multiple locations
-    var jsonPath string
     searchPaths := []string{
-        filepath.Join(wd, "resourceDefinition.json"),
-        filepath.Join(filepath.Dir(wd), "resourceDefinition.json"),
-        filepath.Join(filepath.Dir(filepath.Dir(wd)), "resourceDefinition.json"),
-        filepath.Join(filepath.Dir(filepath.Dir(filepath.Dir(wd))), "resourceDefinition.json"),
-        "/home/ubuntu/.terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/2.0.0-preview5/linux_amd64/resourceDefinition.json",
-        "/home/runner/work/terraform-provider-azurecaf/terraform-provider-azurecaf/resourceDefinition.json",
-        "/home/runner/work/terraform-provider-azurecaf/terraform-provider-azurecaf/tests/e2e/resourceDefinition.json",
-        filepath.Join(os.Getenv("HOME"), "repos/terraform-provider-azurecaf/resourceDefinition.json"),
-        filepath.Join(os.Getenv("HOME"), "repos/terraform-provider-azurecaf/tests/e2e/resourceDefinition.json"),
+        "/home/ubuntu/repos/terraform-provider-azurecaf/resourceDefinition.json",
+        "/home/ubuntu/repos/terraform-provider-azurecaf/tests/e2e/resourceDefinition.json",
     }
 
+    var jsonPath string
     for _, path := range searchPaths {
         if _, err := os.Stat(path); err == nil {
             jsonPath = path
+            log.Printf("[INFO] Found resource definition at: %s", path)
             break
         }
     }
 
     if jsonPath == "" {
-        panic("resourceDefinition.json not found in search paths")
+        log.Printf("[WARN] resourceDefinition.json not found in search paths")
+        return
     }
 
     data, err := os.ReadFile(jsonPath)
     if err != nil {
-        panic(fmt.Sprintf("failed to read resource definitions: %v", err))
+        log.Printf("[ERROR] Failed to read resource definitions: %v", err)
+        return
     }
 
     var definitionsArray []ResourceStructure
     if err := json.Unmarshal(data, &definitionsArray); err != nil {
-        panic(fmt.Sprintf("failed to parse resource definitions: %v", err))
-    }
-
-    // Clean up validation regex patterns by removing quotes
-    for i := range definitionsArray {
-        if definitionsArray[i].ValidationRegExp != "" {
-            // Remove surrounding quotes and unescape inner quotes
-            pattern := definitionsArray[i].ValidationRegExp
-            pattern = strings.Trim(pattern, "\"")
-            pattern = strings.ReplaceAll(pattern, "\\\"", "\"")
-            definitionsArray[i].ValidationRegExp = pattern
-        }
+        log.Printf("[ERROR] Failed to parse resource definitions: %v", err)
+        return
     }
 
     // Initialize ResourceDefinitions map
     for i := range definitionsArray {
         def := &definitionsArray[i]
+        if def.ValidationRegExp != "" {
+            def.ValidationRegExp = strings.Trim(def.ValidationRegExp, "\"")
+            def.ValidationRegExp = strings.ReplaceAll(def.ValidationRegExp, "\\\"", "\"")
+        }
         ResourceDefinitions[def.ResourceTypeName] = def
         ResourceMaps[def.ResourceTypeName] = def.ResourceTypeName
     }
+    log.Printf("[DEBUG] Loaded %d resource definitions", len(ResourceDefinitions))
 }
 
 func GetResourceStructure(resourceType string) (*ResourceStructure, error) {
