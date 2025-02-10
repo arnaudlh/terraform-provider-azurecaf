@@ -1,0 +1,51 @@
+name: Unit Tests
+
+on:
+  push:
+    branches: [ 'main', '3_0' ]
+  pull_request:
+    branches: [ 'main', '3_0' ]
+
+# Prevent duplicate workflow runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22'
+          cache: false
+
+      - name: Install go-junit-report
+        run: |
+          go install github.com/jstemmer/go-junit-report/v2@latest
+          export PATH=$PATH:$(go env GOPATH)/bin
+
+      - name: Run Unit Tests
+        run: |
+          mkdir -p test-results
+          go test -v -coverprofile=coverage.out ./azurecaf/... 2>&1 | go-junit-report > test-results/unit-tests-report.xml
+
+      - name: Generate Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: Unit Tests Report
+          path: test-results/unit-tests-report.xml
+          reporter: java-junit
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: test-results/
+          retention-days: 30

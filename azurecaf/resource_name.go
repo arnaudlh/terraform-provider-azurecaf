@@ -4,10 +4,10 @@ import (
 	"context"
 	b64 "encoding/base64"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/schemas"
+	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/utils"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -17,7 +17,10 @@ func resourceName() *schema.Resource {
 		CreateContext: resourceNameCreate,
 		UpdateContext: resourceNameUpdate,
 		ReadContext:   resourceNameRead,
-		Delete:        schema.RemoveFromState,
+		DeleteContext: func(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+			d.SetId("")
+			return nil
+		},
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -34,42 +37,94 @@ func resourceName() *schema.Resource {
 				Version: 3,
 			},
 		},
-		Schema:        schemas.V4_Schema(),
+		Schema:        schemas.V4_Schema().Schema,
 		CustomizeDiff: getDifference,
 	}
 }
 
 func getDifference(context context.Context, d *schema.ResourceDiff, resource interface{}) error {
-	name := d.Get("name").(string)
-	prefixes := convertInterfaceToString(d.Get("prefixes").([]interface{}))
-	suffixes := convertInterfaceToString(d.Get("suffixes").([]interface{}))
-	separator := d.Get("separator").(string)
-	resourceType := d.Get("resource_type").(string)
-	resourceTypes := convertInterfaceToString(d.Get("resource_types").([]interface{}))
-	cleanInput := d.Get("clean_input").(bool)
-	passthrough := d.Get("passthrough").(bool)
-	useSlug := d.Get("use_slug").(bool)
-	randomLength := d.Get("random_length").(int)
-	randomSeed := int64(d.Get("random_seed").(int))
-	randomString := d.Get("random_string").(string)
-	randomSuffix := randSeq(int(randomLength), randomSeed)
+	name, ok := d.Get("name").(string)
+	if !ok {
+		return fmt.Errorf("name must be a string")
+	}
+	prefixesRaw := d.Get("prefixes")
+	var prefixes []string
+	if prefixesRaw != nil {
+		if arr, ok := prefixesRaw.([]interface{}); ok {
+			prefixes = convertInterfaceToString(arr)
+		}
+	}
+	suffixesRaw := d.Get("suffixes")
+	var suffixes []string
+	if suffixesRaw != nil {
+		if arr, ok := suffixesRaw.([]interface{}); ok {
+			suffixes = convertInterfaceToString(arr)
+		}
+	}
+	separator, ok := d.Get("separator").(string)
+	if !ok {
+		separator = "-"
+	}
+	resourceType, ok := d.Get("resource_type").(string)
+	if !ok {
+		return fmt.Errorf("resource_type must be a string")
+	}
+	cleanInput, _ := d.Get("clean_input").(bool)
+	passthrough, _ := d.Get("passthrough").(bool)
+	useSlug, _ := d.Get("use_slug").(bool)
+	randomLength, _ := d.Get("random_length").(int)
+	randomSeedRaw := d.Get("random_seed")
+	var randomSeed int64
+	if seedInt, ok := randomSeedRaw.(int); ok && seedInt != 0 {
+		randomSeed = int64(seedInt)
+	} else {
+		// Generate new seed only if not already set
+		randomSeed = time.Now().UnixNano()
+		if err := d.SetNew("random_seed", randomSeed); err != nil {
+			return fmt.Errorf("failed to set random_seed: %v", err)
+		}
+	}
+	
+	randomString, _ := d.Get("random_string").(string)
+	var randomSuffix string
 	if len(randomString) > 0 {
 		randomSuffix = randomString
-	} else {
-		d.SetNew("random_string", randomSuffix)
+	} else if randomLength > 0 {
+		randomSuffix = utils.RandSeq(randomLength, randomSeed)
+		if err := d.SetNew("random_string", randomSuffix); err != nil {
+			return fmt.Errorf("failed to set random_string: %v", err)
+		}
+	}
+	
+	// Preserve non-zero random_seed in state
+	if randomSeed != 0 {
+		if err := d.SetNew("random_seed", randomSeed); err != nil {
+			return fmt.Errorf("failed to preserve random_seed: %v", err)
+		}
 	}
 	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
-	result, results, _, err :=
-		getData(resourceType, resourceTypes, separator,
-			prefixes, name, suffixes, randomSuffix,
-			cleanInput, passthrough, useSlug, namePrecedence)
-	if !d.GetRawState().IsNull() {
-		d.SetNew("result", result)
-		d.SetNew("results", results)
-	}
+	result, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get resource name: %s", err.Error())
 	}
+	
+	// Convert existing results to string map
+	existingResults := make(map[string]string)
+	if raw, ok := d.Get("results").(map[string]interface{}); ok {
+		for k, v := range raw {
+			if str, ok := v.(string); ok {
+				existingResults[k] = str
+			}
+		}
+	}
+	existingResults[resourceType] = result
+	if err := d.SetNew("result", result); err != nil {
+		return fmt.Errorf("failed to set result: %v", err)
+	}
+	if err := d.SetNew("results", existingResults); err != nil {
+		return fmt.Errorf("failed to set results: %v", err)
+	}
+	// Random string is already set above
 	return nil
 }
 
@@ -82,8 +137,7 @@ func resourceNameUpdate(ctx context.Context, d *schema.ResourceData, meta interf
 }
 
 func resourceNameRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	var diags diag.Diagnostics
-	return diags
+	return getNameResult(d, meta)
 }
 
 func convertInterfaceToString(source []interface{}) []string {
@@ -101,7 +155,6 @@ func getNameResult(d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	suffixes := convertInterfaceToString(d.Get("suffixes").([]interface{}))
 	separator := d.Get("separator").(string)
 	resourceType := d.Get("resource_type").(string)
-	resourceTypes := convertInterfaceToString(d.Get("resource_types").([]interface{}))
 	cleanInput := d.Get("clean_input").(bool)
 	passthrough := d.Get("passthrough").(bool)
 	useSlug := d.Get("use_slug").(bool)
@@ -110,57 +163,46 @@ func getNameResult(d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 
 	if randomSeed == 0 {
 		randomSeed = time.Now().UnixMicro()
-		d.Set("random_seed", randomSeed)
+		if err := d.Set("random_seed", randomSeed); err != nil {
+			return diag.FromErr(err)
+		}
 	}
 	randomString := d.Get("random_string").(string)
-	randomSuffix := randSeq(int(randomLength), randomSeed)
+	randomSuffix := utils.RandSeq(randomLength, randomSeed)
 	if len(randomString) > 0 {
 		randomSuffix = randomString
 	} else {
-		d.Set("random_string", randomSuffix)
+		if err := d.Set("random_string", randomSuffix); err != nil {
+			return diag.FromErr(err)
+		}
 	}
 
 	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
-	result, results, id, err :=
-		getData(resourceType, resourceTypes, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
+	result, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	if len(result) > 0 {
-		d.Set("result", result)
-	}
-	if len(results) > 0 {
-		d.Set("results", results)
-	}
+	
+	id := b64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s\t%s", resourceType, result)))
 	d.SetId(id)
+
+	// Convert existing results to string map
+	existingResults := make(map[string]string)
+	if raw, ok := d.Get("results").(map[string]interface{}); ok {
+		for k, v := range raw {
+			if str, ok := v.(string); ok {
+				existingResults[k] = str
+			}
+		}
+	}
+	existingResults[resourceType] = result
+
+	if err := d.Set("result", result); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set("results", existingResults); err != nil {
+		return diag.FromErr(err)
+	}
+
 	return diags
-}
-
-func getData(resourceType string, resourceTypes []string, separator string, prefixes []string, name string, suffixes []string, randomSuffix string, cleanInput bool, passthrough bool, useSlug bool, namePrecedence []string) (result string, results map[string]string, id string, err error) {
-	isValid, err := validateResourceType(resourceType, resourceTypes)
-	if !isValid {
-		return
-	}
-	if results == nil {
-		results = make(map[string]string)
-	}
-	ids := []string{}
-	if len(resourceType) > 0 {
-		result, err = getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
-		if err != nil {
-			return
-		}
-		results[resourceType] = result
-		ids = append(ids, fmt.Sprintf("%s\t%s", resourceType, result))
-	}
-
-	for _, resourceTypeName := range resourceTypes {
-		results[resourceTypeName], err = getResourceName(resourceTypeName, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
-		if err != nil {
-			return
-		}
-		ids = append(ids, fmt.Sprintf("%s\t%s", resourceTypeName, results[resourceTypeName]))
-	}
-	id = b64.StdEncoding.EncodeToString([]byte(strings.Join(ids, "\n")))
-	return
 }
