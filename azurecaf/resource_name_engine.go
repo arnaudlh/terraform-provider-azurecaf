@@ -3,6 +3,7 @@ package azurecaf
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/models"
@@ -214,6 +215,27 @@ func getResourceName(resourceTypeName string, separator string,
 
 	if resource.LowerCase {
 		resourceName = strings.ToLower(resourceName)
+	}
+
+	// If name doesn't match validation pattern and we have a random suffix, try to pad to minimum length
+	if !validationRegEx.MatchString(resourceName) && len(randomSuffix) > 0 {
+		// Extract minimum length from regex pattern (e.g., {4,48} -> 4)
+		minLengthRegex := regexp.MustCompile(`\{(\d+),`)
+		if matches := minLengthRegex.FindStringSubmatch(resource.ValidationRegExp); len(matches) > 1 {
+			if minLength, err := strconv.Atoi(matches[1]); err == nil {
+				// Add 2 for the required start and end characters
+				totalMinLength := minLength + 2
+				if len(resourceName) < totalMinLength {
+					// Pad with random characters to meet minimum length
+					paddingNeeded := totalMinLength - len(resourceName)
+					if len(randomSuffix) >= paddingNeeded {
+						resourceName = fmt.Sprintf("%s%s", resourceName, randomSuffix[:paddingNeeded])
+					} else {
+						resourceName = fmt.Sprintf("%s%s", resourceName, randomSuffix)
+					}
+				}
+			}
+		}
 	}
 
 	if !validationRegEx.MatchString(resourceName) {
