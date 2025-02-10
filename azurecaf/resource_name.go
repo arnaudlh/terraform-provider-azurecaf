@@ -75,9 +75,16 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 	randomLength, _ := d.Get("random_length").(int)
 	randomSeedRaw := d.Get("random_seed")
 	var randomSeed int64
-	if seedInt, ok := randomSeedRaw.(int); ok {
+	if seedInt, ok := randomSeedRaw.(int); ok && seedInt != 0 {
 		randomSeed = int64(seedInt)
+	} else {
+		// Generate new seed only if not already set
+		randomSeed = time.Now().UnixNano()
+		if err := d.SetNew("random_seed", randomSeed); err != nil {
+			return fmt.Errorf("failed to set random_seed: %v", err)
+		}
 	}
+	
 	randomString, _ := d.Get("random_string").(string)
 	var randomSuffix string
 	if len(randomString) > 0 {

@@ -498,7 +498,8 @@ func BaseSchema() map[string]*schema.Schema {
 		"random_seed": {
 			Type:     schema.TypeInt,
 			Optional: true,
-			ValidateFunc: validation.IntAtLeast(1),
+			Computed: true,
+			ForceNew: true,
 		},
 		"use_slug": {
 			Type:     schema.TypeBool,
