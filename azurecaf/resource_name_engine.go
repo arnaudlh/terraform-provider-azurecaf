@@ -133,12 +133,13 @@ func composeName(separator string,
 				}
 			} else if currentLength < 27 {
 				// Add padding between name and random suffix
+				paddingNeeded := 27 - currentLength
 				if randomSuffix != "" {
 					baseLength := len(result) - len(separator + randomSuffix)
-					padding := strings.Repeat(separator, (27-currentLength)/len(separator))
+					padding := strings.Repeat("-", paddingNeeded)
 					result = result[:baseLength] + padding + separator + randomSuffix
 				} else {
-					result += strings.Repeat(separator, (27-currentLength)/len(separator))
+					result += strings.Repeat("-", paddingNeeded)
 				}
 			}
 		}
@@ -228,16 +229,16 @@ func composeName(separator string,
 		case "name":
 			if name != "" {
 				components = append(components, name)
-				// For resource groups, add slug right after name
-				if useSlug && resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_resource_group" {
-					components = append(components, "rg")
-				}
 			}
 		case "slug":
-			if useSlug && resourceDef != nil && resourceDef.ResourceTypeName != "azurerm_resource_group" {
-				slug := resourceDef.CafPrefix
-				if slug != "" {
-					components = append(components, slug)
+			if useSlug && resourceDef != nil {
+				if resourceDef.ResourceTypeName == "azurerm_resource_group" {
+					components = append(components, "rg")
+				} else {
+					slug := resourceDef.CafPrefix
+					if slug != "" {
+						components = append(components, slug)
+					}
 				}
 			}
 		case "random":
