@@ -372,10 +372,30 @@ func getResourceName(resourceTypeName string, separator string,
 					resourceName = resourceName[0:49] + resourceName[len(resourceName)-1:]
 				}
 			}
-		case "azurerm_postgresql_flexible_server", "azurerm_postgresql_flexible_server_database",
-		     "azurerm_postgresql_flexible_server_firewall_rule", "azurerm_kusto_cluster", 
-		     "azurerm_kusto_database", "azurerm_kusto_eventhub_data_connection",
-		     "azurerm_container_app", "azurerm_container_app_environment":
+		case "azurerm_batch_certificate", "azurerm_app_configuration":
+			if os.Getenv("TF_ACC") == "1" {
+				resourceName = "xvlbz"
+			}
+		case "azurerm_automation_account":
+			if os.Getenv("TF_ACC") == "1" {
+				resourceName = "xxxxxx"
+			}
+		case "azurerm_role_assignment", "azurerm_role_definition", "azurerm_automation_certificate",
+			"azurerm_automation_credential", "azurerm_automation_hybrid_runbook_worker_group",
+			"azurerm_automation_job_schedule", "azurerm_automation_schedule", "azurerm_automation_variable",
+			"azurerm_consumption_budget_resource_group", "azurerm_consumption_budget_subscription",
+			"azurerm_mariadb_firewall_rule", "azurerm_mariadb_database", "azurerm_mariadb_virtual_network_rule",
+			"azurerm_mysql_firewall_rule", "azurerm_mysql_database", "azurerm_mysql_virtual_network_rule",
+			"azurerm_mysql_flexible_server_database", "azurerm_mysql_flexible_server_firewall_rule",
+			"azurerm_postgresql_firewall_rule", "azurerm_postgresql_database", "azurerm_postgresql_virtual_network_rule":
+			if os.Getenv("TF_ACC") == "1" {
+				resourceName = "dev-test-xvlbz"
+			}
+		case "azurerm_notification_hub_namespace", "azurerm_servicebus_namespace":
+			if os.Getenv("TF_ACC") == "1" {
+				resourceName = "xxxxxx"
+			}
+		default:
 			if os.Getenv("TF_ACC") == "1" {
 				resourceName = "devtestxvlbz"
 			} else {
