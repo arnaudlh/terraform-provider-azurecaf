@@ -15,7 +15,6 @@ import (
 func resourceName() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: resourceNameCreate,
-		UpdateContext: resourceNameUpdate,
 		ReadContext:   resourceNameRead,
 		DeleteContext: func(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 			d.SetId("")
@@ -27,12 +26,12 @@ func resourceName() *schema.Resource {
 		SchemaVersion: 4,
 		StateUpgraders: []schema.StateUpgrader{
 			{
-				Type:    schemas.V2().CoreConfigSchema().ImpliedType(),
+				Type:    schemas.V2_Schema().CoreConfigSchema().ImpliedType(),
 				Upgrade: schemas.ResourceNameStateUpgradeV2,
 				Version: 2,
 			},
 			{
-				Type:    schemas.V3().CoreConfigSchema().ImpliedType(),
+				Type:    schemas.V3_Schema().CoreConfigSchema().ImpliedType(),
 				Upgrade: schemas.ResourceNameStateUpgradeV3,
 				Version: 3,
 			},
@@ -127,9 +126,7 @@ func resourceNameCreate(ctx context.Context, d *schema.ResourceData, meta interf
 	return getNameResult(d, meta)
 }
 
-func resourceNameUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	return getNameResult(d, meta)
-}
+
 
 func resourceNameRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	return getNameResult(d, meta)
