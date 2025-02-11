@@ -185,6 +185,8 @@ func composeName(separator string,
 			if strings.HasPrefix(resourceDef.ResourceTypeName, "azurerm_automation_") {
 				// Automation accounts require at least 6 chars and must start with a letter
 				return fmt.Sprintf("auto%stest%sxvlbz", separator, separator)
+			} else if resourceDef.ResourceTypeName == "azurerm_batch_application" {
+				return "devtestxvlbz"
 			} else if strings.HasPrefix(resourceDef.ResourceTypeName, "azurerm_batch_") {
 				return fmt.Sprintf("dev%stest%sxvlbz", separator, separator)
 			}
