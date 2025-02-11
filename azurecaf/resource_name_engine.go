@@ -372,19 +372,14 @@ func getResourceName(resourceTypeName string, separator string,
 					resourceName = resourceName[0:49] + resourceName[len(resourceName)-1:]
 				}
 			}
-		case "azurerm_postgresql_flexible_server", "azurerm_postgresql_flexible_server_database", 
-		     "azurerm_postgresql_flexible_server_firewall_rule", "azurerm_kusto_database",
-		     "azurerm_kusto_eventhub_data_connection":
+		case "azurerm_postgresql_flexible_server", "azurerm_postgresql_flexible_server_database",
+		     "azurerm_postgresql_flexible_server_firewall_rule":
 			if os.Getenv("TF_ACC") == "1" {
 				resourceName = "devtestxvlbz"
 			} else {
-				if os.Getenv("TF_ACC") == "1" {
-					resourceName = "devtestxvlbz"
-				} else {
-					resourceName = regexp.MustCompile(`[^a-zA-Z0-9]`).ReplaceAllString(resourceName, "")
-					if len(resourceName) > 63 {
-						resourceName = resourceName[:63]
-					}
+				resourceName = regexp.MustCompile(`[^a-zA-Z0-9]`).ReplaceAllString(resourceName, "")
+				if len(resourceName) > 63 {
+					resourceName = resourceName[:63]
 				}
 			}
 		case "azurerm_kusto_cluster", "azurerm_kusto_database", "azurerm_kusto_eventhub_data_connection":
