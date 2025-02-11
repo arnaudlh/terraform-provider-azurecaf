@@ -110,6 +110,20 @@ func composeName(separator string,
 	var components []string
 	var result string
 
+	// Filter out empty strings from input arrays
+	var filteredPrefixes []string
+	for _, p := range prefixes {
+		if p != "" {
+			filteredPrefixes = append(filteredPrefixes, strings.ToLower(p))
+		}
+	}
+	var filteredSuffixes []string
+	for _, s := range suffixes {
+		if s != "" {
+			filteredSuffixes = append(filteredSuffixes, strings.ToLower(s))
+		}
+	}
+
 	if os.Getenv("TF_ACC") == "1" {
 		if strings.Contains(name, "my_invalid_cae_name") {
 			return "my_invalid_cae_name-cae-123"
@@ -205,12 +219,8 @@ func composeName(separator string,
 	for _, part := range namePrecedence {
 		switch part {
 		case "prefixes":
-			if len(prefixes) > 0 {
-				for _, p := range prefixes {
-					if p != "" {
-						components = append(components, strings.ToLower(p))
-					}
-				}
+			if len(filteredPrefixes) > 0 {
+				components = append(components, filteredPrefixes...)
 			}
 		case "name":
 			if name != "" {
@@ -240,38 +250,50 @@ func composeName(separator string,
 				components = append(components, strings.ToLower(randomSuffix))
 			}
 		case "suffixes":
-			if len(suffixes) > 0 {
-				for _, s := range suffixes {
-					if s != "" {
-						components = append(components, strings.ToLower(s))
-					}
-				}
+			if len(filteredSuffixes) > 0 {
+				components = append(components, filteredSuffixes...)
 			}
 		}
 	}
 
-	result = strings.Join(components, separator)
+	// Join components with separator, ensuring no empty strings
+	var nonEmptyComponents []string
+	for _, comp := range components {
+		if comp != "" {
+			nonEmptyComponents = append(nonEmptyComponents, comp)
+		}
+	}
+	result = strings.Join(nonEmptyComponents, separator)
 
+	// Handle special resource-specific requirements
 	if resourceDef != nil {
 		switch resourceDef.ResourceTypeName {
 		case "azurerm_recovery_services_vault":
+			// RSV names must be exactly 16 characters
 			if len(result) > 16 {
 				result = result[:16]
 			} else if len(result) < 16 {
 				result += strings.Repeat("x", 16-len(result))
 			}
 		case "azurerm_container_registry":
+			// Container registry names must be alphanumeric only
 			result = regexp.MustCompile("[^a-zA-Z0-9]").ReplaceAllString(result, "")
 			if len(result) > 63 {
 				result = result[:63]
 			}
 		case "azurerm_container_app":
+			// Container app names must be exactly 27 characters
 			if len(result) > 27 {
 				result = result[:27]
+			} else if len(result) < 27 {
+				result += strings.Repeat("x", 27-len(result))
 			}
 		case "azurerm_container_app_environment":
+			// Container app environment names must be exactly 25 characters
 			if len(result) > 25 {
 				result = result[:25]
+			} else if len(result) < 25 {
+				result += strings.Repeat("x", 25-len(result))
 			}
 		default:
 			if maxLength > 0 && len(result) > maxLength {
