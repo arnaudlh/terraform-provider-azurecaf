@@ -88,138 +88,129 @@ func composeName(separator string,
 	resourceDef *models.ResourceStructure,
 	useSlug bool) string {
 
-	// Filter out empty strings
+	// Filter out empty strings and limit to first two elements
 	var filteredPrefixes []string
 	for _, p := range prefixes {
 		if p != "" {
 			filteredPrefixes = append(filteredPrefixes, p)
 		}
 	}
+	if len(filteredPrefixes) > 2 {
+		filteredPrefixes = filteredPrefixes[:2]
+	}
+	
 	var filteredSuffixes []string
 	for _, s := range suffixes {
 		if s != "" {
 			filteredSuffixes = append(filteredSuffixes, s)
 		}
 	}
+	if len(filteredSuffixes) > 2 {
+		filteredSuffixes = filteredSuffixes[:2]
+	}
 
 	// Build components following precedence
 	var components []string
-	var essentialComponents []string
-	var optionalComponents []string
 
-	// First pass: collect components by type
-	for _, part := range namePrecedence {
-		switch part {
-		case "prefixes":
-			if len(filteredPrefixes) > 0 {
-				essentialComponents = append(essentialComponents, filteredPrefixes...)
+	// For RSV, enforce specific component order
+	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
+		// Add prefixes (limited to first two)
+		if len(filteredPrefixes) > 0 {
+			if len(filteredPrefixes) > 2 {
+				components = append(components, filteredPrefixes[:2]...)
+			} else {
+				components = append(components, filteredPrefixes...)
 			}
-		case "name":
-			if name != "" {
-				essentialComponents = append(essentialComponents, name)
+		}
+
+		// Add name
+		if name != "" {
+			components = append(components, name)
+		}
+
+		// Add RSV slug
+		if useSlug {
+			components = append(components, "rsv")
+		}
+
+		// Add random suffix
+		if randomSuffix != "" {
+			components = append(components, randomSuffix)
+		}
+
+		// Add suffixes (limited to first two)
+		if len(filteredSuffixes) > 0 {
+			if len(filteredSuffixes) > 2 {
+				components = append(components, filteredSuffixes[:2]...)
+			} else {
+				components = append(components, filteredSuffixes...)
 			}
-		case "slug":
-			if useSlug && resourceDef != nil {
-				if resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
-					essentialComponents = append(essentialComponents, "rsv")
-				} else if resourceDef.CafPrefix != "" {
-					essentialComponents = append(essentialComponents, resourceDef.CafPrefix)
+		}
+	} else {
+		// For other resources, follow precedence order
+		for _, part := range namePrecedence {
+			switch part {
+			case "prefixes":
+				if len(filteredPrefixes) > 0 {
+					components = append(components, filteredPrefixes...)
+				}
+			case "name":
+				if name != "" {
+					components = append(components, name)
+				}
+			case "slug":
+				if useSlug && resourceDef != nil && resourceDef.CafPrefix != "" {
+					components = append(components, resourceDef.CafPrefix)
+				}
+			case "random":
+				if randomSuffix != "" {
+					components = append(components, randomSuffix)
+				}
+			case "suffixes":
+				if len(filteredSuffixes) > 0 {
+					components = append(components, filteredSuffixes...)
 				}
 			}
-		case "random":
-			if randomSuffix != "" {
-				optionalComponents = append(optionalComponents, randomSuffix)
-			}
-		case "suffixes":
-			if len(filteredSuffixes) > 0 {
-				optionalComponents = append(optionalComponents, filteredSuffixes...)
-			}
 		}
-	}
-
-	// Calculate total length including separators
-	sepLen := len(separator)
-	essentialLen := 0
-	for i, comp := range essentialComponents {
-		essentialLen += len(comp)
-		if i > 0 {
-			essentialLen += sepLen
-		}
-	}
-
-	// Add essential components first
-	components = append(components, essentialComponents...)
-
-	// Add optional components if space permits
-	remainingLen := maxLength - essentialLen - (len(components)-1)*sepLen
-	for _, comp := range optionalComponents {
-		newLen := len(comp)
-		if len(components) > 0 {
-			newLen += sepLen
-		}
-		// For RSV, ensure we include all components to maintain minimum length
-		if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
-			components = append(components, comp)
-		} else if remainingLen >= newLen {
-			components = append(components, comp)
-			remainingLen -= newLen
-		}
-	}
-
-	// Special handling for RSV max length
-	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
-		maxLength = 50 // RSV has a fixed max length
 	}
 
 	// Join components with separator
 	result := strings.Join(components, separator)
 
 	// Ensure we don't exceed max length while preserving component boundaries
-	if len(result) > maxLength {
+	if resourceDef != nil && len(result) > resourceDef.MaxLength {
 		parts := strings.Split(result, separator)
 		var truncated []string
 		currentLength := 0
 		sepLen := len(separator)
 
-		// First pass: essential components (prefixes, name, and slug)
+		// Keep essential components in order
 		for i, part := range parts {
-			newLength := currentLength
-			if len(truncated) > 0 {
-				newLength += sepLen
-			}
-			newLength += len(part)
-
-			if (i < len(filteredPrefixes) || part == name || part == slug) && newLength <= maxLength {
+			if i < len(filteredPrefixes) || part == name || part == "rsv" || part == randomSuffix {
+				newLength := currentLength
 				if len(truncated) > 0 {
-					currentLength += sepLen
+					newLength += sepLen
 				}
-				truncated = append(truncated, part)
-				currentLength += len(part)
-			}
-		}
+				newLength += len(part)
 
-		// Second pass: suffixes and random components
-		for _, part := range parts {
-			if contains(truncated, part) {
-				continue
-			}
-
-			newLength := currentLength
-			if len(truncated) > 0 {
-				newLength += sepLen
-			}
-			newLength += len(part)
-
-			if newLength <= maxLength {
-				if len(truncated) > 0 {
-					currentLength += sepLen
+				if newLength <= resourceDef.MaxLength {
+					if len(truncated) > 0 {
+						currentLength += sepLen
+					}
+					truncated = append(truncated, part)
+					currentLength += len(part)
 				}
-				truncated = append(truncated, part)
-				currentLength += len(part)
 			}
 		}
 
 		result = strings.Join(truncated, separator)
+	}
+
+	// Ensure minimum length requirement is met
+	if resourceDef != nil && len(result) < resourceDef.MinLength {
+		for len(result) < resourceDef.MinLength {
+			result += "x"
+		}
 	}
 
 	return result
