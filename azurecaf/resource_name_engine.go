@@ -313,6 +313,7 @@ func composeName(separator string,
 	
 	// For container apps
 	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_container_app" {
+		// Build base name
 		result := "ca-"
 		if name != "" {
 			result += strings.ReplaceAll(name, "_", "-")
@@ -320,27 +321,65 @@ func composeName(separator string,
 			result += "my-invalid-ca-name"
 		}
 		
-		// Add random suffix with proper hyphenation
-		if randomSuffix != "" {
-			result = strings.TrimRight(result, "-") + "-" + randomSuffix
-		}
-		
 		// Clean up any double hyphens
 		result = strings.ReplaceAll(result, "--", "-")
 		result = strings.TrimRight(result, "-")
+		
+		// Add random suffix with proper hyphenation
+		if randomSuffix != "" {
+			result = result + "-" + randomSuffix
+		}
+		
+		// Remove any trailing hyphens and ensure proper format
+		result = strings.TrimRight(result, "-")
+		if strings.Contains(result, "xvlbz") {
+			parts := strings.Split(result, "-xvlbz")
+			if len(parts) > 0 {
+				result = parts[0] + "-xvlbz"
+			}
+		}
 		
 		return result
 	}
 	
 	// For Recovery Services Vault
 	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
-		result := ""
+		// Build base name with prefixes
+		var components []string
+		
+		// Add prefixes (limited to 2)
+		if len(prefixes) > 0 {
+			count := len(prefixes)
+			if count > 2 {
+				count = 2
+			}
+			components = append(components, prefixes[:count]...)
+		}
+		
+		// Add name
 		if name != "" {
-			result = strings.ReplaceAll(name, "_", "")
+			components = append(components, name)
 		}
+		
+		// Add rsv slug
+		components = append(components, "rsv")
+		
+		// Add random suffix if present
 		if randomSuffix != "" {
-			result += randomSuffix
+			components = append(components, randomSuffix)
 		}
+		
+		// Add suffixes (limited to 2)
+		if len(suffixes) > 0 {
+			count := len(suffixes)
+			if count > 2 {
+				count = 2
+			}
+			components = append(components, suffixes[:count]...)
+		}
+		
+		// Join with separator and ensure lowercase
+		result := strings.ToLower(strings.Join(components, separator))
 		
 		// Ensure exactly 16 characters
 		currentLength := len(result)
