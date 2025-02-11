@@ -373,7 +373,8 @@ func getResourceName(resourceTypeName string, separator string,
 				}
 			}
 		case "azurerm_postgresql_flexible_server", "azurerm_postgresql_flexible_server_database",
-		     "azurerm_postgresql_flexible_server_firewall_rule":
+		     "azurerm_postgresql_flexible_server_firewall_rule", "azurerm_container_app",
+		     "azurerm_container_app_environment":
 			if os.Getenv("TF_ACC") == "1" {
 				resourceName = "devtestxvlbz"
 			} else {
