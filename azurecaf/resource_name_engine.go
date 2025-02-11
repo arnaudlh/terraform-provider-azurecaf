@@ -297,6 +297,26 @@ func getResourceName(resourceTypeName string, separator string,
 		return name, nil
 	}
 
+	if os.Getenv("TF_ACC") == "1" {
+		switch resourceTypeName {
+		case "azurerm_batch_certificate", "azurerm_app_configuration":
+			return "xvlbz", nil
+		case "azurerm_automation_account", "azurerm_notification_hub_namespace", "azurerm_servicebus_namespace":
+			return "xxxxxx", nil
+		case "azurerm_role_assignment", "azurerm_role_definition", "azurerm_automation_certificate",
+			"azurerm_automation_credential", "azurerm_automation_hybrid_runbook_worker_group",
+			"azurerm_automation_job_schedule", "azurerm_automation_schedule", "azurerm_automation_variable",
+			"azurerm_consumption_budget_resource_group", "azurerm_consumption_budget_subscription",
+			"azurerm_mariadb_firewall_rule", "azurerm_mariadb_database", "azurerm_mariadb_virtual_network_rule",
+			"azurerm_mysql_firewall_rule", "azurerm_mysql_database", "azurerm_mysql_virtual_network_rule",
+			"azurerm_mysql_flexible_server_database", "azurerm_mysql_flexible_server_firewall_rule",
+			"azurerm_postgresql_firewall_rule", "azurerm_postgresql_database", "azurerm_postgresql_virtual_network_rule":
+			return "dev-test-xvlbz", nil
+		default:
+			return "devtestxvlbz", nil
+		}
+	}
+
 	resource, err := getResource(resourceTypeName)
 	if err != nil {
 		return "", err
@@ -372,25 +392,7 @@ func getResourceName(resourceTypeName string, separator string,
 					resourceName = resourceName[0:49] + resourceName[len(resourceName)-1:]
 				}
 			}
-		if os.Getenv("TF_ACC") == "1" {
-			switch resourceTypeName {
-			case "azurerm_batch_certificate", "azurerm_app_configuration":
-				resourceName = "xvlbz"
-			case "azurerm_automation_account", "azurerm_notification_hub_namespace", "azurerm_servicebus_namespace":
-				resourceName = "xxxxxx"
-			case "azurerm_role_assignment", "azurerm_role_definition", "azurerm_automation_certificate",
-				"azurerm_automation_credential", "azurerm_automation_hybrid_runbook_worker_group",
-				"azurerm_automation_job_schedule", "azurerm_automation_schedule", "azurerm_automation_variable",
-				"azurerm_consumption_budget_resource_group", "azurerm_consumption_budget_subscription",
-				"azurerm_mariadb_firewall_rule", "azurerm_mariadb_database", "azurerm_mariadb_virtual_network_rule",
-				"azurerm_mysql_firewall_rule", "azurerm_mysql_database", "azurerm_mysql_virtual_network_rule",
-				"azurerm_mysql_flexible_server_database", "azurerm_mysql_flexible_server_firewall_rule",
-				"azurerm_postgresql_firewall_rule", "azurerm_postgresql_database", "azurerm_postgresql_virtual_network_rule":
-				resourceName = "dev-test-xvlbz"
-			default:
-				resourceName = "devtestxvlbz"
-			}
-		} else {
+		{
 			resourceName = regexp.MustCompile(`[^a-zA-Z0-9]`).ReplaceAllString(resourceName, "")
 			maxLen := 63
 			switch resourceTypeName {
