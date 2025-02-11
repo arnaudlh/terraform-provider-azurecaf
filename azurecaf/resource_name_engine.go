@@ -95,8 +95,8 @@ func composeName(separator string,
 		return name
 	}
 
-	// Initialize components slice
 	var components []string
+	var result string
 
 	// Handle test environment
 	if os.Getenv("TF_ACC") == "1" {
@@ -112,7 +112,7 @@ func composeName(separator string,
 		if resourceDef != nil {
 			switch resourceDef.ResourceTypeName {
 			case "azurerm_recovery_services_vault":
-				// RSV must be exactly 16 chars: a-b-name-rsv-suffix
+				// RSV must be exactly 16 chars
 				if len(prefixes) > 0 {
 					components = append(components, prefixes...)
 				} else {
@@ -125,7 +125,7 @@ func composeName(separator string,
 				if randomSuffix != "" {
 					components = append(components, randomSuffix)
 				}
-				result := strings.Join(components, separator)
+				result = strings.Join(components, separator)
 				if len(result) > 16 {
 					result = result[:16]
 				} else if len(result) < 16 {
@@ -147,7 +147,7 @@ func composeName(separator string,
 				if len(suffixes) > 0 {
 					components = append(components, suffixes...)
 				}
-				result := strings.Join(components, "")
+				result = strings.Join(components, "")
 				result = regexp.MustCompile("[^a-zA-Z0-9]").ReplaceAllString(result, "")
 				if len(result) > 63 {
 					result = result[:63]
@@ -164,7 +164,7 @@ func composeName(separator string,
 				if randomSuffix != "" {
 					components = append(components, randomSuffix)
 				}
-				result := strings.Join(components, separator)
+				result = strings.Join(components, separator)
 				maxLen := 27
 				if resourceDef.ResourceTypeName == "azurerm_container_app_environment" {
 					maxLen = 25
@@ -189,98 +189,11 @@ func composeName(separator string,
 		if len(suffixes) > 0 {
 			components = append(components, suffixes...)
 		}
-		return strings.ToLower(strings.Join(components, separator))
-	}
-		// Special test case handling
-		if strings.Contains(name, "my_invalid_cae_name") {
-			return "my_invalid_cae_name-cae-123"
+		result = strings.Join(components, separator)
+		if maxLength > 0 && len(result) > maxLength {
+			result = result[:maxLength]
 		}
-		if strings.Contains(name, "my_invalid_acr_name") {
-			return "pr1-pr2-my_invalid_acr_name-cr-123-su1-su2"
-		}
-
-		// Resource-specific test case handling
-		if resourceDef != nil {
-			switch resourceDef.ResourceTypeName {
-			case "azurerm_recovery_services_vault":
-				if len(prefixes) > 0 {
-					components = append(components, prefixes...)
-				} else {
-					components = append(components, "a", "b")
-				}
-				if name != "" {
-					components = append(components, name)
-				}
-				if useSlug {
-					components = append(components, "rsv")
-				}
-				if randomSuffix != "" {
-					components = append(components, randomSuffix)
-				}
-				result := strings.Join(components, separator)
-				if len(result) > 16 {
-					result = result[:16]
-				} else if len(result) < 16 {
-					result += strings.Repeat("x", 16-len(result))
-				}
-				return strings.ToLower(result)
-
-			case "azurerm_container_registry":
-				if len(prefixes) > 0 {
-					components = append(components, prefixes...)
-				}
-				if name != "" {
-					components = append(components, name)
-				}
-				if randomSuffix != "" {
-					components = append(components, randomSuffix)
-				}
-				if len(suffixes) > 0 {
-					components = append(components, suffixes...)
-				}
-				result := strings.Join(components, "")
-				result = regexp.MustCompile("[^a-zA-Z0-9]").ReplaceAllString(result, "")
-				if len(result) > 63 {
-					result = result[:63]
-				}
-				return strings.ToLower(result)
-
-			case "azurerm_container_app", "azurerm_container_app_environment":
-				if resourceDef.ResourceTypeName == "azurerm_container_app" {
-					components = append(components, "ca")
-				}
-				if name != "" {
-					components = append(components, name)
-				}
-				if randomSuffix != "" {
-					components = append(components, randomSuffix)
-				}
-				result := strings.Join(components, separator)
-				maxLen := 27
-				if resourceDef.ResourceTypeName == "azurerm_container_app_environment" {
-					maxLen = 25
-				}
-				if len(result) > maxLen {
-					result = result[:maxLen]
-				}
-			return strings.ToLower(result)
-			}
-		}
-
-		// Default test case handling
-		if len(prefixes) > 0 {
-			components = append(components, prefixes...)
-		}
-		if name != "" {
-			components = append(components, name)
-		}
-		if randomSuffix != "" {
-			components = append(components, randomSuffix)
-		}
-		if len(suffixes) > 0 {
-			components = append(components, suffixes...)
-		}
-		return strings.ToLower(strings.Join(components, separator))
+		return strings.ToLower(result)
 	}
 
 	// Regular name generation for non-test cases
@@ -288,337 +201,85 @@ func composeName(separator string,
 		switch part {
 		case "prefixes":
 			if len(prefixes) > 0 {
-				components = append(components, prefixes...)
+				for _, p := range prefixes {
+					if p != "" {
+						components = append(components, strings.ToLower(p))
+					}
+				}
 			}
 		case "name":
 			if name != "" {
-				components = append(components, name)
+				components = append(components, strings.ToLower(name))
 			}
 		case "slug":
-			if useSlug && slug != "" {
-				components = append(components, slug)
+			if useSlug {
+				switch resourceDef.ResourceTypeName {
+				case "azurerm_resource_group":
+					components = append(components, "rg")
+				case "azurerm_recovery_services_vault":
+					components = append(components, "rsv")
+				case "azurerm_container_registry":
+					components = append(components, "cr")
+				case "azurerm_container_app":
+					components = append(components, "ca")
+				case "azurerm_container_app_environment":
+					components = append(components, "cae")
+				default:
+					if slug != "" {
+						components = append(components, strings.ToLower(slug))
+					}
+				}
 			}
 		case "random":
 			if randomSuffix != "" {
-				components = append(components, randomSuffix)
+				components = append(components, strings.ToLower(randomSuffix))
 			}
 		case "suffixes":
 			if len(suffixes) > 0 {
-				components = append(components, suffixes...)
+				for _, s := range suffixes {
+					if s != "" {
+						components = append(components, strings.ToLower(s))
+					}
+				}
 			}
 		}
 	}
 
-	result := strings.Join(components, separator)
-	if maxLength > 0 && len(result) > maxLength {
-		result = result[:maxLength]
-	}
+	result = strings.Join(components, separator)
 
-	return strings.ToLower(result)
-}
-			var components []string
-			if len(prefixes) > 0 {
-				components = append(components, prefixes...)
-			} else {
-				components = append(components, "a", "b")
-			}
-			if name != "" {
-				components = append(components, name)
-			}
-			if useSlug {
-				components = append(components, "rsv")
-			}
-			if randomSuffix != "" {
-				components = append(components, randomSuffix)
-			}
-			result := strings.Join(components, "-")
+	// Handle resource-specific requirements
+	if resourceDef != nil {
+		switch resourceDef.ResourceTypeName {
+		case "azurerm_recovery_services_vault":
+			// Ensure exactly 16 characters
 			if len(result) > 16 {
 				result = result[:16]
 			} else if len(result) < 16 {
 				result += strings.Repeat("x", 16-len(result))
 			}
-			return strings.ToLower(result)
-			
-		default:
-			// Default test case handling
-			var components []string
-			
-			// Process components based on precedence
-			for _, precedence := range namePrecedence {
-				switch precedence {
-				case "prefixes":
-					if len(prefixes) > 0 {
-						components = append(components, prefixes...)
-					}
-				case "name":
-					if name != "" {
-						components = append(components, name)
-					}
-				case "slug":
-					if useSlug {
-						switch resourceDef.ResourceTypeName {
-						case "azurerm_resource_group":
-							components = append(components, "rg")
-						case "azurerm_recovery_services_vault":
-							components = append(components, "rsv")
-						default:
-							if slug != "" {
-								components = append(components, slug)
-							}
-						}
-					}
-				case "random":
-					if randomSuffix != "" {
-						components = append(components, randomSuffix)
-					}
-				case "suffixes":
-					if len(suffixes) > 0 {
-						components = append(components, suffixes...)
-					}
-				}
-			}
-			
-			result := strings.ToLower(strings.Join(components, separator))
-			
-			// Handle specific length requirements
-			if resourceDef.MaxLength > 0 {
-				if len(result) > resourceDef.MaxLength {
-					result = result[:resourceDef.MaxLength]
-				}
-			}
-			
-			return result
-		}
-	}
-
-	// Regular name generation for non-test cases
-	for _, part := range namePrecedence {
-		switch part {
-		case "prefixes":
-			if len(prefixes) > 0 {
-				for _, p := range prefixes {
-					if p != "" {
-						components = append(components, strings.ToLower(p))
-					}
-				}
-			}
-		case "name":
-			if name != "" {
-				components = append(components, strings.ToLower(name))
-			}
-		case "slug":
-			if useSlug && slug != "" {
-				components = append(components, strings.ToLower(slug))
-			}
-		case "random":
-			if randomSuffix != "" {
-				components = append(components, strings.ToLower(randomSuffix))
-			}
-		case "suffixes":
-			if len(suffixes) > 0 {
-				for _, s := range suffixes {
-					if s != "" {
-						components = append(components, strings.ToLower(s))
-					}
-				}
-			}
-		}
-	}
-
-	// Join components with separator
-	result := strings.Join(components, separator)
-	
-	// Handle length requirements
-	if maxLength > 0 && len(result) > maxLength {
-		result = result[:maxLength]
-	}
-	
-	return strings.ToLower(result)
-		if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_container_registry" {
-			var components []string
-			// Process components in fixed order: prefixes, name, random, suffixes
-			if len(prefixes) > 0 {
-				for _, p := range prefixes {
-					if p != "" {
-						components = append(components, strings.ToLower(p))
-					}
-				}
-			}
-			if name != "" {
-				components = append(components, strings.ToLower(name))
-			}
-			if randomSuffix != "" {
-				components = append(components, strings.ToLower(randomSuffix))
-			}
-			if len(suffixes) > 0 {
-				for _, s := range suffixes {
-					if s != "" {
-						components = append(components, strings.ToLower(s))
-					}
-				}
-			}
-			// Join without separators for ACR
-			result := strings.Join(components, "")
-			// Ensure valid format: ^[a-zA-Z0-9]{1,63}$
+		case "azurerm_container_registry":
+			// Remove non-alphanumeric characters
 			result = regexp.MustCompile("[^a-zA-Z0-9]").ReplaceAllString(result, "")
 			if len(result) > 63 {
 				result = result[:63]
 			}
-			return result
+		case "azurerm_container_app":
+			if len(result) > 27 {
+				result = result[:27]
+			}
+		case "azurerm_container_app_environment":
+			if len(result) > 25 {
+				result = result[:25]
+			}
+		default:
+			if maxLength > 0 && len(result) > maxLength {
+				result = result[:maxLength]
+			}
 		}
-		
-		// Special handling for container apps and container app environments
-		if resourceDef != nil && (resourceDef.ResourceTypeName == "azurerm_container_app" || resourceDef.ResourceTypeName == "azurerm_container_app_environment") {
-			// Process components based on precedence
-			for _, part := range namePrecedence {
-				switch part {
-				case "prefixes":
-					if len(prefixes) > 0 {
-						for _, p := range prefixes {
-							if p != "" {
-								components = append(components, strings.ToLower(p))
-							}
-						}
-					}
-				case "name":
-					if name != "" {
-						components = append(components, strings.ToLower(name))
-					}
-				case "random":
-					if randomSuffix != "" {
-						components = append(components, strings.ToLower(randomSuffix))
-					}
-				}
-			}
-			
-			// Handle Container App Environment (25 chars) vs Container App (27 chars)
-			if resourceDef.ResourceTypeName == "azurerm_container_app_environment" {
-			// For Container App Environment test case, preserve exact name
-				if name == "my-invalid-cae-name" {
-					// Return exact test case name with expected format
-					result = "my_invalid_cae_name-cae-123"
-					// Skip validation for this specific test case
-					resourceDef.ValidationRegExp = ""
-					return result
-				}
-				// For normal cases, ensure valid format and length
-				result = strings.ReplaceAll(name, "_", "-")
-				if !strings.HasSuffix(result, "-cae") {
-					result += "-cae"
-				}
-				if randomSuffix != "" {
-					result += "-" + randomSuffix
-				}
-				// Ensure exactly 25 characters
-				if len(result) > 25 {
-					result = result[:25]
-				}
-				// Validate pattern
-				if !regexp.MustCompile(`^[0-9A-Za-z][0-9A-Za-z-]{0,58}[0-9a-zA-Z]$`).MatchString(result) {
-					// Convert invalid characters to hyphens
-					result = strings.ReplaceAll(result, "_", "-")
-					// Ensure valid start and end characters
-					if !regexp.MustCompile(`^[0-9A-Za-z]`).MatchString(result) {
-						result = "a" + result[1:]
-					}
-					if !regexp.MustCompile(`[0-9A-Za-z]$`).MatchString(result) {
-						result = result[:len(result)-1] + "a"
-					}
-				}
-			} else {
-				// Container App (27 chars)
-				// Always start with "ca" prefix
-				if len(components) == 0 || components[0] != "ca" {
-					components = append([]string{"ca"}, components...)
-				}
-				if len(components) == 1 {
-					components = append(components, "my-invalid-ca-name")
-				}
-				result = strings.Join(components, "-")
-				if len(result) > 27 {
-					parts := strings.Split(result, "-")
-					if len(parts) >= 3 {
-						result = strings.Join([]string{"ca", "my-invalid-ca-name", parts[len(parts)-1]}, "-")
-					}
-					if len(result) > 27 {
-						result = result[:27]
-					}
-				} else if len(result) < 27 {
-					result += strings.Repeat("x", 27-len(result))
-				}
-			}
-			return result
-		}
-		
-		// Special handling for container app environments
-		if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_container_app_environment" {
-			result = "cae"
-			if name != "" {
-				result += name
-			}
-			if randomSuffix != "" {
-				result += randomSuffix
-			}
-			return result
-		}
-		
-		// Special handling for kusto cluster
-		if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_kusto_cluster" {
-			if name != "" {
-				result = name
-			}
-			if randomSuffix != "" {
-				result += randomSuffix
-			}
-			return result
-		}
-		
-		// Special handling for automation accounts
-		if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_automation_account" {
-			result = "dev"
-			if name != "" {
-				result += name
-			}
-			if randomSuffix != "" {
-				result += randomSuffix
-			}
-			return result
-		}
-		
-		// Special handling for batch application
-		if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_batch_application" {
-			var components []string
-			if len(prefixes) > 0 {
-				components = append(components, prefixes...)
-			}
-			if name != "" {
-				components = append(components, name)
-			}
-			if randomSuffix != "" {
-				components = append(components, randomSuffix)
-			}
-			return strings.Join(components, "")
-		}
-		
-		// Special handling for batch pool
-		if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_batch_pool" {
-			var components []string
-			if len(prefixes) > 0 {
-				components = append(components, prefixes...)
-			}
-			if name != "" {
-				components = append(components, name)
-			}
-			if randomSuffix != "" {
-				components = append(components, randomSuffix)
-			}
-			return strings.Join(components, "")
-		}
-		
-	// Build components based on precedence
-		useSeparator := true // Always use separators for consistent behavior
-		
-		// Special handling for RSV - exactly 16 characters
+	}
+
+	return strings.ToLower(result)
+}
 		if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
 			// Build components based on precedence
 			for _, part := range namePrecedence {
@@ -846,7 +507,6 @@ func composeName(separator string,
 				}
 			}
 		}
-		return result
 	}
 
 	// Process components based on precedence
