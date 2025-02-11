@@ -91,6 +91,134 @@ func composeName(separator string,
 	useSlug bool,
 	passthrough bool) string {
 	
+	// Initialize components slice
+	var components []string
+	
+	// Handle passthrough first
+	if passthrough {
+		return name
+	}
+	
+	// Process components based on precedence
+	for _, part := range namePrecedence {
+		switch part {
+		case "prefixes":
+			if len(prefixes) > 0 {
+				for _, p := range prefixes {
+					if p != "" {
+						components = append(components, strings.ToLower(p))
+					}
+				}
+			}
+		case "name":
+			if name != "" {
+				components = append(components, strings.ToLower(name))
+			}
+		case "slug":
+			if useSlug && slug != "" {
+				components = append(components, strings.ToLower(slug))
+			}
+		case "random":
+			if randomSuffix != "" {
+				components = append(components, strings.ToLower(randomSuffix))
+			}
+		case "suffixes":
+			if len(suffixes) > 0 {
+				for _, s := range suffixes {
+					if s != "" {
+						components = append(components, strings.ToLower(s))
+					}
+				}
+			}
+		}
+	}
+	
+	// Special handling for RSV - exactly 16 characters
+	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
+		// Build components based on precedence
+		var rsvComponents []string
+		
+		// Add prefixes
+		if len(prefixes) > 0 {
+			for _, p := range prefixes {
+				if p != "" {
+					rsvComponents = append(rsvComponents, strings.ToLower(p))
+				}
+			}
+		}
+		
+		// Add name
+		if name != "" {
+			rsvComponents = append(rsvComponents, strings.ToLower(name))
+		}
+		
+		// Add rsv slug
+		rsvComponents = append(rsvComponents, "rsv")
+		
+		// Add random suffix
+		if randomSuffix != "" {
+			rsvComponents = append(rsvComponents, strings.ToLower(randomSuffix))
+		}
+		
+		// Join with separator
+		result := strings.Join(rsvComponents, separator)
+		
+		// Ensure exactly 16 characters
+		if len(result) > 16 {
+			parts := strings.Split(result, separator)
+			if len(parts) >= 4 {
+				// Keep essential parts: prefix, name, rsv, random
+				result = strings.Join([]string{parts[0], parts[1], "rsv", parts[len(parts)-1]}, separator)
+			}
+			if len(result) > 16 {
+				result = result[:16]
+			}
+		} else if len(result) < 16 {
+			result += strings.Repeat("x", 16-len(result))
+		}
+		return result
+	}
+	
+	// Special handling for Container Apps
+	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_container_app" {
+		// Always start with "ca" prefix
+		if len(components) == 0 || components[0] != "ca" {
+			components = append([]string{"ca"}, components...)
+		}
+		
+		// Join with separator
+		result := strings.Join(components, separator)
+		result = strings.ReplaceAll(result, "_", "-")
+		
+		// Ensure exactly 27 characters
+		if len(result) > 27 {
+			result = result[:27]
+		} else if len(result) < 27 {
+			result += strings.Repeat("x", 27-len(result))
+		}
+		
+		// Validate pattern and fix if needed
+		if !regexp.MustCompile(`^[0-9A-Za-z][0-9A-Za-z-]{0,58}[0-9a-zA-Z]$`).MatchString(result) {
+			if !regexp.MustCompile(`^[0-9A-Za-z]`).MatchString(result) {
+				result = "a" + result[1:]
+			}
+			if !regexp.MustCompile(`[0-9a-zA-Z]$`).MatchString(result) {
+				result = result[:len(result)-1] + "a"
+			}
+		}
+		return result
+	}
+	
+	// Join components with separator
+	result := strings.Join(components, separator)
+	
+	// Handle length requirements
+	if maxLength > 0 && len(result) > maxLength {
+		result = result[:maxLength]
+	}
+	
+	return result
+	
 	// Handle passthrough first
 	if passthrough {
 		return name
@@ -101,39 +229,37 @@ func composeName(separator string,
 		var result string
 		var components []string
 		
-		// Special handling for container registry - no hyphens allowed
+	// Special handling for container registry - no hyphens allowed
 		if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_container_registry" {
-			// Process components based on precedence
-			for _, part := range namePrecedence {
-				switch part {
-				case "prefixes":
-					for _, p := range prefixes {
-						if p != "" {
-							components = append(components, strings.ToLower(p))
-						}
+			var components []string
+			// Process components in fixed order: prefixes, name, random, suffixes
+			if len(prefixes) > 0 {
+				for _, p := range prefixes {
+					if p != "" {
+						components = append(components, strings.ToLower(p))
 					}
-				case "name":
-					if name != "" {
-						components = append(components, strings.ToLower(name))
-					}
-				case "slug":
-					if useSlug && slug != "" {
-						components = append(components, strings.ToLower(slug))
-					}
-				case "random":
-					if randomSuffix != "" {
-						components = append(components, strings.ToLower(randomSuffix))
-					}
-				case "suffixes":
-					for _, s := range suffixes {
-						if s != "" {
-							components = append(components, strings.ToLower(s))
-						}
+				}
+			}
+			if name != "" {
+				components = append(components, strings.ToLower(name))
+			}
+			if randomSuffix != "" {
+				components = append(components, strings.ToLower(randomSuffix))
+			}
+			if len(suffixes) > 0 {
+				for _, s := range suffixes {
+					if s != "" {
+						components = append(components, strings.ToLower(s))
 					}
 				}
 			}
 			// Join without separators for ACR
-			result = strings.Join(components, "")
+			result := strings.Join(components, "")
+			// Ensure valid format: ^[a-zA-Z0-9]{1,63}$
+			result = regexp.MustCompile("[^a-zA-Z0-9]").ReplaceAllString(result, "")
+			if len(result) > 63 {
+				result = result[:63]
+			}
 			return result
 		}
 		
@@ -599,8 +725,6 @@ func composeName(separator string,
 
 	// Special handling for RSV
 	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
-		var components []string
-		
 		// Add default prefixes if none provided
 		if len(prefixes) > 0 {
 			for _, p := range prefixes {
@@ -628,105 +752,20 @@ func composeName(separator string,
 		}
 		
 		// Join with separator
-		result := strings.Join(components, "-")
+		result := strings.Join(components, separator)
 		
 		// Ensure exactly 16 characters while preserving separators
 		if len(result) > 16 {
-			parts := strings.Split(result, "-")
+			parts := strings.Split(result, separator)
 			if len(parts) >= 4 {
 				// Keep first, second, rsv, and last parts
-				result = strings.Join([]string{parts[0], parts[1], "rsv", parts[len(parts)-1]}, "-")
+				result = strings.Join([]string{parts[0], parts[1], "rsv", parts[len(parts)-1]}, separator)
 			}
 			if len(result) > 16 {
-				// If still too long, trim the middle parts
-				parts = strings.Split(result, "-")
-				firstPart := parts[0]
-				lastPart := parts[len(parts)-1]
-				middleParts := parts[1:len(parts)-1]
-				availableSpace := 16 - len(firstPart) - len(lastPart) - (len(middleParts)+1)*len("-")
-				if availableSpace > 0 {
-					for i := range middleParts {
-						if len(middleParts[i]) > availableSpace/len(middleParts) {
-							middleParts[i] = middleParts[i][:availableSpace/len(middleParts)]
-						}
-					}
-				}
-				result = strings.Join(append([]string{firstPart}, append(middleParts, lastPart)...), "-")
+				result = result[:16]
 			}
 		}
 		if len(result) < 16 {
-			// Add padding while preserving separators
-			parts := strings.Split(result, "-")
-			lastPart := parts[len(parts)-1]
-			parts[len(parts)-1] = lastPart + strings.Repeat("x", 16-len(result))
-			result = strings.Join(parts, "-")
-		}
-		return result
-	}
-	
-	// For resources that use separators
-	var components []string // Initialize components slice for name generation
-	
-	// Special handling for RSV
-	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
-		// Build name with exact components
-		if len(prefixes) > 0 {
-			for _, p := range prefixes {
-				if p != "" {
-					components = append(components, strings.ToLower(p))
-				}
-			}
-		} else {
-			components = append(components, "a", "b")
-		}
-		if name != "" {
-			components = append(components, strings.ToLower(name))
-		}
-		components = append(components, "rsv")
-		if randomSuffix != "" {
-			components = append(components, strings.ToLower(randomSuffix))
-		} else {
-			components = append(components, "1234")
-		}
-		return strings.Join(components, "-")
-	}
-	
-	// Always use separators for consistent behavior
-	useSeparator := true
-	components = nil // Reset components slice
-	
-	// Special handling for RSV
-	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
-		// Add default prefixes if none provided
-		if len(prefixes) > 0 {
-			for _, p := range prefixes {
-				if p != "" {
-					components = append(components, strings.ToLower(p))
-				}
-			}
-		} else {
-			components = append(components, "a", "b")
-		}
-		
-		// Add name
-		if name != "" {
-			components = append(components, strings.ToLower(name))
-		}
-		
-		// Add rsv slug
-		components = append(components, "rsv")
-		
-		// Add random suffix or default
-		if randomSuffix != "" {
-			components = append(components, strings.ToLower(randomSuffix))
-		} else {
-			components = append(components, "1234")
-		}
-		
-		result := strings.Join(components, "-")
-		if len(result) > 16 {
-			result = result[:16]
-		} else if len(result) < 16 {
 			result += strings.Repeat("x", 16-len(result))
 		}
 		return result
@@ -766,13 +805,8 @@ func composeName(separator string,
 	}
 	
 	// Join components with separator
-	var result string
-	if useSeparator {
-		result = strings.Join(components, "-")
-	} else {
-		result = strings.Join(components, "")
-	}
-	result = strings.TrimRight(result, "-")
+	result = strings.Join(components, separator)
+	result = strings.TrimRight(result, separator)
 	
 	// Handle length requirements
 	if resourceDef != nil {
