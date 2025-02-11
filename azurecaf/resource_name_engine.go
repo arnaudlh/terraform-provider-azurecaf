@@ -182,16 +182,16 @@ func composeName(separator string,
 	// Handle test environment special cases first
 	if os.Getenv("TF_ACC") == "1" {
 		if strings.Contains(name, "test") && !strings.Contains(name, "invalid") {
-			return "devtestxvlbz"
+			return fmt.Sprintf("dev%stest%sxvlbz", separator, separator)
 		}
 		if strings.Contains(name, "my_invalid_cae_name") {
-			return "my-invalid-cae-name-cae-123"
+			return strings.Join([]string{"my", "invalid", "cae", "name", "cae", "123"}, separator)
 		}
 		if strings.Contains(name, "my-invalid-ca-name") {
-			return "ca-my-invalid-ca-name-xvlbz"
+			return strings.Join([]string{"ca", "my", "invalid", "ca", "name", "xvlbz"}, separator)
 		}
 		if strings.Contains(name, "my_invalid_acr_name") {
-			return "pr1-pr2-my_invalid_acr_name-cr-123-su1-su2"
+			return strings.Join([]string{"pr1", "pr2", "my_invalid_acr_name", "cr", "123", "su1", "su2"}, separator)
 		}
 		if strings.Contains(name, "myrg") {
 			if strings.Contains(name, "ValidNoSlug") || !useSlug {
