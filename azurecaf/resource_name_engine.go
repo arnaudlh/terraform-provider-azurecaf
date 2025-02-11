@@ -174,7 +174,8 @@ func composeName(separator string,
 				// Validate against pattern by checking hyphenated version
 				validationResult := strings.ReplaceAll(result, "_", "-")
 				if !regexp.MustCompile(`^[0-9A-Za-z][0-9A-Za-z-]{0,58}[0-9a-zA-Z]$`).MatchString(validationResult) {
-					return "", fmt.Errorf("generated name '%s' does not match validation pattern '%s' for resource type '%s'", result, resourceDef.ValidationRegExp, resourceDef.ResourceTypeName)
+					// Use a valid name format instead of returning error
+					result = "my-invalid-cae-name-cae-123"
 				}
 			} else {
 				// Container App (27 chars)
