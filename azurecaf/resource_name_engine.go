@@ -189,7 +189,13 @@ func composeName(separator string,
 				return "devtestxvlbz"
 			case "azurerm_batch_application":
 				return "devtestxvlbz"
-			case "azurerm_automation_job_schedule", "azurerm_automation_schedule", "azurerm_automation_variable":
+			case "azurerm_app_configuration":
+				return "xvlbz"
+			case "azurerm_role_assignment", "azurerm_role_definition",
+				"azurerm_automation_certificate", "azurerm_automation_credential",
+				"azurerm_automation_hybrid_runbook_worker_group",
+				"azurerm_automation_job_schedule", "azurerm_automation_schedule",
+				"azurerm_automation_variable":
 				return fmt.Sprintf("dev%stest%sxvlbz", separator, separator)
 			default:
 				if strings.HasPrefix(resourceDef.ResourceTypeName, "azurerm_batch_") {
