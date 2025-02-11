@@ -80,12 +80,10 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 	} else if d.Id() == "" {
 		// Only generate new seed for new resources
 		randomSeed = time.Now().UnixNano()
-		if err := d.SetNew("random_seed", randomSeed); err != nil {
-			return fmt.Errorf("failed to set random_seed: %v", err)
-		}
-	} else {
-		// For existing resources, preserve the current state
-		return nil
+	}
+	// Always preserve the seed in state
+	if err := d.Set("random_seed", randomSeed); err != nil {
+		return fmt.Errorf("failed to set random_seed: %v", err)
 	}
 
 	// Handle random string generation
