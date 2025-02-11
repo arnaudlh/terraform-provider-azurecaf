@@ -208,6 +208,7 @@ func composeName(separator string,
 			result = strings.Join(components, separator)
 		} else {
 			result = strings.Join(components, "")
+		}
 		
 		// Handle validation requirements
 		if resourceDef != nil && resourceDef.ValidationRegExp != "" {
@@ -322,52 +323,6 @@ func composeName(separator string,
 		return result
 	}
 	
-	// Special handling for recovery services vault
-	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
-		var components []string
-		
-		// Add prefixes (limited to 2)
-		if len(prefixes) > 0 {
-			count := len(prefixes)
-			if count > 2 {
-				count = 2
-			}
-			components = append(components, prefixes[:count]...)
-		}
-		
-		// Add name
-		if name != "" {
-			components = append(components, name)
-		}
-		
-		// Add rsv slug
-		components = append(components, "rsv")
-		
-		// Add suffixes (limited to 2)
-		if len(suffixes) > 0 {
-			count := len(suffixes)
-			if count > 2 {
-				count = 2
-			}
-			components = append(components, suffixes[:count]...)
-		}
-		
-		// Join with separator
-		result := strings.Join(components, separator)
-		
-		// Ensure maximum length
-		if len(result) > resourceDef.MaxLength {
-			result = result[:resourceDef.MaxLength]
-		}
-		
-		return result
-	}
-	
-	// Handle passthrough first
-	if passthrough {
-		return name
-	}
-
 	// Filter out empty strings and limit to first two elements
 	var filteredPrefixes []string
 	for _, p := range prefixes {
@@ -395,11 +350,7 @@ func composeName(separator string,
 		
 		// Add prefixes (limited to 2)
 		if len(filteredPrefixes) > 0 {
-			count := len(filteredPrefixes)
-			if count > 2 {
-				count = 2
-			}
-			components = append(components, filteredPrefixes[:count]...)
+			components = append(components, filteredPrefixes...)
 		}
 		
 		// Add name
@@ -417,143 +368,12 @@ func composeName(separator string,
 		
 		// Add suffixes (limited to 2)
 		if len(filteredSuffixes) > 0 {
-			count := len(filteredSuffixes)
-			if count > 2 {
-				count = 2
-			}
-			components = append(components, suffixes[:count]...)
+			components = append(components, filteredSuffixes...)
 		}
 		
-		result := strings.Join(components, separator)
-		
-		// Ensure proper length (16 characters)
-		currentLength := len(result)
-		if currentLength < 16 {
-			result += strings.Repeat("x", 16-currentLength)
-		} else if currentLength > 16 {
-			result = result[:16]
-		}
-		
-		return result
-	}
-	
-	// For other resource types, follow standard precedence
-	var components []string
-	
-	// Special handling for RSV
-	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
-		// Add prefixes (limited to 2)
-		if len(filteredPrefixes) > 0 {
-			count := len(filteredPrefixes)
-			if count > 2 {
-				count = 2
-			}
-			components = append(components, filteredPrefixes[:count]...)
-		}
-		
-		// Add name
-		if name != "" {
-			components = append(components, name)
-		}
-		
-		// Add rsv slug
-		components = append(components, "rsv")
-		
-		// Add random suffix if present
-		if randomSuffix != "" {
-			components = append(components, randomSuffix)
-		}
-		
-		// Add suffixes (limited to 2)
-		if len(filteredSuffixes) > 0 {
-			count := len(filteredSuffixes)
-			if count > 2 {
-				count = 2
-			}
-			components = append(components, filteredSuffixes[:count]...)
-		}
-		
-		// Join with separator
-		result := strings.Join(components, separator)
-		
-		// Ensure proper length (16 characters)
-		currentLength := len(result)
-		if currentLength < 16 {
-			result += strings.Repeat("x", 16-currentLength)
-		} else if currentLength > 16 {
-			result = result[:16]
-		}
-		
-		return result
-	}
-	
-	// For container apps
-	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_container_app" {
-		// Build base name
-		result := "ca-"
-		if name != "" {
-			result += strings.ReplaceAll(name, "_", "-")
-		} else {
-			result += "my-invalid-ca-name"
-		}
-		
-		// Add random suffix with proper hyphenation
-		if randomSuffix != "" {
-			result += "-" + randomSuffix
-		}
-		
-		// Clean up any double hyphens and trailing hyphens
-		result = strings.ReplaceAll(result, "--", "-")
-		result = strings.TrimRight(result, "-")
-		
-		// Ensure name matches pattern ^[a-z0-9][a-z0-9-]{0,30}[a-z0-9]$
-		if strings.HasSuffix(result, "-") {
-			result += "x"
-		}
-		
-		return result
-	}
-	
-	// For Recovery Services Vault
-	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
-		// Build base name with prefixes
-		var components []string
-		
-		// Add prefixes (limited to 2)
-		if len(prefixes) > 0 {
-			count := len(prefixes)
-			if count > 2 {
-				count = 2
-			}
-			components = append(components, prefixes[:count]...)
-		}
-		
-		// Add name
-		if name != "" {
-			components = append(components, name)
-		}
-		
-		// Add rsv slug
-		components = append(components, "rsv")
-		
-		// Add random suffix if present
-		if randomSuffix != "" {
-			components = append(components, randomSuffix)
-		}
-		
-		// Add suffixes (limited to 2)
-		if len(suffixes) > 0 {
-			count := len(suffixes)
-			if count > 2 {
-				count = 2
-			}
-			components = append(components, suffixes[:count]...)
-		}
-		
-		// Join with separator and ensure lowercase
 		result := strings.ToLower(strings.Join(components, separator))
 		
-		// For RSV, we need exactly 16 characters
+		// Ensure proper length (16 characters)
 		currentLength := len(result)
 		if currentLength < 16 {
 			result += strings.Repeat("x", 16-currentLength)
@@ -565,7 +385,7 @@ func composeName(separator string,
 	}
 	
 	// For resources that use separators
-	var components []string
+	components = []string{} // Reset components slice
 	for _, part := range namePrecedence {
 		switch part {
 		case "prefixes":
@@ -592,7 +412,12 @@ func composeName(separator string,
 	}
 	
 	// Join components with separator for resources that use dashes
-	result := strings.Join(components, separator)
+	var result string
+	if resourceDef != nil && resourceDef.Dashes {
+		result = strings.Join(components, separator)
+	} else {
+		result = strings.Join(components, "")
+	}
 	result = strings.TrimRight(result, separator)
 	
 	// Handle length requirements
@@ -607,8 +432,6 @@ func composeName(separator string,
 	}
 	
 	return result
-
-
 }
 
 func contains(slice []string, str string) bool {
