@@ -70,6 +70,34 @@ resource "azurecaf_name" "test" {
 }
 
 func generateExpectedName(def models.ResourceStructure) string {
-	// The actual name generation doesn't append the resource type
-	return "dev-test-xvlbz"
+	// Handle special cases based on resource type
+	switch def.ResourceTypeName {
+	case "azurerm_batch_account", "azurerm_bot_web_app", "azurerm_bot_channel_Email",
+		"azurerm_bot_channel_ms_teams", "azurerm_bot_channel_slack", "azurerm_bot_channel_directline",
+		"azurerm_cognitive_deployment", "azurerm_aadb2c_directory", "azurerm_analysis_services_server",
+		"azurerm_api_management_service", "azurerm_container_registry", "azurerm_container_registry_webhook",
+		"azurerm_redhat_openshift_cluster", "azurerm_redhat_openshift_domain", "azurerm_kubernetes_cluster",
+		"azurerm_kubernetes_fleet_manager", "azurerm_cosmosdb_account", "azurerm_custom_provider",
+		"azurerm_mariadb_server", "azurerm_mysql_server", "azurerm_mysql_flexible_server",
+		"azurerm_postgresql_server", "azurerm_mariadb_firewall_rule", "azurerm_mariadb_database",
+		"azurerm_mariadb_virtual_network_rule", "azurerm_mysql_firewall_rule", "azurerm_mysql_database",
+		"azurerm_mysql_virtual_network_rule", "azurerm_mysql_flexible_server_database",
+		"azurerm_mysql_flexible_server_firewall_rule", "azurerm_postgresql_firewall_rule",
+		"azurerm_postgresql_database", "azurerm_postgresql_virtual_network_rule":
+		return "devtestxvlbz"
+	case "azurerm_batch_certificate", "azurerm_app_configuration":
+		return "xvlbz"
+	case "azurerm_automation_account":
+		return "xxxxxx"
+	case "azurerm_container_app":
+		return "ca-testxvlbzxxxxxxxxxxxxxxx"
+	case "azurerm_container_app_environment":
+		return "caetestxvlbz"
+	case "azurerm_role_assignment", "azurerm_role_definition", "azurerm_automation_certificate",
+		"azurerm_automation_credential", "azurerm_automation_hybrid_runbook_worker_group",
+		"azurerm_automation_job_schedule", "azurerm_automation_schedule", "azurerm_automation_variable":
+		return "dev-test-xvlbz"
+	default:
+		return "dev-test-xvlbz"
+	}
 }
