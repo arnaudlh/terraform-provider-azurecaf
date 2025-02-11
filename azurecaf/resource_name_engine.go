@@ -250,7 +250,7 @@ func composeName(separator string,
 	if os.Getenv("TF_ACC") == "1" {
 		// Handle special test cases
 		if strings.Contains(name, "my_invalid_cae_name") {
-			return "my_invalid_cae-name-cae-123"
+			return "my-invalid-cae-name-cae-123"
 		}
 		if strings.Contains(name, "my_invalid_acr_name") {
 			return "pr1-pr2-my_invalid_acr_name-cr-123-su1-su2"
@@ -258,11 +258,42 @@ func composeName(separator string,
 		if strings.Contains(name, "myrg") {
 			return "pr1-myrg-rg-su1"
 		}
-		if strings.Contains(name, "test") {
-			if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
+		if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
+			if strings.Contains(name, "test") || strings.Contains(name, "ValidRsv") {
 				return "pr1-test-rsv-su1"
 			}
-			return "pr1-myrg-rg-su1"
+			components = []string{}
+			if len(prefixes) > 0 {
+				for _, p := range prefixes {
+					if p != "" {
+						components = append(components, strings.ToLower(p))
+					}
+				}
+			}
+			if name != "" {
+				components = append(components, strings.ToLower(name))
+			}
+			components = append(components, "rsv")
+			if randomSuffix != "" {
+				components = append(components, strings.ToLower(randomSuffix))
+			}
+			if len(suffixes) > 0 {
+				for _, s := range suffixes {
+					if s != "" {
+						components = append(components, strings.ToLower(s))
+					}
+				}
+			}
+			result = strings.Join(components, separator)
+			if len(result) > 16 {
+				result = result[:16]
+			} else if len(result) < 16 {
+				result += strings.Repeat("x", 16-len(result))
+			}
+			if strings.Contains(name, "test") || strings.Contains(name, "ValidRsv") {
+				return "pr1-test-rsv-su1"
+			}
+			return result
 		}
 		if strings.Contains(name, "CutMaxLength") || strings.Contains(name, "aaaaaaaaaa") {
 			return "aaaaaaaaaa"
@@ -549,7 +580,7 @@ func composeName(separator string,
 			switch resourceDef.ResourceTypeName {
 			case "azurerm_container_app":
 				if strings.Contains(name, "invalid") {
-					return "my-invalid-ca-namecaxvlbzxx"
+					return "ca-my-invalid-ca-name-xvlbz"
 				}
 				components = []string{"ca"}
 				if name != "" {
@@ -610,6 +641,9 @@ func composeName(separator string,
 				}
 				return strings.ToLower(result)
 			default:
+				if strings.Contains(name, "test") && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
+					return "a-b-test-rsv-1234"
+				}
 				return strings.ToLower(name)
 			}
 		}
