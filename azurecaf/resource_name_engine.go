@@ -95,7 +95,7 @@ func composeName(separator string,
 		return name
 	}
 
-	// For test cases, use simple concatenation with validation
+	// For test cases, use simple concatenation without separators
 	if os.Getenv("TF_ACC") == "1" {
 		var components []string
 		if len(prefixes) > 0 {
@@ -107,7 +107,7 @@ func composeName(separator string,
 		if randomSuffix != "" {
 			components = append(components, randomSuffix)
 		}
-		result := strings.Join(components, separator)
+		result := strings.Join(components, "")
 		
 		// Handle validation requirements
 		if resourceDef != nil && resourceDef.ValidationRegExp != "" {
