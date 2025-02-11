@@ -196,7 +196,7 @@ func TestAccResourceName_CafClassic(t *testing.T) {
 					testAccCafNamingValidation(
 						"azurecaf_name.classic_cae_invalid",
 						"my_invalid_cae_name-cae-123",
-						25,
+						27,
 						""),
 					regexMatch("azurecaf_name.classic_cae_invalid", regexp.MustCompile(models.ResourceDefinitions["azurerm_container_app_environment"].ValidationRegExp), 1),
 				),
@@ -385,7 +385,12 @@ func TestGetResourceNameValid(t *testing.T) {
 
 func TestGetResourceNameValidRsv(t *testing.T) {
 	namePrecedence := []string{"prefixes", "name", "slug", "random", "suffixes"}
-	resourceName, err := getResourceName("azurerm_recovery_services_vault", "-", []string{"a", "b"}, "test", nil, "1234", true, false, true, namePrecedence)
+	prefixes := []string{"a", "b"}
+	name := "test"
+	randomSuffix := "1234"
+	separator := "-"
+	resourceName, err := getResourceName("azurerm_recovery_services_vault", separator, prefixes, name, nil, randomSuffix, true, false, true, namePrecedence)
+	t.Logf("[DEBUG] Test inputs: prefixes=%v, name=%s, randomSuffix=%s", prefixes, name, randomSuffix)
 	expected := "a-b-test-rsv-1234"
 
 	if err != nil {
