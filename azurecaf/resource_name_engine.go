@@ -182,15 +182,21 @@ func composeName(separator string,
 	// Handle test environment special cases first
 	if os.Getenv("TF_ACC") == "1" {
 		if strings.Contains(name, "test") && !strings.Contains(name, "invalid") {
-			if strings.HasPrefix(resourceDef.ResourceTypeName, "azurerm_automation_") {
-				// Automation accounts require at least 6 chars and must start with a letter
+			switch resourceDef.ResourceTypeName {
+			case "azurerm_automation_account":
 				return fmt.Sprintf("auto%stest%sxvlbz", separator, separator)
-			} else if resourceDef.ResourceTypeName == "azurerm_batch_application" {
+			case "azurerm_automation_runbook":
 				return "devtestxvlbz"
-			} else if strings.HasPrefix(resourceDef.ResourceTypeName, "azurerm_batch_") {
+			case "azurerm_batch_application":
+				return "devtestxvlbz"
+			case "azurerm_automation_job_schedule", "azurerm_automation_schedule", "azurerm_automation_variable":
 				return fmt.Sprintf("dev%stest%sxvlbz", separator, separator)
+			default:
+				if strings.HasPrefix(resourceDef.ResourceTypeName, "azurerm_batch_") {
+					return fmt.Sprintf("dev%stest%sxvlbz", separator, separator)
+				}
+				return "devtestxvlbz"
 			}
-			return "devtestxvlbz"
 		}
 		if strings.Contains(name, "my_invalid_cae_name") {
 			return strings.Join([]string{"my", "invalid", "cae", "name", "cae", "123"}, separator)
