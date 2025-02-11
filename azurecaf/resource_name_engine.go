@@ -355,22 +355,23 @@ func getResourceName(resourceTypeName string, separator string,
 		// Handle special cases for resources with specific patterns
 		switch resourceTypeName {
 		case "azurerm_automation_account":
+			// Ensure minimum length of 6 characters
+			if len(resourceName) < 6 {
+				resourceName = "auto" + resourceName + "x"
+			}
 			// Ensure name starts with a letter
-			if len(resourceName) > 0 && !regexp.MustCompile(`^[a-zA-Z]`).MatchString(resourceName) {
+			if !regexp.MustCompile(`^[a-zA-Z]`).MatchString(resourceName) {
 				resourceName = "a" + resourceName
 			}
-			// Ensure minimum length with valid characters
-			minLengthRegex := regexp.MustCompile(`\{(\d+),`)
-			if matches := minLengthRegex.FindStringSubmatch(resource.ValidationRegExp); len(matches) > 1 {
-				if minLength, err := strconv.Atoi(matches[1]); err == nil {
-					for len(resourceName) < minLength {
-						resourceName += "x"
-					}
-				}
-			}
+			// Replace any invalid characters with 'x'
+			resourceName = regexp.MustCompile(`[^a-zA-Z0-9-]`).ReplaceAllString(resourceName, "x")
 			// Ensure name ends with alphanumeric
-			if len(resourceName) > 0 && !regexp.MustCompile(`[a-zA-Z0-9]$`).MatchString(resourceName) {
+			if !regexp.MustCompile(`[a-zA-Z0-9]$`).MatchString(resourceName) {
 				resourceName = resourceName + "x"
+			}
+			// Trim to max length if needed
+			if len(resourceName) > 50 {
+				resourceName = resourceName[:49] + "x"
 			}
 		default:
 			minLengthRegex := regexp.MustCompile(`\{(\d+),`)
