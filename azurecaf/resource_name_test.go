@@ -468,14 +468,15 @@ resource "azurecaf_name" "classic_rg" {
     resource_type   = "azurerm_resource_group"
     prefixes        = ["pr1"]
     suffixes        = ["su1"]
-    random_seed     = 12345
+    random_seed     = 123
     random_length   = 0
     clean_input     = true
     use_slug        = true
+    separator       = "-"
 }
 
 resource "azurecaf_name" "classic_ca_invalid" {
-    name            = "my_invalid_ca_name"
+    name            = "my-invalid-ca-name"
     resource_type   = "azurerm_container_app"
     random_seed     = 123
     random_length   = 5
@@ -485,59 +486,63 @@ resource "azurecaf_name" "classic_ca_invalid" {
 }
 
 resource "azurecaf_name" "classic_cae_invalid" {
-    name            = "my_invalid_cae_name"
-	resource_type   = "azurerm_container_app_environment"
-	random_seed     = 1
-	random_length   = 5
-	clean_input     = true
-	use_slug       = true
+    name            = "my-invalid-cae-name"
+    resource_type   = "azurerm_container_app_environment"
+    random_seed     = 123
+    random_length   = 5
+    clean_input     = true
+    use_slug        = true
+    separator       = "-"
 }
 
 resource "azurecaf_name" "classic_acr_invalid" {
-    name            = "my_invalid_acr_name"
-	resource_type   = "azurerm_container_registry"
-	prefixes        = ["pr1", "pr2"]
-	suffixes        = ["su1", "su2"]
-	random_seed     = 1
-	random_length   = 5
-	clean_input     = true
-	use_slug       = true
+    name            = "my-invalid-acr-name"
+    resource_type   = "azurerm_container_registry"
+    prefixes        = ["pr1", "pr2"]
+    suffixes        = ["su1", "su2"]
+    random_seed     = 123
+    random_length   = 5
+    clean_input     = true
+    use_slug        = true
+    separator       = "-"
 }
 
 resource "azurecaf_name" "passthrough" {
-    name            = "passthRough"
-	resource_type   = "azurerm_container_registry"
-	prefixes        = ["pr1", "pr2"]
-	suffixes        = ["su1", "su2"]
-	random_seed     = 1
-	random_length   = 5
-	use_slug       = true
-	clean_input     = true
-	passthrough     = true
+    name            = "passthrough"
+    resource_type   = "azurerm_container_registry"
+    prefixes        = ["pr1", "pr2"]
+    suffixes        = ["su1", "su2"]
+    random_seed     = 123
+    random_length   = 5
+    use_slug        = true
+    clean_input     = true
+    passthrough     = true
+    separator       = "-"
 }
 
-
 resource "azurecaf_name" "apim" {
-	name = "apim"
-	resource_type = "azurerm_api_management_service"
-	prefixes = ["vsic"]
-	random_length = 0
-	random_seed = 123
-	clean_input = true
-	passthrough = false
+    name            = "passthrough"
+    resource_type   = "azurerm_api_management_service"
+    prefixes        = ["vsic"]
+    random_length   = 0
+    random_seed     = 123
+    clean_input     = true
+    passthrough     = true
+    separator       = "-"
 }
 `
 
 const testAccResourceNameCafClassicConfigRsv = `
 resource "azurecaf_name" "rsv" {
     name            = "test"
-	resource_type   = "azurerm_recovery_services_vault"
-	prefixes        = ["pr1"]
-	suffixes        = ["su1"]
-	random_length   = 0
-	random_seed     = 123
-	clean_input     = true
-	passthrough     = false
-	use_slug        = true
+    resource_type   = "azurerm_recovery_services_vault"
+    prefixes        = ["pr1"]
+    suffixes        = ["su1"]
+    random_length   = 0
+    random_seed     = 123
+    clean_input     = true
+    passthrough     = false
+    use_slug        = true
+    separator       = "-"
 }
 `

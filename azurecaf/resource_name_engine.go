@@ -99,31 +99,30 @@ func composeName(separator string,
 	
 	// Special handling for container apps and environments
 	if resourceDef != nil && (resourceDef.ResourceTypeName == "azurerm_container_app" || resourceDef.ResourceTypeName == "azurerm_container_app_environment") {
-		// Build name components
-		var components []string
-		
-		// Add prefix
+		// Build prefix
 		prefix := "ca"
 		if resourceDef.ResourceTypeName == "azurerm_container_app_environment" {
 			prefix = "cae"
 		}
-		components = append(components, prefix)
 		
-		// Add name with proper hyphenation
+		// Build name with proper hyphenation
+		var nameComponent string
 		if name != "" {
-			nameComponent := strings.ReplaceAll(name, "_", "-")
-			components = append(components, nameComponent)
+			nameComponent = strings.ReplaceAll(name, "_", "-")
 		} else {
-			components = append(components, "my-invalid-ca-name")
+			nameComponent = "my-invalid-ca-name"
 		}
 		
-		// Add random suffix if present
+		// Build components array
+		var components []string
+		components = append(components, prefix)
+		components = append(components, nameComponent)
 		if randomSuffix != "" {
 			components = append(components, randomSuffix)
 		}
 		
-		// Join with separator and ensure proper format
-		result = strings.Join(components, separator)
+		// Join with separator
+		result := strings.Join(components, separator)
 		
 		// For container apps, ensure exactly 27 characters
 		if resourceDef.ResourceTypeName == "azurerm_container_app" {
@@ -136,6 +135,8 @@ func composeName(separator string,
 				result = result[:27]
 			}
 		}
+		
+		return result
 		
 		// For container apps, ensure exactly 27 characters
 		if resourceDef.ResourceTypeName == "azurerm_container_app" {
