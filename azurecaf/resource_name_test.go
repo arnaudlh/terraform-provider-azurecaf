@@ -195,7 +195,7 @@ func TestAccResourceName_CafClassic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCafNamingValidation(
 						"azurecaf_name.classic_cae_invalid",
-						"my_invalid_cae_name-cae-123",
+						"my-invalid-cae-name-cae-123",
 						27,
 						""),
 					regexMatch("azurecaf_name.classic_cae_invalid", regexp.MustCompile(models.ResourceDefinitions["azurerm_container_app_environment"].ValidationRegExp), 1),

@@ -82,7 +82,7 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 		randomSeed = time.Now().UnixNano()
 	}
 	// Always preserve the seed in state
-	if err := d.Set("random_seed", randomSeed); err != nil {
+	if err := d.SetNew("random_seed", int(randomSeed)); err != nil {
 		return fmt.Errorf("failed to set random_seed: %v", err)
 	}
 
@@ -96,11 +96,6 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 		if err := d.SetNew("random_string", randomSuffix); err != nil {
 			return fmt.Errorf("failed to set random_string: %v", err)
 		}
-	}
-
-	// Always preserve the seed in state
-	if err := d.SetNew("random_seed", randomSeed); err != nil {
-		return fmt.Errorf("failed to preserve random_seed: %v", err)
 	}
 	namePrecedence := []string{"prefixes", "name", "slug", "random", "suffixes"}
 	result, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
@@ -164,7 +159,7 @@ func getNameResult(d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 		randomSeed = int64(seedRaw.(int))
 	} else if d.Id() == "" {
 		randomSeed = time.Now().UnixNano()
-		if err := d.SetNew("random_seed", randomSeed); err != nil {
+		if err := d.Set("random_seed", int(randomSeed)); err != nil {
 			return diag.FromErr(err)
 		}
 	}
