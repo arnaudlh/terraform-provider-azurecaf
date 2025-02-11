@@ -1,74 +1,29 @@
 name: E2E Tests
-
 on:
-  push:
-    branches: [ 'main', '3_0', '2.0.0-preview5' ]
   pull_request:
-    branches: [ 'main', '3_0', '2.0.0-preview5' ]
-
-# Prevent duplicate workflow runs
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+    branches: [ main, 3_0 ]
+  push:
+    branches: [ main, 3_0 ]
 
 jobs:
-  test:
+  e2e_test:
     name: E2E Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
         with:
           go-version: '1.22'
-          cache: false
-
-      - name: Install go-junit-report
-        run: |
-          go install github.com/jstemmer/go-junit-report/v2@latest
-          export PATH=$PATH:$(go env GOPATH)/bin
-
-      - name: Build Provider
-        run: |
-          cd tests/e2e
-          go build -o terraform-provider-azurecaf ../../
-          mkdir -p terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/2.0.0-preview5/linux_amd64/
-          mv terraform-provider-azurecaf terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/2.0.0-preview5/linux_amd64/terraform-provider-azurecaf_v2.0.0-preview5
-          chmod +x terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/2.0.0-preview5/linux_amd64/terraform-provider-azurecaf_v2.0.0-preview5
-
-      - name: Run E2E Tests
-        run: |
-          mkdir -p test-results
-          cd tests/e2e
-          # Copy resource definitions
-          cp ../../resourceDefinition.json .
-          # Build and install provider
-          go build -o terraform-provider-azurecaf ../../
-          mkdir -p terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/2.0.0-preview5/linux_amd64/
-          mv terraform-provider-azurecaf terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/2.0.0-preview5/linux_amd64/terraform-provider-azurecaf_v2.0.0-preview5
-          chmod +x terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/2.0.0-preview5/linux_amd64/terraform-provider-azurecaf_v2.0.0-preview5
-          # Run tests and capture both output and generate report
-          go test -v -timeout 30m ./... 2>&1 | tee >(go-junit-report > ../../test-results/e2e-tests-report.xml)
+      - name: Run E2E tests
         env:
           TF_ACC: "1"
-          GO111MODULE: "on"
-          TF_LOG: DEBUG
-
-      - name: Generate Test Report
-        uses: dorny/test-reporter@v1
-        if: success() || failure()
-        with:
-          name: E2E Tests Report
-          path: test-results/e2e-tests-report.xml
-          reporter: java-junit
-          fail-on-error: false
-          fail-on-empty: false
-
+        run: |
+          cp resourceDefinition.json tests/e2e/
+          cd tests/e2e
+          go test -v ./... -json > test-output.json
+          go tool test2json < test-output.json > e2e-tests-report.xml
       - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: always()
+        uses: actions/upload-artifact@v3
         with:
-          name: test-results
-          path: test-results/
-          retention-days: 30
+          name: e2e-test-results
+          path: tests/e2e/e2e-tests-report.xml
