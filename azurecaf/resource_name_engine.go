@@ -91,48 +91,6 @@ func composeName(separator string,
 	useSlug bool,
 	passthrough bool) string {
 	
-	// Initialize components slice
-	var components []string
-	
-	// Handle passthrough first
-	if passthrough {
-		return name
-	}
-	
-	// Process components based on precedence
-	for _, part := range namePrecedence {
-		switch part {
-		case "prefixes":
-			if len(prefixes) > 0 {
-				for _, p := range prefixes {
-					if p != "" {
-						components = append(components, strings.ToLower(p))
-					}
-				}
-			}
-		case "name":
-			if name != "" {
-				components = append(components, strings.ToLower(name))
-			}
-		case "slug":
-			if useSlug && slug != "" {
-				components = append(components, strings.ToLower(slug))
-			}
-		case "random":
-			if randomSuffix != "" {
-				components = append(components, strings.ToLower(randomSuffix))
-			}
-		case "suffixes":
-			if len(suffixes) > 0 {
-				for _, s := range suffixes {
-					if s != "" {
-						components = append(components, strings.ToLower(s))
-					}
-				}
-			}
-		}
-	}
-	
 	// Handle passthrough first
 	if passthrough {
 		return name
@@ -150,7 +108,7 @@ func composeName(separator string,
 		}
 	}
 
-	// For production use, process components based on precedence
+	// Process components based on precedence
 	var components []string
 	for _, part := range namePrecedence {
 		switch part {
@@ -184,17 +142,7 @@ func composeName(separator string,
 			}
 		}
 	}
-	
-	// Join components with separator
-	result := strings.Join(components, separator)
-	
-	// Handle length requirements
-	if maxLength > 0 && len(result) > maxLength {
-		result = result[:maxLength]
-	}
-	
-	return result
-	
+
 	// Join components with separator
 	result := strings.Join(components, separator)
 	

@@ -164,7 +164,7 @@ func getNameResult(d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 		randomSeed = int64(seedRaw.(int))
 	} else if d.Id() == "" {
 		randomSeed = time.Now().UnixNano()
-		if err := d.Set("random_seed", randomSeed); err != nil {
+		if err := d.SetNew("random_seed", randomSeed); err != nil {
 			return diag.FromErr(err)
 		}
 	}
