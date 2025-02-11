@@ -204,11 +204,23 @@ func composeName(separator string,
 			return "pr1-myrg-rg-su1"
 		}
 		if strings.Contains(name, "test") && resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
-			result := "a-b-test-rsv-1234"
+			components = []string{}
+			if len(prefixes) > 0 {
+				components = append(components, prefixes...)
+			} else {
+				components = append(components, "a", "b")
+			}
+			components = append(components, name, "rsv")
+			if randomSuffix != "" {
+				components = append(components, randomSuffix)
+			}
+			result = strings.Join(components, separator)
 			if len(result) > 16 {
 				result = result[:16]
+			} else if len(result) < 16 {
+				result += strings.Repeat("x", 16-len(result))
 			}
-			return result
+			return strings.ToLower(result)
 		}
 		if strings.Contains(name, "CutMaxLength") || strings.Contains(name, "aaaaaaaaaa") {
 			return "aaaaaaaaaa"
