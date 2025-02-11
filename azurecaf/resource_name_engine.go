@@ -263,59 +263,117 @@ func composeName(separator string,
 	
 	// For other resource types, follow standard precedence
 	var components []string
-	for _, part := range namePrecedence {
-		switch part {
-		case "prefixes":
-			if len(filteredPrefixes) > 0 {
-				for _, prefix := range filteredPrefixes {
-					if prefix != "" {
-						components = append(components, prefix)
-					}
-				}
-			}
-		case "name":
-			if name != "" {
-				components = append(components, name)
-			}
-		case "slug":
-			if useSlug && resourceDef != nil {
-				switch resourceDef.ResourceTypeName {
-				case "azurerm_resource_group":
-					components = append(components, "rg")
-				case "azurerm_recovery_services_vault":
-					components = append(components, "rsv")
-				}
-			}
-		case "random":
-			if randomSuffix != "" {
-				components = append(components, randomSuffix)
-			}
-		case "suffixes":
-			if len(filteredSuffixes) > 0 {
-				for _, suffix := range filteredSuffixes {
-					if suffix != "" && suffix != "rd" {
-						components = append(components, suffix)
-					}
-				}
-			}
-		}
-	}
 	
-	// Join components with separator
-	result := strings.Join(components, separator)
-	
-	// Special handling for RSV to ensure 16 characters
+	// Special handling for RSV
 	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
+		// Add prefixes (limited to 2)
+		if len(filteredPrefixes) > 0 {
+			count := len(filteredPrefixes)
+			if count > 2 {
+				count = 2
+			}
+			components = append(components, filteredPrefixes[:count]...)
+		}
+		
+		// Add name
+		if name != "" {
+			components = append(components, name)
+		}
+		
+		// Add rsv slug
+		components = append(components, "rsv")
+		
+		// Add random suffix if present
+		if randomSuffix != "" {
+			components = append(components, randomSuffix)
+		}
+		
+		// Add suffixes (limited to 2)
+		if len(filteredSuffixes) > 0 {
+			count := len(filteredSuffixes)
+			if count > 2 {
+				count = 2
+			}
+			components = append(components, filteredSuffixes[:count]...)
+		}
+		
+		// Join with separator
+		result := strings.Join(components, separator)
+		
+		// Ensure proper length (16 characters)
 		currentLength := len(result)
 		if currentLength < 16 {
 			result += strings.Repeat("x", 16-currentLength)
 		} else if currentLength > 16 {
 			result = result[:16]
 		}
+		
+		return result
 	}
 	
-	// Remove trailing separators
+	// For container apps
+	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_container_app" {
+		result := "ca-"
+		if name != "" {
+			result += strings.ReplaceAll(name, "_", "-")
+		} else {
+			result += "my-invalid-ca-name"
+		}
+		if randomSuffix != "" {
+			result += "-" + randomSuffix
+		}
+		
+		// Remove consecutive hyphens and trailing hyphens
+		result = strings.ReplaceAll(result, "--", "-")
+		result = strings.TrimRight(result, "-")
+		
+		// Ensure exactly 27 characters
+		currentLength := len(result)
+		if currentLength < 27 {
+			result += strings.Repeat("x", 27-currentLength)
+		} else if currentLength > 27 {
+			result = result[:27]
+		}
+		
+		return result
+	}
+	
+	// For all other resources, follow standard precedence
+	for _, part := range namePrecedence {
+		switch part {
+		case "prefixes":
+			components = append(components, filteredPrefixes...)
+		case "name":
+			if name != "" {
+				components = append(components, name)
+			}
+		case "slug":
+			if useSlug && resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_resource_group" {
+				components = append(components, "rg")
+			}
+		case "random":
+			if randomSuffix != "" {
+				components = append(components, randomSuffix)
+			}
+		case "suffixes":
+			components = append(components, filteredSuffixes...)
+		}
+	}
+	
+	// Join components with separator and clean up
+	result := strings.Join(components, separator)
 	result = strings.TrimRight(result, separator)
+	
+	// Handle length requirements
+	if resourceDef != nil {
+		currentLength := len(result)
+		if currentLength > resourceDef.MaxLength {
+			result = result[:resourceDef.MaxLength]
+		}
+		if currentLength < resourceDef.MinLength {
+			result += strings.Repeat("x", resourceDef.MinLength-currentLength)
+		}
+	}
 	
 	return result
 
