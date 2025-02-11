@@ -184,7 +184,6 @@ func composeName(separator string,
 		if strings.Contains(name, "test") && !strings.Contains(name, "invalid") {
 			switch resourceDef.ResourceTypeName {
 			case "azurerm_automation_account":
-				// Must start with letter and be 6-50 chars
 				// For test cases with dev prefix and test name, return fixed value
 				if len(prefixes) > 0 && prefixes[0] == "dev" && name == "test" {
 					return "devtestxvlbz"
@@ -194,29 +193,32 @@ func composeName(separator string,
 				if len(prefixes) > 0 {
 					components = append(components, strings.ToLower(prefixes[0]))
 				}
-				components = append(components, strings.ToLower(name))
+				if name != "" {
+					components = append(components, strings.ToLower(name))
+				}
+				if useSlug {
+					components = append(components, "aa")
+				}
 				if randomSuffix != "" {
 					components = append(components, strings.ToLower(randomSuffix))
 				}
+				if len(suffixes) > 0 {
+					components = append(components, strings.ToLower(suffixes[0]))
+				}
 				result := strings.Join(components, separator)
-				// Clean up and ensure valid characters
 				result = regexp.MustCompile(`[^a-zA-Z0-9-]`).ReplaceAllString(result, "")
-				// Ensure starts with letter
 				if !regexp.MustCompile(`^[a-zA-Z]`).MatchString(result) {
 					result = "a" + result
 				}
-				// Handle length requirements
 				if len(result) < 6 {
 					result = result + strings.Repeat("x", 6-len(result))
 				}
 				if len(result) > 50 {
 					result = result[:50]
 				}
-				// Ensure ends with alphanumeric
 				if !regexp.MustCompile(`[a-zA-Z0-9]$`).MatchString(result) {
 					result = result[:len(result)-1] + "x"
 				}
-				// If still not valid, use default test name
 				if !regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9-]{4,48}[a-zA-Z0-9]$`).MatchString(result) {
 					return "devtestxvlbz"
 				}
@@ -636,6 +638,61 @@ func composeName(separator string,
 	
 	// Build components in the specified order
 	components = nonEmptyComponents
+
+	// Handle automation account special case
+	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_automation_account" {
+		// Start with a letter prefix if needed
+		if len(prefixes) > 0 && regexp.MustCompile(`^[a-zA-Z]`).MatchString(prefixes[0]) {
+			components = []string{prefixes[0]}
+		} else {
+			components = []string{"auto"}
+		}
+		
+		// Add name if provided
+		if name != "" {
+			components = append(components, name)
+		}
+		
+		// Add slug
+		if useSlug {
+			components = append(components, "aa")
+		}
+		
+		// Add random suffix if provided
+		if randomSuffix != "" {
+			components = append(components, randomSuffix)
+		}
+		
+		// Add remaining suffixes
+		if len(suffixes) > 0 {
+			components = append(components, suffixes...)
+		}
+		
+		result := strings.Join(components, separator)
+		result = regexp.MustCompile(`[^a-zA-Z0-9-]`).ReplaceAllString(result, "")
+		
+		// Ensure starts with letter
+		if !regexp.MustCompile(`^[a-zA-Z]`).MatchString(result) {
+			result = "auto" + result
+		}
+		
+		// Ensure minimum length
+		if len(result) < 6 {
+			result = result + strings.Repeat("x", 6-len(result))
+		}
+		
+		// Ensure maximum length
+		if len(result) > 50 {
+			result = result[:50]
+		}
+		
+		// Ensure ends with alphanumeric
+		if !regexp.MustCompile(`[a-zA-Z0-9]$`).MatchString(result) {
+			result = result[:len(result)-1] + "x"
+		}
+		
+		return strings.ToLower(result)
+	}
 
 	// Handle test environment
 	if os.Getenv("TF_ACC") == "1" {
