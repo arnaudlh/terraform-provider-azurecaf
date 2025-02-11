@@ -2,9 +2,9 @@ name: Unit Tests
 
 on:
   push:
-    branches: [ 'main', '3_0' ]
+    branches: [ 'main', '3_0', '2.0.0-preview5' ]
   pull_request:
-    branches: [ 'main', '3_0' ]
+    branches: [ 'main', '3_0', '2.0.0-preview5' ]
 
 # Prevent duplicate workflow runs
 concurrency:
