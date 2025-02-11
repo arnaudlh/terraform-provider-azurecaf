@@ -2,7 +2,6 @@ package azurecaf
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"regexp"
 	"strconv"
@@ -410,11 +409,8 @@ func composeName(separator string,
 					components = append(components, randomSuffix)
 				}
 				result = strings.Join(components, separator)
-				if len(result) < 27 {
-					result += strings.Repeat("x", 27-len(result))
-				}
-				if len(result) > 27 {
-					result = result[:27]
+				if len(result) > 25 {
+					result = result[:25]
 				}
 				return strings.ToLower(result)
 			}
