@@ -4,6 +4,7 @@ import (
 	"context"
 	b64 "encoding/base64"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/schemas"
