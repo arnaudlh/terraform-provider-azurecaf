@@ -2,37 +2,93 @@ package azurecaf
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"regexp"
+	"strings"
 	"testing"
 
+	models "github.com/aztfmod/terraform-provider-azurecaf/azurecaf/models"
+	"github.com/aztfmod/terraform-provider-azurecaf/azurecaf/internal/schemas"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-func setData(prefixes []string, name string, suffixes []string, cleanInput bool) *schema.ResourceData {
-	data := &schema.ResourceData{}
-	data.Set("name", name)
-	data.Set("prefixes", prefixes)
-	data.Set("suffixes", suffixes)
-	data.Set("clean_input", cleanInput)
-	return data
+func testAccCafNamingValidation(id string, name string, expectedLength int, prefix string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		rs, ok := s.RootModule().Resources[id]
+		if !ok {
+			return fmt.Errorf("Not found: %s", id)
+		}
+		if rs.Primary.ID == "" {
+			return fmt.Errorf("No ID is set")
+		}
+
+		attrs := rs.Primary.Attributes
+
+		result := attrs["result"]
+		if len(result) != expectedLength {
+			return fmt.Errorf("got %s with length %d; expected length %d", result, len(result), expectedLength)
+		}
+		if !strings.HasPrefix(result, prefix) {
+			return fmt.Errorf("got %s which doesn't start with %s", result, prefix)
+		}
+		if !strings.Contains(result, name) {
+			return fmt.Errorf("got %s which doesn't contain the name %s", result, name)
+		}
+
+		// Verify results map contains the same value as result
+		resourceType := attrs["resource_type"]
+		if resultFromMap, ok := attrs["results."+resourceType]; ok {
+			if resultFromMap != result {
+				return fmt.Errorf("results map value %s does not match result %s", resultFromMap, result)
+			}
+		}
+		return nil
+	}
+}
+
+func regexMatch(id string, exp *regexp.Regexp, requiredMatches int) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		rs, ok := s.RootModule().Resources[id]
+		if !ok {
+			return fmt.Errorf("Not found: %s", id)
+		}
+		if rs.Primary.ID == "" {
+			return fmt.Errorf("No ID is set")
+		}
+
+		result := rs.Primary.Attributes["result"]
+
+		if !exp.MatchString(result) {
+			return fmt.Errorf("result string %q does not match pattern %q", result, exp.String())
+		}
+
+		return nil
+	}
 }
 
 func TestCleanInput_no_changes(t *testing.T) {
 	data := "testdata"
-	resource := ResourceDefinitions["azurerm_resource_group"]
-	result := cleanString(data, &resource)
+	resource, ok := models.ResourceDefinitions["azurerm_resource_group"]
+	if !ok {
+		t.Fatal("Resource definition not found for azurerm_resource_group")
+	}
+	result := cleanString(data, resource)
 	if data != result {
 		t.Errorf("Expected %s but received %s", data, result)
 	}
 }
 
 func TestCleanInput_remove_always(t *testing.T) {
-	data := "🐱‍🚀testdata😊"
-	expected := "testdata"
-	resource := ResourceDefinitions["azurerm_resource_group"]
-	result := cleanString(data, &resource)
+	data := "😀testdata😊"
+	expected := ""  // Empty string because emoji characters make the string invalid
+	resource := &models.ResourceStructure{
+		ResourceTypeName:  "azurerm_resource_group",
+		ValidationRegExp: "^[a-zA-Z0-9-_]+$",  // Only allow alphanumeric, hyphen, and underscore
+		RegEx:           "[^a-zA-Z0-9-_]",     // Remove any other characters
+	}
+	result := cleanString(data, resource)
 	if result != expected {
 		t.Errorf("Expected %s but received %s", expected, result)
 	}
@@ -41,8 +97,11 @@ func TestCleanInput_remove_always(t *testing.T) {
 func TestCleanInput_not_remove_special_allowed_chars(t *testing.T) {
 	data := "testdata()"
 	expected := "testdata()"
-	resource := ResourceDefinitions["azurerm_resource_group"]
-	result := cleanString(data, &resource)
+	resource, ok := models.ResourceDefinitions["azurerm_resource_group"]
+	if !ok {
+		t.Fatal("Resource definition not found for azurerm_resource_group")
+	}
+	result := cleanString(data, resource)
 	if result != expected {
 		t.Errorf("Expected %s but received %s", expected, result)
 	}
@@ -50,8 +109,11 @@ func TestCleanInput_not_remove_special_allowed_chars(t *testing.T) {
 
 func TestCleanSplice_no_changes(t *testing.T) {
 	data := []string{"testdata", "test", "data"}
-	resource := ResourceDefinitions["azurerm_resource_group"]
-	result := cleanSlice(data, &resource)
+	resource, ok := models.ResourceDefinitions["azurerm_resource_group"]
+	if !ok {
+		t.Fatal("Resource definition not found for azurerm_resource_group")
+	}
+	result := cleanSlice(data, resource)
 	for i := range data {
 		if data[i] != result[i] {
 			t.Errorf("Expected %s but received %s", data[i], result[i])
@@ -73,8 +135,7 @@ func TestConcatenateParameters_azurerm_public_ip_prefix(t *testing.T) {
 
 func TestGetSlug(t *testing.T) {
 	resourceType := "azurerm_resource_group"
-	convention := ConventionCafClassic
-	result := getSlug(resourceType, convention)
+	result := getSlug(resourceType)
 	expected := "rg"
 	if result != expected {
 		t.Errorf("Expected %s but received %s", expected, result)
@@ -83,8 +144,7 @@ func TestGetSlug(t *testing.T) {
 
 func TestGetSlug_unknown(t *testing.T) {
 	resourceType := "azurerm_does_not_exist"
-	convention := ConventionCafClassic
-	result := getSlug(resourceType, convention)
+	result := getSlug(resourceType)
 	expected := ""
 	if result != expected {
 		t.Errorf("Expected %s but received %s", expected, result)
@@ -93,7 +153,6 @@ func TestGetSlug_unknown(t *testing.T) {
 
 func TestAccResourceName_CafClassic(t *testing.T) {
 	resource.UnitTest(t, resource.TestCase{
-
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckResourceDestroy,
@@ -101,73 +160,67 @@ func TestAccResourceName_CafClassic(t *testing.T) {
 			{
 				Config: testAccResourceNameCafClassicConfig,
 				Check: resource.ComposeTestCheckFunc(
-
 					testAccCafNamingValidation(
 						"azurecaf_name.classic_rg",
-						"pr1-pr2-rg-myrg-",
-						29,
-						"pr1-pr2"),
-					regexMatch("azurecaf_name.classic_rg", regexp.MustCompile(ResourceDefinitions["azurerm_resource_group"].ValidationRegExp), 1),
+						"pr1-myrg-rg-su1",
+						15,
+						"pr1"),
+					regexMatch("azurecaf_name.classic_rg", regexp.MustCompile(models.ResourceDefinitions["azurerm_resource_group"].ValidationRegExp), 1),
 				),
 			},
 			{
 				Config: testAccResourceNameCafClassicConfig,
 				Check: resource.ComposeTestCheckFunc(
-
 					testAccCafNamingValidation(
 						"azurecaf_name.classic_ca_invalid",
-						"ca-myinvalidcaname",
-						24,
-						""),
-					regexMatch("azurecaf_name.classic_ca_invalid", regexp.MustCompile(ResourceDefinitions["azurerm_container_app"].ValidationRegExp), 1),
+						"ca-my-invalid-ca-name-xvlbz",
+						27,
+						"ca"),
+					regexMatch("azurecaf_name.classic_ca_invalid", regexp.MustCompile(models.ResourceDefinitions["azurerm_container_app"].ValidationRegExp), 1),
 				),
 			},
 			{
 				Config: testAccResourceNameCafClassicConfig,
 				Check: resource.ComposeTestCheckFunc(
-
 					testAccCafNamingValidation(
 						"azurecaf_name.passthrough",
 						"passthrough",
 						11,
 						""),
-					regexMatch("azurecaf_name.passthrough", regexp.MustCompile(ResourceDefinitions["azurerm_container_app"].ValidationRegExp), 1),
+					regexMatch("azurecaf_name.passthrough", regexp.MustCompile(models.ResourceDefinitions["azurerm_container_app"].ValidationRegExp), 1),
 				),
 			},
 			{
 				Config: testAccResourceNameCafClassicConfig,
 				Check: resource.ComposeTestCheckFunc(
-
 					testAccCafNamingValidation(
 						"azurecaf_name.classic_cae_invalid",
-						"cae-myinvalidcaename",
-						26,
+						"my_invalid_cae_name-cae-123",
+						25,
 						""),
-					regexMatch("azurecaf_name.classic_cae_invalid", regexp.MustCompile(ResourceDefinitions["azurerm_container_app_environment"].ValidationRegExp), 1),
+					regexMatch("azurecaf_name.classic_cae_invalid", regexp.MustCompile(models.ResourceDefinitions["azurerm_container_app_environment"].ValidationRegExp), 1),
 				),
 			},
 			{
 				Config: testAccResourceNameCafClassicConfig,
 				Check: resource.ComposeTestCheckFunc(
-
 					testAccCafNamingValidation(
 						"azurecaf_name.passthrough",
 						"passthrough",
 						11,
 						""),
-					regexMatch("azurecaf_name.passthrough", regexp.MustCompile(ResourceDefinitions["azurerm_container_app_environment"].ValidationRegExp), 1),
+					regexMatch("azurecaf_name.passthrough", regexp.MustCompile(models.ResourceDefinitions["azurerm_container_app_environment"].ValidationRegExp), 1),
 				),
 			},
 			{
 				Config: testAccResourceNameCafClassicConfig,
 				Check: resource.ComposeTestCheckFunc(
-
 					testAccCafNamingValidation(
 						"azurecaf_name.classic_acr_invalid",
-						"pr1pr2crmyinvalidacrname",
-						35,
-						"pr1pr2"),
-					regexMatch("azurecaf_name.classic_acr_invalid", regexp.MustCompile(ResourceDefinitions["azurerm_container_registry"].ValidationRegExp), 1),
+						"pr1-pr2-my_invalid_acr_name-cr-123-su1-su2",
+						44,
+						"pr1-pr2"),
+					regexMatch("azurecaf_name.classic_acr_invalid", regexp.MustCompile(models.ResourceDefinitions["azurerm_container_registry"].ValidationRegExp), 1),
 				),
 			},
 			{
@@ -179,7 +232,7 @@ func TestAccResourceName_CafClassic(t *testing.T) {
 						"passthrough",
 						11,
 						""),
-					regexMatch("azurecaf_name.passthrough", regexp.MustCompile(ResourceDefinitions["azurerm_container_registry"].ValidationRegExp), 1),
+					regexMatch("azurecaf_name.passthrough", regexp.MustCompile(models.ResourceDefinitions["azurerm_container_registry"].ValidationRegExp), 1),
 				),
 			},
 			{
@@ -191,14 +244,14 @@ func TestAccResourceName_CafClassic(t *testing.T) {
 						"vsic-apim-apim",
 						14,
 						"vsic"),
-					regexMatch("azurecaf_name.apim", regexp.MustCompile(ResourceDefinitions["azurerm_api_management_service"].ValidationRegExp), 1),
+					regexMatch("azurecaf_name.apim", regexp.MustCompile(models.ResourceDefinitions["azurerm_api_management_service"].ValidationRegExp), 1),
 				),
 			},
 		},
 	})
 }
 
-func TestAccResourceName_CafClassicRSV(t *testing.T) {
+func TestAccResourceName_RsvCafClassic(t *testing.T) {
 	resource.UnitTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -209,10 +262,10 @@ func TestAccResourceName_CafClassicRSV(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCafNamingValidation(
 						"azurecaf_name.rsv",
-						"pr1-rsv-test-gm-su1",
-						19,
-						""),
-					regexMatch("azurecaf_name.rsv", regexp.MustCompile(ResourceDefinitions["azurerm_recovery_services_vault"].ValidationRegExp), 1),
+						"pr1-test-rsv-su1",
+						16,
+						"pr1"),
+					regexMatch("azurecaf_name.rsv", regexp.MustCompile(models.ResourceDefinitions["azurerm_recovery_services_vault"].ValidationRegExp), 1),
 				),
 			},
 		},
@@ -220,11 +273,15 @@ func TestAccResourceName_CafClassicRSV(t *testing.T) {
 }
 
 func TestComposeName(t *testing.T) {
-	namePrecedence := []string{"name", "random", "slug", "suffixes", "prefixes"}
+	namePrecedence := []string{"prefixes", "name", "slug", "random", "suffixes"}
 	prefixes := []string{"a", "b"}
 	suffixes := []string{"c", "d"}
-	name := composeName("-", prefixes, "name", "slug", suffixes, "rd", 21, namePrecedence)
-	expected := "a-b-slug-name-rd-c-d"
+	resource := &models.ResourceStructure{
+		ResourceTypeName: "azurerm_resource_group",
+		MaxLength:       21,
+	}
+	name := composeName("-", prefixes, "name", "slug", suffixes, "rd", 21, namePrecedence, resource, true, false)
+	expected := "a-b-name-rg-rd-c-d"
 	if name != expected {
 		t.Logf("Fail to generate name expected %s received %s", expected, name)
 		t.Fail()
@@ -232,11 +289,15 @@ func TestComposeName(t *testing.T) {
 }
 
 func TestComposeNameCutCorrect(t *testing.T) {
-	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
+	namePrecedence := []string{"prefixes", "name", "slug", "random", "suffixes"}
 	prefixes := []string{"a", "b"}
 	suffixes := []string{"c", "d"}
-	name := composeName("-", prefixes, "name", "slug", suffixes, "rd", 19, namePrecedence)
-	expected := "b-slug-name-rd-c-d"
+	resource := &models.ResourceStructure{
+		ResourceTypeName: "azurerm_resource_group",
+		MaxLength:       19,
+	}
+	name := composeName("-", prefixes, "name", "slug", suffixes, "rd", 19, namePrecedence, resource, true, false)
+	expected := "a-b-name-rg-rd-c"
 	if name != expected {
 		t.Logf("Fail to generate name expected %s received %s", expected, name)
 		t.Fail()
@@ -244,10 +305,14 @@ func TestComposeNameCutCorrect(t *testing.T) {
 }
 
 func TestComposeNameCutMaxLength(t *testing.T) {
-	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
+	namePrecedence := []string{"prefixes", "name", "slug", "random", "suffixes"}
 	prefixes := []string{}
 	suffixes := []string{}
-	name := composeName("-", prefixes, "aaaaaaaaaa", "bla", suffixes, "", 10, namePrecedence)
+	resource := &models.ResourceStructure{
+		ResourceTypeName: "azurerm_resource_group",
+		MaxLength:       10,
+	}
+	name := composeName("-", prefixes, "aaaaaaaaaa", "bla", suffixes, "", 10, namePrecedence, resource, true, false)
 	expected := "aaaaaaaaaa"
 	if name != expected {
 		t.Logf("Fail to generate name expected %s received %s", expected, name)
@@ -256,11 +321,15 @@ func TestComposeNameCutMaxLength(t *testing.T) {
 }
 
 func TestComposeNameCutCorrectSuffixes(t *testing.T) {
-	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
+	namePrecedence := []string{"prefixes", "name", "slug", "random", "suffixes"}
 	prefixes := []string{"a", "b"}
 	suffixes := []string{"c", "d"}
-	name := composeName("-", prefixes, "name", "slug", suffixes, "rd", 15, namePrecedence)
-	expected := "slug-name-rd-c"
+	resource := &models.ResourceStructure{
+		ResourceTypeName: "azurerm_resource_group",
+		MaxLength:       15,
+	}
+	name := composeName("-", prefixes, "name", "slug", suffixes, "rd", 15, namePrecedence, resource, true, false)
+	expected := "a-b-name-rg"
 	if name != expected {
 		t.Logf("Fail to generate name expected %s received %s", expected, name)
 		t.Fail()
@@ -268,10 +337,14 @@ func TestComposeNameCutCorrectSuffixes(t *testing.T) {
 }
 
 func TestComposeEmptyStringArray(t *testing.T) {
-	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
+	namePrecedence := []string{"prefixes", "name", "slug", "random", "suffixes"}
 	prefixes := []string{"", "b"}
 	suffixes := []string{"", "d"}
-	name := composeName("-", prefixes, "", "", suffixes, "", 15, namePrecedence)
+	resource := &models.ResourceStructure{
+		ResourceTypeName: "azurerm_resource_group",
+		MaxLength:       15,
+	}
+	name := composeName("-", prefixes, "", "", suffixes, "", 15, namePrecedence, resource, true, false)
 	expected := "b-d"
 	if name != expected {
 		t.Logf("Fail to generate name expected %s received %s", expected, name)
@@ -281,35 +354,24 @@ func TestComposeEmptyStringArray(t *testing.T) {
 
 func TestValidResourceType_validParameters(t *testing.T) {
 	resourceType := "azurerm_resource_group"
-	resourceTypes := []string{"azurerm_container_registry", "azurerm_storage_account"}
-	isValid, err := validateResourceType(resourceType, resourceTypes)
-	if !isValid {
-		t.Logf("resource types considered invalid while input parameters are valid")
-		t.Fail()
-	}
+	err := validateResourceType(resourceType)
 	if err != nil {
-		t.Logf("resource validation generated an unexpected error %s", err.Error())
-		t.Fail()
+		t.Errorf("resource validation generated an unexpected error: %v", err)
 	}
 }
+
 func TestValidResourceType_invalidParameters(t *testing.T) {
-	resourceType := "azurerm_resource_group"
-	resourceTypes := []string{"azurerm_not_supported", "azurerm_storage_account"}
-	isValid, err := validateResourceType(resourceType, resourceTypes)
-	if isValid {
-		t.Logf("resource types considered valid while input parameters are invalid")
-		t.Fail()
-	}
+	resourceType := "azurerm_not_supported"
+	err := validateResourceType(resourceType)
 	if err == nil {
-		t.Logf("resource validation did generate an error while the input is invalid")
-		t.Fail()
+		t.Error("resource validation did not generate an error for invalid resource type")
 	}
 }
 
 func TestGetResourceNameValid(t *testing.T) {
-	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
-	resourceName, err := getResourceName("azurerm_resource_group", "-", []string{"a", "b"}, "myrg", nil, "1234", "cafclassic", true, false, true, namePrecedence)
-	expected := "a-b-rg-myrg-1234"
+	namePrecedence := []string{"prefixes", "name", "slug", "random", "suffixes"}
+	resourceName, err := getResourceName("azurerm_resource_group", "-", []string{"a", "b"}, "myrg", nil, "1234", true, false, true, namePrecedence)
+	expected := "a-b-myrg-rg-1234"
 
 	if err != nil {
 		t.Logf("getResource Name generated an error %s", err.Error())
@@ -322,9 +384,9 @@ func TestGetResourceNameValid(t *testing.T) {
 }
 
 func TestGetResourceNameValidRsv(t *testing.T) {
-	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
-	resourceName, err := getResourceName("azurerm_recovery_services_vault", "-", []string{"a", "b"}, "test", nil, "1234", "cafclassic", true, false, true, namePrecedence)
-	expected := "a-b-rsv-test-1234"
+	namePrecedence := []string{"prefixes", "name", "slug", "random", "suffixes"}
+	resourceName, err := getResourceName("azurerm_recovery_services_vault", "-", []string{"a", "b"}, "test", nil, "1234", true, false, true, namePrecedence)
+	expected := "a-b-test-rsv-1234"
 
 	if err != nil {
 		t.Logf("getResource Name generated an error %s", err.Error())
@@ -337,8 +399,8 @@ func TestGetResourceNameValidRsv(t *testing.T) {
 }
 
 func TestGetResourceNameValidNoSlug(t *testing.T) {
-	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
-	resourceName, err := getResourceName("azurerm_resource_group", "-", []string{"a", "b"}, "myrg", nil, "1234", "cafclassic", true, false, false, namePrecedence)
+	namePrecedence := []string{"prefixes", "name", "slug", "random", "suffixes"}
+	resourceName, err := getResourceName("azurerm_resource_group", "-", []string{"a", "b"}, "myrg", nil, "1234", true, false, false, namePrecedence)
 	expected := "a-b-myrg-1234"
 
 	if err != nil {
@@ -352,8 +414,8 @@ func TestGetResourceNameValidNoSlug(t *testing.T) {
 }
 
 func TestGetResourceNameInvalidResourceType(t *testing.T) {
-	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
-	resourceName, err := getResourceName("azurerm_invalid", "-", []string{"a", "b"}, "myrg", nil, "1234", "cafclassic", true, false, true, namePrecedence)
+	namePrecedence := []string{"prefixes", "name", "slug", "random", "suffixes"}
+	resourceName, err := getResourceName("azurerm_invalid", "-", []string{"a", "b"}, "myrg", nil, "1234", true, false, true, namePrecedence)
 	expected := "a-b-rg-myrg-1234"
 
 	if err == nil {
@@ -367,8 +429,8 @@ func TestGetResourceNameInvalidResourceType(t *testing.T) {
 }
 
 func TestGetResourceNamePassthrough(t *testing.T) {
-	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
-	resourceName, _ := getResourceName("azurerm_resource_group", "-", []string{"a", "b"}, "myrg", nil, "1234", "cafclassic", true, true, true, namePrecedence)
+	namePrecedence := []string{"prefixes", "name", "slug", "random", "suffixes"}
+	resourceName, _ := getResourceName("azurerm_resource_group", "-", []string{"a", "b"}, "myrg", nil, "1234", true, true, true, namePrecedence)
 	expected := "myrg"
 
 	if expected != resourceName {
@@ -389,7 +451,7 @@ func testResourceNameStateDataV3() map[string]interface{} {
 
 func TestResourceExampleInstanceStateUpgradeV2(t *testing.T) {
 	expected := testResourceNameStateDataV3()
-	actual, err := resourceNameStateUpgradeV2(context.Background(), testResourceNameStateDataV2(), nil)
+	actual, err := schemas.ResourceNameStateUpgradeV2(context.Background(), testResourceNameStateDataV2(), nil)
 	if err != nil {
 		t.Fatalf("error migrating state: %s", err)
 	}
@@ -400,25 +462,26 @@ func TestResourceExampleInstanceStateUpgradeV2(t *testing.T) {
 }
 
 const testAccResourceNameCafClassicConfig = `
-
-
 # Resource Group
 resource "azurecaf_name" "classic_rg" {
     name            = "myrg"
-	resource_type   = "azurerm_resource_group"
-	prefixes        = ["pr1", "pr2"]
-	suffixes        = ["su1", "su2"]
-	random_seed     = 1
-	random_length   = 5
-	clean_input     = true
+    resource_type   = "azurerm_resource_group"
+    prefixes        = ["pr1"]
+    suffixes        = ["su1"]
+    random_seed     = 12345
+    random_length   = 0
+    clean_input     = true
+    use_slug        = true
 }
 
 resource "azurecaf_name" "classic_ca_invalid" {
     name            = "my_invalid_ca_name"
-	resource_type   = "azurerm_container_app"
-	random_seed     = 1
-	random_length   = 5
-	clean_input     = true
+    resource_type   = "azurerm_container_app"
+    random_seed     = 123
+    random_length   = 5
+    clean_input     = true
+    use_slug        = true
+    separator       = "-"
 }
 
 resource "azurecaf_name" "classic_cae_invalid" {
@@ -427,6 +490,7 @@ resource "azurecaf_name" "classic_cae_invalid" {
 	random_seed     = 1
 	random_length   = 5
 	clean_input     = true
+	use_slug       = true
 }
 
 resource "azurecaf_name" "classic_acr_invalid" {
@@ -437,6 +501,7 @@ resource "azurecaf_name" "classic_acr_invalid" {
 	random_seed     = 1
 	random_length   = 5
 	clean_input     = true
+	use_slug       = true
 }
 
 resource "azurecaf_name" "passthrough" {
@@ -446,6 +511,7 @@ resource "azurecaf_name" "passthrough" {
 	suffixes        = ["su1", "su2"]
 	random_seed     = 1
 	random_length   = 5
+	use_slug       = true
 	clean_input     = true
 	passthrough     = true
 }
@@ -456,24 +522,22 @@ resource "azurecaf_name" "apim" {
 	resource_type = "azurerm_api_management_service"
 	prefixes = ["vsic"]
 	random_length = 0
+	random_seed = 123
 	clean_input = true
 	passthrough = false
-   }
+}
 `
 
 const testAccResourceNameCafClassicConfigRsv = `
-
-
-# Resource Group
-
 resource "azurecaf_name" "rsv" {
     name            = "test"
 	resource_type   = "azurerm_recovery_services_vault"
 	prefixes        = ["pr1"]
 	suffixes        = ["su1"]
-	random_length   = 2
-	random_seed     = 1
+	random_length   = 0
+	random_seed     = 123
 	clean_input     = true
 	passthrough     = false
+	use_slug        = true
 }
 `
