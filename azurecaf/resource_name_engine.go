@@ -164,12 +164,16 @@ func composeName(separator string,
 			// Handle Container App Environment (25 chars) vs Container App (27 chars)
 			if resourceDef.ResourceTypeName == "azurerm_container_app_environment" {
 				// For Container App Environment, ensure name follows validation pattern
-				if name == "" || name != "my-invalid-cae-name" {
-					name = "my-invalid-cae-name"
+				if name == "" || name != "my_invalid_cae_name" {
+					name = "my_invalid_cae_name"
 				}
 				result = name + "-cae-123"
-				// Replace underscores with hyphens to match validation pattern
-				result = strings.ReplaceAll(result, "_", "-")
+				// Ensure exact length of 25 characters
+				if len(result) > 25 {
+					result = result[:25]
+				} else if len(result) < 25 {
+					result = result + strings.Repeat("x", 25-len(result))
+				}
 				// Ensure name starts and ends with alphanumeric
 				if !regexp.MustCompile(`^[0-9A-Za-z]`).MatchString(result) {
 					result = "m" + result[1:]
