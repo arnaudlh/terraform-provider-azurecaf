@@ -321,17 +321,21 @@ func composeName(separator string,
 			result += "my-invalid-ca-name"
 		}
 		
-		// Clean up any double hyphens
+		// Clean up any double hyphens and ensure proper format
 		result = strings.ReplaceAll(result, "--", "-")
 		result = strings.TrimRight(result, "-")
 		
 		// Add random suffix with proper hyphenation
 		if randomSuffix != "" {
-			if randomSuffix == "xvlbz" {
-				result = "ca-my-invalid-ca-name-xvlbz"
-			} else {
-				result = result + "-" + randomSuffix
-			}
+			result = result + "-" + randomSuffix
+		}
+		
+		// Ensure name matches pattern ^[a-z0-9][a-z0-9-]{0,30}[a-z0-9]$
+		if strings.HasSuffix(result, "-") {
+			result = result[:len(result)-1]
+		}
+		if len(result) > 32 {
+			result = result[:32]
 		}
 		
 		return result
@@ -366,33 +370,18 @@ func composeName(separator string,
 		result := strings.ToLower(strings.Join(components, separator))
 		
 		// Ensure exactly 16 characters
-		currentLength := len(result)
-		if currentLength < 16 {
-			// Add 'x' characters to reach 16 characters
-			result += strings.Repeat("x", 16-currentLength)
-		} else if currentLength > 16 {
-			// If we have a random suffix, try to preserve it
-			if randomSuffix != "" {
-				// Calculate how much space we need for the random suffix
-				suffixLength := len(randomSuffix)
-				baseLength := 16 - suffixLength - 1 // Account for separator
+		if len(result) < 16 {
+			result += strings.Repeat("x", 16-len(result))
+		} else if len(result) > 16 {
+			// Try to preserve random suffix if present
+			if randomSuffix != "" && len(randomSuffix) <= 16 {
+				baseLength := 16 - len(randomSuffix) - 1
 				if baseLength > 0 {
-					// Take the first part of the base name and append the random suffix
-					result = result[:baseLength] + separator + randomSuffix
+					base := result[:baseLength]
+					result = base + separator + randomSuffix
 				} else {
-					// If we can't fit both, just take the first 16 characters
 					result = result[:16]
 				}
-			} else {
-				// No random suffix, just take first 16 characters
-				result = result[:16]
-			}
-		}
-		
-		// Ensure exactly 16 characters
-		if len(result) != 16 {
-			if len(result) < 16 {
-				result += strings.Repeat("x", 16-len(result))
 			} else {
 				result = result[:16]
 			}
