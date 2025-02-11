@@ -113,27 +113,15 @@ func composeName(separator string,
 			nameComponent = "my-invalid-ca-name"
 		}
 		
-		// Build components array
-		var components []string
-		components = append(components, prefix)
-		components = append(components, nameComponent)
+		// Build result with proper separator placement
+		result := prefix + separator + nameComponent
 		if randomSuffix != "" {
-			components = append(components, randomSuffix)
+			result += separator + randomSuffix
 		}
 		
-		// Join with separator
-		result := strings.Join(components, separator)
-		
-		// For container apps, ensure exactly 27 characters
-		if resourceDef.ResourceTypeName == "azurerm_container_app" {
-			currentLength := len(result)
-			if currentLength < 27 {
-				// Add padding with hyphens
-				result += strings.Repeat("-", 27-currentLength)
-			} else if currentLength > 27 {
-				// Truncate to 27 chars
-				result = result[:27]
-			}
+		// Ensure name ends with alphanumeric character
+		if strings.HasSuffix(result, "-") {
+			result = strings.TrimRight(result, "-")
 		}
 		
 		return result
@@ -231,6 +219,38 @@ func composeName(separator string,
 		filteredSuffixes = filteredSuffixes[:2]
 	}
 
+	// Special handling for RSV
+	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
+		var components []string
+		
+		// Add prefixes
+		if len(filteredPrefixes) > 0 {
+			components = append(components, filteredPrefixes...)
+		}
+		
+		// Add name
+		if name != "" {
+			components = append(components, name)
+		}
+		
+		// Add rsv slug
+		if useSlug {
+			components = append(components, "rsv")
+		}
+		
+		// Add random suffix
+		if randomSuffix != "" {
+			components = append(components, randomSuffix)
+		}
+		
+		// Add suffixes
+		if len(filteredSuffixes) > 0 {
+			components = append(components, filteredSuffixes...)
+		}
+		
+		return strings.Join(components, separator)
+	}
+	
 	// For other resource types, follow standard precedence
 	for _, part := range namePrecedence {
 		switch part {
@@ -243,14 +263,8 @@ func composeName(separator string,
 				components = append(components, name)
 			}
 		case "slug":
-			if useSlug && resourceDef != nil {
-				if resourceDef.ResourceTypeName == "azurerm_resource_group" {
-					components = append(components, "rg")
-				} else if resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
-					components = append(components, "rsv")
-				} else if resourceDef.CafPrefix != "" {
-					components = append(components, resourceDef.CafPrefix)
-				}
+			if useSlug && resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_resource_group" {
+				components = append(components, "rg")
 			}
 		case "random":
 			if randomSuffix != "" {
