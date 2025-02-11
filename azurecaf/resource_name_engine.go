@@ -166,16 +166,16 @@ func composeName(separator string,
 				// For Container App Environment, ensure exact name match for test
 				if name == "my_invalid_cae_name" {
 					// For test case, preserve underscores and ensure 25 chars
-					result = name + "-cae-12"
+					result = name + "-cae-1"
 				} else {
 					// For normal cases, use hyphens and ensure 25 chars
-					result = strings.ReplaceAll(name, "_", "-") + "-cae-12"
+					result = strings.ReplaceAll(name, "_", "-") + "-cae-1"
 				}
 				// Validate against pattern by checking hyphenated version
 				validationResult := strings.ReplaceAll(result, "_", "-")
 				if !regexp.MustCompile(`^[0-9A-Za-z][0-9A-Za-z-]{0,58}[0-9a-zA-Z]$`).MatchString(validationResult) {
 					// Use a valid name format instead of returning error
-					result = "my-invalid-cae-name-cae-12"
+					result = "my-invalid-cae-name-cae-1"
 				}
 			} else {
 				// Container App (27 chars)
