@@ -75,13 +75,18 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 	// Get or generate random seed
 	var randomSeed int64
 	if seedRaw, ok := d.GetOk("random_seed"); ok {
-		randomSeed = int64(seedRaw.(int))
-	} else if d.Id() == "" {
+		if seedStr, ok := seedRaw.(string); ok {
+			if seed, err := strconv.ParseInt(seedStr, 10, 64); err == nil {
+				randomSeed = seed
+			}
+		}
+	}
+	if randomSeed == 0 && d.Id() == "" {
 		// Only generate new seed for new resources
 		randomSeed = time.Now().UnixNano()
 	}
 	// Always preserve the seed in state
-	if err := d.SetNew("random_seed", int(randomSeed)); err != nil {
+	if err := d.SetNew("random_seed", strconv.FormatInt(randomSeed, 10)); err != nil {
 		return fmt.Errorf("failed to set random_seed: %v", err)
 	}
 
@@ -153,10 +158,15 @@ func getNameResult(d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	randomLength := d.Get("random_length").(int)
 	var randomSeed int64
 	if seedRaw, ok := d.GetOk("random_seed"); ok {
-		randomSeed = int64(seedRaw.(int))
-	} else if d.Id() == "" {
+		if seedStr, ok := seedRaw.(string); ok {
+			if seed, err := strconv.ParseInt(seedStr, 10, 64); err == nil {
+				randomSeed = seed
+			}
+		}
+	}
+	if randomSeed == 0 && d.Id() == "" {
 		randomSeed = time.Now().UnixNano()
-		if err := d.Set("random_seed", int(randomSeed)); err != nil {
+		if err := d.Set("random_seed", strconv.FormatInt(randomSeed, 10)); err != nil {
 			return diag.FromErr(err)
 		}
 	}

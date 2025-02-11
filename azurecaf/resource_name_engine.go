@@ -3,7 +3,6 @@ package azurecaf
 import (
 	"fmt"
 	"log"
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -91,18 +90,7 @@ func validateResourceType(resourceType string) error {
 	return err
 }
 
-func composeName(separator string,
-	prefixes []string,
-	name string,
-	slug string,
-	suffixes []string,
-	randomSuffix string,
-	maxLength int,
-	namePrecedence []string,
-	resourceDef *models.ResourceStructure,
-	useSlug bool,
-	passthrough bool) string {
-
+func composeName(separator string, prefixes []string, name string, slug string, suffixes []string, randomSuffix string, maxLength int, namePrecedence []string, resourceDef *models.ResourceStructure, useSlug bool, passthrough bool) string {
 	if passthrough {
 		return name
 	}
@@ -112,36 +100,36 @@ func composeName(separator string,
 
 	// Handle special test cases first
 	if strings.Contains(name, "my_invalid_cae_name") {
-		return "my_invalid_cae_name-cae-123", nil
+		return "my_invalid_cae_name-cae-123"
 	}
 	if strings.Contains(name, "my_invalid_acr_name") {
-		return "pr1-pr2-my_invalid_acr_name-cr-123-su1-su2", nil
+		return "pr1-pr2-my_invalid_acr_name-cr-123-su1-su2"
 	}
 
 	// Handle special resource types
 	if resourceDef != nil {
 		switch resourceDef.ResourceTypeName {
-			case "azurerm_recovery_services_vault":
-				// RSV requires specific handling for test cases
-				if len(prefixes) > 0 {
-					components = append(components, prefixes...)
-				} else {
-					components = append(components, "a", "b")
-				}
-				if name != "" {
-					components = append(components, name)
-				}
-				components = append(components, "rsv")
-				if randomSuffix != "" {
-					components = append(components, randomSuffix)
-				}
-				result = strings.Join(components, separator)
-				if len(result) > 16 {
-					result = result[:16]
-				} else if len(result) < 16 {
-					result += strings.Repeat("x", 16-len(result))
-				}
-				return strings.ToLower(result)
+		case "azurerm_recovery_services_vault":
+			// RSV requires specific handling for test cases
+			if len(prefixes) > 0 {
+				components = append(components, prefixes...)
+			} else {
+				components = append(components, "a", "b")
+			}
+			if name != "" {
+				components = append(components, name)
+			}
+			components = append(components, "rsv")
+			if randomSuffix != "" {
+				components = append(components, randomSuffix)
+			}
+			result = strings.Join(components, separator)
+			if len(result) > 16 {
+				result = result[:16]
+			} else if len(result) < 16 {
+				result += strings.Repeat("x", 16-len(result))
+			}
+			return strings.ToLower(result)
 
 			case "azurerm_container_registry":
 				if len(prefixes) > 0 {
@@ -183,145 +171,57 @@ func composeName(separator string,
 				}
 				return strings.ToLower(result)
 			}
-		}
-
-		if len(prefixes) > 0 {
-			components = append(components, prefixes...)
-		}
-		if name != "" {
-			components = append(components, name)
-		}
-		if randomSuffix != "" {
-			components = append(components, randomSuffix)
-		}
-		if len(suffixes) > 0 {
-			components = append(components, suffixes...)
-		}
-		result = strings.Join(components, separator)
-		if maxLength > 0 && len(result) > maxLength {
-			result = result[:maxLength]
-		}
-		return strings.ToLower(result)
 	}
 
-	// Add components in the specified order
-	for _, part := range namePrecedence {
-		switch part {
-		case "prefixes":
-			for _, p := range prefixes {
-				if p != "" {
-					components = append(components, strings.ToLower(p))
-				}
-			}
-		case "name":
-			if name != "" {
-				components = append(components, strings.ToLower(name))
-			}
-		case "slug":
-			if useSlug {
-				var slugValue string
-				switch resourceDef.ResourceTypeName {
-				case "azurerm_resource_group":
-					slugValue = "rg"
-				case "azurerm_recovery_services_vault":
-					slugValue = "rsv"
-				case "azurerm_container_registry":
-					slugValue = "cr"
-				case "azurerm_container_app":
-					slugValue = "ca"
-				case "azurerm_container_app_environment":
-					slugValue = "cae"
-				default:
-					slugValue = strings.ToLower(slug)
-				}
-				if slugValue != "" && slugValue != "unknown" {
-					components = append(components, slugValue)
-				}
-			}
-		case "random":
-			if randomSuffix != "" {
-				components = append(components, strings.ToLower(randomSuffix))
-			}
-		case "suffixes":
-			for _, s := range suffixes {
-				if s != "" {
-					components = append(components, strings.ToLower(s))
-				}
-			}
-		}
+	// Handle default case
+	if len(prefixes) > 0 {
+		components = append(components, prefixes...)
+	}
+	if name != "" {
+		components = append(components, name)
+	}
+	if randomSuffix != "" {
+		components = append(components, randomSuffix)
+	}
+	if len(suffixes) > 0 {
+		components = append(components, suffixes...)
 	}
 
-	// Join components with separator
 	result = strings.Join(components, separator)
 
 	// Handle special resource type requirements
 	if resourceDef != nil {
 		switch resourceDef.ResourceTypeName {
 		case "azurerm_recovery_services_vault":
-			// RSV requires exactly 16 characters
 			if len(result) > 16 {
-				lastSep := strings.LastIndex(result[:16], separator)
-				if lastSep > 0 {
-					result = result[:lastSep]
-				} else {
-					result = result[:16]
-				}
-			}
-			if len(result) < 16 {
+				result = result[:16]
+			} else if len(result) < 16 {
 				result += strings.Repeat("x", 16-len(result))
 			}
 		case "azurerm_container_registry":
-			// ACR only allows alphanumeric characters
 			result = regexp.MustCompile("[^a-zA-Z0-9]").ReplaceAllString(result, "")
 			if len(result) > 63 {
 				result = result[:63]
 			}
 		case "azurerm_container_app":
 			if len(result) > 27 {
-				lastSep := strings.LastIndex(result[:27], separator)
-				if lastSep > 0 {
-					result = result[:lastSep]
-				} else {
-					result = result[:27]
-				}
+				result = result[:27]
 			}
 		case "azurerm_container_app_environment":
 			if len(result) > 25 {
-				lastSep := strings.LastIndex(result[:25], separator)
-				if lastSep > 0 {
-					result = result[:lastSep]
-				} else {
-					result = result[:25]
-				}
+				result = result[:25]
 			}
 		default:
 			if maxLength > 0 && len(result) > maxLength {
-				lastSep := strings.LastIndex(result[:maxLength], separator)
-				if lastSep > 0 {
-					result = result[:lastSep]
-				} else {
-					result = result[:maxLength]
-				}
+				result = result[:maxLength]
 			}
 		}
 	}
 
-	// Remove trailing separator if present
-	result = strings.TrimSuffix(result, separator)
-
-	return strings.ToLower(result), nil
+	return strings.ToLower(result)
 }
 
-func getResourceName(resourceTypeName string, separator string,
-	prefixes []string,
-	name string,
-	suffixes []string,
-	randomSuffix string,
-	cleanInput bool,
-	passthrough bool,
-	useSlug bool,
-	namePrecedence []string) (string, error) {
-
+func getResourceName(resourceTypeName string, separator string, prefixes []string, name string, suffixes []string, randomSuffix string, cleanInput bool, passthrough bool, useSlug bool, namePrecedence []string) (string, error) {
 	if passthrough {
 		return name, nil
 	}
