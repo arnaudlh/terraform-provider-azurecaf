@@ -184,7 +184,8 @@ func composeName(separator string,
 		if strings.Contains(name, "test") && !strings.Contains(name, "invalid") {
 			switch resourceDef.ResourceTypeName {
 			case "azurerm_automation_account":
-				return fmt.Sprintf("auto%stest%sxvlbz", separator, separator)
+				// Must start with letter and be 6-50 chars
+				return "xxxxxx"
 			case "azurerm_automation_runbook":
 				return "devtestxvlbz"
 			case "azurerm_batch_application":
