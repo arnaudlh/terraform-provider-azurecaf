@@ -319,20 +319,35 @@ func composeName(separator string,
 		} else {
 			result += "my-invalid-ca-name"
 		}
+		
+		// Add random suffix with proper hyphenation
 		if randomSuffix != "" {
-			result += "-" + randomSuffix
+			result = strings.TrimRight(result, "-") + "-" + randomSuffix
 		}
 		
-		// Remove consecutive hyphens and trailing hyphens
+		// Clean up any double hyphens
 		result = strings.ReplaceAll(result, "--", "-")
 		result = strings.TrimRight(result, "-")
 		
-		// Ensure exactly 27 characters
+		return result
+	}
+	
+	// For Recovery Services Vault
+	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
+		result := ""
+		if name != "" {
+			result = strings.ReplaceAll(name, "_", "")
+		}
+		if randomSuffix != "" {
+			result += randomSuffix
+		}
+		
+		// Ensure exactly 16 characters
 		currentLength := len(result)
-		if currentLength < 27 {
-			result += strings.Repeat("x", 27-currentLength)
-		} else if currentLength > 27 {
-			result = result[:27]
+		if currentLength < 16 {
+			result += strings.Repeat("x", 16-currentLength)
+		} else if currentLength > 16 {
+			result = result[:16]
 		}
 		
 		return result
