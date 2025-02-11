@@ -374,27 +374,27 @@ func getResourceName(resourceTypeName string, separator string,
 			}
 		case "azurerm_postgresql_flexible_server", "azurerm_postgresql_flexible_server_database",
 		     "azurerm_postgresql_flexible_server_firewall_rule", "azurerm_kusto_cluster", 
-		     "azurerm_kusto_database", "azurerm_kusto_eventhub_data_connection":
+		     "azurerm_kusto_database", "azurerm_kusto_eventhub_data_connection",
+		     "azurerm_container_app", "azurerm_container_app_environment":
 			if os.Getenv("TF_ACC") == "1" {
-				resourceName = "devtestxvlbz"
-			} else {
-				resourceName = regexp.MustCompile(`[^a-zA-Z0-9]`).ReplaceAllString(resourceName, "")
-				if len(resourceName) > 63 {
-					resourceName = resourceName[:63]
-				}
-			}
-		case "azurerm_container_app", "azurerm_container_app_environment":
-			if os.Getenv("TF_ACC") == "1" {
-				if resourceTypeName == "azurerm_container_app" {
+				switch resourceTypeName {
+				case "azurerm_container_app":
 					resourceName = "catestxvlbz"
-				} else {
+				case "azurerm_container_app_environment":
 					resourceName = "testxvlbz"
+				default:
+					resourceName = "devtestxvlbz"
 				}
 			} else {
 				resourceName = regexp.MustCompile(`[^a-zA-Z0-9]`).ReplaceAllString(resourceName, "")
-				maxLen := 27
-				if resourceTypeName == "azurerm_container_app_environment" {
+				maxLen := 63
+				switch resourceTypeName {
+				case "azurerm_container_app":
+					maxLen = 27
+				case "azurerm_container_app_environment":
 					maxLen = 25
+				case "azurerm_kusto_cluster":
+					maxLen = 22
 				}
 				if len(resourceName) > maxLen {
 					resourceName = resourceName[:maxLen]
