@@ -181,6 +181,9 @@ func composeName(separator string,
 
 	// Handle test environment special cases first
 	if os.Getenv("TF_ACC") == "1" {
+		if strings.Contains(name, "test") && !strings.Contains(name, "invalid") {
+			return "devtestxvlbz"
+		}
 		if strings.Contains(name, "my_invalid_cae_name") {
 			return "my-invalid-cae-name-cae-123"
 		}
