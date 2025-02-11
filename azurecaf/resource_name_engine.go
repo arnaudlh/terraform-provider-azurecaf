@@ -374,7 +374,8 @@ func getResourceName(resourceTypeName string, separator string,
 			}
 		case "azurerm_postgresql_flexible_server", "azurerm_postgresql_flexible_server_database",
 		     "azurerm_postgresql_flexible_server_firewall_rule", "azurerm_container_app",
-		     "azurerm_container_app_environment":
+		     "azurerm_container_app_environment", "azurerm_kusto_cluster", 
+		     "azurerm_kusto_database", "azurerm_kusto_eventhub_data_connection":
 			if os.Getenv("TF_ACC") == "1" {
 				resourceName = "devtestxvlbz"
 			} else {
@@ -383,7 +384,6 @@ func getResourceName(resourceTypeName string, separator string,
 					resourceName = resourceName[:63]
 				}
 			}
-		case "azurerm_kusto_cluster", "azurerm_kusto_database", "azurerm_kusto_eventhub_data_connection":
 			if os.Getenv("TF_ACC") == "1" {
 				resourceName = "devtestxvlbz"
 			} else {
