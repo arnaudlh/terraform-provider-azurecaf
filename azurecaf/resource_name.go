@@ -73,36 +73,33 @@ func getDifference(context context.Context, d *schema.ResourceDiff, resource int
 	passthrough, _ := d.Get("passthrough").(bool)
 	useSlug, _ := d.Get("use_slug").(bool)
 	randomLength, _ := d.Get("random_length").(int)
-	randomSeedRaw := d.Get("random_seed")
 	var randomSeed int64
-	if seedInt, ok := randomSeedRaw.(int); ok && seedInt != 0 {
-		randomSeed = int64(seedInt)
-	} else {
-		// Generate new seed only if not already set
+	if seedRaw, ok := d.GetOk("random_seed"); ok {
+		// Use existing seed if set
+		randomSeed = int64(seedRaw.(int))
+	} else if d.Id() == "" {
+		// Only generate new seed for new resources
 		randomSeed = time.Now().UnixNano()
 		if err := d.SetNew("random_seed", randomSeed); err != nil {
 			return fmt.Errorf("failed to set random_seed: %v", err)
 		}
+	} else {
+		// For existing resources without a seed, preserve current state
+		return nil
 	}
-	
+
 	randomString, _ := d.Get("random_string").(string)
 	var randomSuffix string
 	if len(randomString) > 0 {
 		randomSuffix = randomString
 	} else if randomLength > 0 {
-		randomSuffix = utils.RandSeq(randomLength, randomSeed)
+		// Generate random string using seed
+	randomSuffix = utils.RandSeq(randomLength, randomSeed)
 		if err := d.SetNew("random_string", randomSuffix); err != nil {
 			return fmt.Errorf("failed to set random_string: %v", err)
 		}
 	}
-	
-	// Preserve non-zero random_seed in state
-	if randomSeed != 0 {
-		if err := d.SetNew("random_seed", randomSeed); err != nil {
-			return fmt.Errorf("failed to preserve random_seed: %v", err)
-		}
-	}
-	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
+	namePrecedence := []string{"prefixes", "name", "slug", "random", "suffixes"}
 	result, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
 	if err != nil {
 		return fmt.Errorf("failed to get resource name: %s", err.Error())
@@ -159,25 +156,26 @@ func getNameResult(d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	passthrough := d.Get("passthrough").(bool)
 	useSlug := d.Get("use_slug").(bool)
 	randomLength := d.Get("random_length").(int)
-	randomSeed := int64(d.Get("random_seed").(int))
-
-	if randomSeed == 0 {
-		randomSeed = time.Now().UnixMicro()
+	var randomSeed int64
+	if seedRaw, ok := d.GetOk("random_seed"); ok {
+		randomSeed = int64(seedRaw.(int))
+	} else if d.Id() == "" {
+		randomSeed = time.Now().UnixNano()
 		if err := d.Set("random_seed", randomSeed); err != nil {
 			return diag.FromErr(err)
 		}
 	}
-	randomString := d.Get("random_string").(string)
-	randomSuffix := utils.RandSeq(randomLength, randomSeed)
-	if len(randomString) > 0 {
+	var randomSuffix string
+	if randomString, ok := d.Get("random_string").(string); ok && len(randomString) > 0 {
 		randomSuffix = randomString
-	} else {
+	} else if randomLength > 0 {
+		randomSuffix = utils.RandSeq(randomLength, randomSeed)
 		if err := d.Set("random_string", randomSuffix); err != nil {
 			return diag.FromErr(err)
 		}
 	}
 
-	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
+	namePrecedence := []string{"prefixes", "name", "slug", "random", "suffixes"}
 	result, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, cleanInput, passthrough, useSlug, namePrecedence)
 	if err != nil {
 		return diag.FromErr(err)

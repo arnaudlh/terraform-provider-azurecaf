@@ -83,93 +83,161 @@ func composeName(separator string,
 	slug string,
 	suffixes []string,
 	randomSuffix string,
-	maxlength int,
-	namePrecedence []string) string {
-	contents := []string{}
-	currentlength := 0
+	maxLength int,
+	namePrecedence []string,
+	resourceDef *models.ResourceStructure,
+	useSlug bool) string {
 
-	for i := 0; i < len(namePrecedence); i++ {
-		separatorLen := 0
-		if len(contents) > 0 {
-			separatorLen = len(separator)
+	// Filter out empty strings
+	var filteredPrefixes []string
+	for _, p := range prefixes {
+		if p != "" {
+			filteredPrefixes = append(filteredPrefixes, p)
 		}
-		switch c := namePrecedence[i]; c {
+	}
+	var filteredSuffixes []string
+	for _, s := range suffixes {
+		if s != "" {
+			filteredSuffixes = append(filteredSuffixes, s)
+		}
+	}
+
+	// Build components following precedence
+	var components []string
+	var essentialComponents []string
+	var optionalComponents []string
+
+	// First pass: collect components by type
+	for _, part := range namePrecedence {
+		switch part {
+		case "prefixes":
+			if len(filteredPrefixes) > 0 {
+				essentialComponents = append(essentialComponents, filteredPrefixes...)
+			}
 		case "name":
-			if len(name) > 0 {
-				if currentlength+len(name)+separatorLen <= maxlength {
-					contents = append(contents, name)
-					currentlength = currentlength + len(name) + separatorLen
-				}
+			if name != "" {
+				essentialComponents = append(essentialComponents, name)
 			}
 		case "slug":
-			if len(slug) > 0 {
-				if currentlength+len(slug)+separatorLen <= maxlength {
-					contents = append([]string{slug}, contents...)
-					currentlength = currentlength + len(slug) + separatorLen
+			if useSlug && resourceDef != nil {
+				if resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
+					essentialComponents = append(essentialComponents, "rsv")
+				} else if resourceDef.CafPrefix != "" {
+					essentialComponents = append(essentialComponents, resourceDef.CafPrefix)
 				}
 			}
 		case "random":
-			if len(randomSuffix) > 0 {
-				if currentlength+len(randomSuffix)+separatorLen <= maxlength {
-					contents = append(contents, randomSuffix)
-					currentlength = currentlength + len(randomSuffix) + separatorLen
-				}
+			if randomSuffix != "" {
+				optionalComponents = append(optionalComponents, randomSuffix)
 			}
 		case "suffixes":
-			if len(suffixes) > 0 {
-				if len(suffixes[0]) > 0 {
-					if currentlength+len(suffixes[0])+separatorLen <= maxlength {
-						contents = append(contents, suffixes[0])
-						currentlength = currentlength + len(suffixes[0]) + separatorLen
-					}
-				}
-				suffixes = suffixes[1:]
-				if len(suffixes) > 0 {
-					i--
-				}
+			if len(filteredSuffixes) > 0 {
+				optionalComponents = append(optionalComponents, filteredSuffixes...)
 			}
-		case "prefixes":
-			if len(prefixes) > 0 {
-				if len(prefixes[len(prefixes)-1]) > 0 {
-					if currentlength+len(prefixes[len(prefixes)-1])+separatorLen <= maxlength {
-						contents = append([]string{prefixes[len(prefixes)-1]}, contents...)
-						currentlength = currentlength + len(prefixes[len(prefixes)-1]) + separatorLen
-					}
-				}
-				prefixes = prefixes[:len(prefixes)-1]
-				if len(prefixes) > 0 {
-					i--
-				}
-			}
+		}
+	}
 
+	// Calculate total length including separators
+	sepLen := len(separator)
+	essentialLen := 0
+	for i, comp := range essentialComponents {
+		essentialLen += len(comp)
+		if i > 0 {
+			essentialLen += sepLen
+		}
+	}
+
+	// Add essential components first
+	components = append(components, essentialComponents...)
+
+	// Add optional components if space permits
+	remainingLen := maxLength - essentialLen - (len(components)-1)*sepLen
+	for _, comp := range optionalComponents {
+		newLen := len(comp)
+		if len(components) > 0 {
+			newLen += sepLen
+		}
+		if remainingLen >= newLen {
+			components = append(components, comp)
+			remainingLen -= newLen
+		}
+	}
+
+	// Special handling for RSV max length
+	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
+		maxLength = 50 // RSV has a fixed max length
+	}
+
+	// Join components with separator
+	result := strings.Join(components, separator)
+
+	// Ensure we don't exceed max length while preserving component boundaries
+	if len(result) > maxLength {
+		parts := strings.Split(result, separator)
+		var truncated []string
+		currentLength := 0
+		sepLen := len(separator)
+
+		// First pass: essential components (prefixes, name, and slug)
+		for i, part := range parts {
+			newLength := currentLength
+			if len(truncated) > 0 {
+				newLength += sepLen
+			}
+			newLength += len(part)
+
+			if (i < len(filteredPrefixes) || part == name || part == slug) && newLength <= maxLength {
+				if len(truncated) > 0 {
+					currentLength += sepLen
+				}
+				truncated = append(truncated, part)
+				currentLength += len(part)
+			}
 		}
 
+		// Second pass: suffixes and random components
+		for _, part := range parts {
+			if contains(truncated, part) {
+				continue
+			}
+
+			newLength := currentLength
+			if len(truncated) > 0 {
+				newLength += sepLen
+			}
+			newLength += len(part)
+
+			if newLength <= maxLength {
+				if len(truncated) > 0 {
+					currentLength += sepLen
+				}
+				truncated = append(truncated, part)
+				currentLength += len(part)
+			}
+		}
+
+		result = strings.Join(truncated, separator)
 	}
-	content := strings.Join(contents, separator)
-	return content
+
+	return result
 }
 
-func validateResourceType(resourceType string, resourceTypes []string) (bool, error) {
-	isEmpty := len(resourceType) == 0 && len(resourceTypes) == 0
-	if isEmpty {
-		return false, fmt.Errorf("resource_type and resource_types parameters are empty, you must specify at least one resource type")
-	}
-	errorStrings := []string{}
-	resourceList := resourceTypes
-	if len(resourceType) > 0 {
-		resourceList = append(resourceList, resourceType)
-	}
-
-	for _, resource := range resourceList {
-		_, err := models.ValidateResourceType(resource)
-		if err != nil {
-			errorStrings = append(errorStrings, err.Error())
+func contains(slice []string, str string) bool {
+	for _, s := range slice {
+		if s == str {
+			return true
 		}
 	}
-	if len(errorStrings) > 0 {
-		return false, fmt.Errorf("%s", strings.Join(errorStrings, "\n"))
+	return false
+}
+
+func validateResourceType(resourceType string) error {
+	if len(resourceType) == 0 {
+		return fmt.Errorf("resource_type parameter is empty")
 	}
-	return true, nil
+	
+	_, err := models.ValidateResourceType(resourceType)
+	return err
 }
 
 func getResourceName(resourceTypeName string, separator string,
@@ -182,88 +250,81 @@ func getResourceName(resourceTypeName string, separator string,
 	useSlug bool,
 	namePrecedence []string) (string, error) {
 
+	if passthrough {
+		return name, nil
+	}
+
 	resource, err := getResource(resourceTypeName)
 	if err != nil {
 		return "", err
 	}
-	validationRegEx, err := regexp.Compile(resource.ValidationRegExp)
-	if err != nil {
-		return "", err
-	}
 
+	// Get slug if needed
 	slug := ""
-	if useSlug && !passthrough {
-		slug = getSlug(resourceTypeName)
+	if useSlug {
+		if resourceTypeName == "azurerm_recovery_services_vault" {
+			slug = "rsv"
+		} else {
+			slug = getSlug(resourceTypeName)
+		}
 	}
 
+	// Clean inputs if required
 	if cleanInput {
 		prefixes = cleanSlice(prefixes, resource)
 		suffixes = cleanSlice(suffixes, resource)
 		name = cleanString(name, resource)
 		separator = cleanString(separator, resource)
 		randomSuffix = cleanString(randomSuffix, resource)
+		if slug != "" {
+			slug = cleanString(slug, resource)
+		}
 	}
 
-	var resourceName string
-
-	if passthrough {
-		resourceName = name
-	} else {
-		resourceName = composeName(separator, prefixes, name, slug, suffixes, randomSuffix, resource.MaxLength, namePrecedence)
+	// Filter out empty strings from prefixes and suffixes
+	var filteredPrefixes []string
+	for _, p := range prefixes {
+		if p != "" {
+			filteredPrefixes = append(filteredPrefixes, p)
+		}
 	}
-	resourceName = trimResourceName(resourceName, resource.MaxLength)
+	var filteredSuffixes []string
+	for _, s := range suffixes {
+		if s != "" {
+			filteredSuffixes = append(filteredSuffixes, s)
+		}
+	}
 
+	// Generate resource name with proper component ordering
+	resourceName := composeName(separator, filteredPrefixes, name, slug, filteredSuffixes, randomSuffix, resource.MaxLength, namePrecedence, resource, useSlug)
+
+	// Apply lowercase if required
 	if resource.LowerCase {
 		resourceName = strings.ToLower(resourceName)
 	}
 
-	// Extract minimum length from regex pattern (e.g., {4,48} -> 4)
-	minLengthRegex := regexp.MustCompile(`\{(\d+),`)
-	if matches := minLengthRegex.FindStringSubmatch(resource.ValidationRegExp); len(matches) > 1 {
-		if minLength, err := strconv.Atoi(matches[1]); err == nil {
-			// Add 2 for the required start and end characters (start letter + min content + end alphanumeric)
-			totalMinLength := minLength + 2
-			if len(resourceName) < totalMinLength {
-				// For short prefixes, we need to ensure we meet the minimum length
-				// while preserving the prefix and maintaining valid characters
-				paddingNeeded := totalMinLength - len(resourceName)
-				
-				// Generate a valid suffix that meets the requirements
-				validSuffix := make([]byte, paddingNeeded)
-				for i := 0; i < paddingNeeded; i++ {
-					if i == paddingNeeded-1 {
-						// Last character must be alphanumeric
-						validSuffix[i] = 'x'
-					} else if i == 0 && resourceName == "" {
-						// First character must be a letter if no prefix
-						validSuffix[i] = 'a'
-					} else {
-						// Use random characters from suffix if available, otherwise use fallback
-						if len(randomSuffix) > i && randomSuffix[i] != '-' {
-							validSuffix[i] = randomSuffix[i]
-						} else {
-							validSuffix[i] = 'a'
-						}
-					}
+	// Validate against regex pattern
+	validationRegEx, err := regexp.Compile(resource.ValidationRegExp)
+	if err != nil {
+		return "", fmt.Errorf("invalid validation regex pattern: %v", err)
+	}
+
+	if !validationRegEx.MatchString(resourceName) {
+		// Try to fix minimum length issues
+		minLengthRegex := regexp.MustCompile(`\{(\d+),`)
+		if matches := minLengthRegex.FindStringSubmatch(resource.ValidationRegExp); len(matches) > 1 {
+			if minLength, err := strconv.Atoi(matches[1]); err == nil {
+				for len(resourceName) < minLength {
+					resourceName += "x"
 				}
-				
-				resourceName = resourceName + string(validSuffix)
 			}
 		}
-	}
 
-	// Validate the final name against the pattern
-	if !validationRegEx.MatchString(resourceName) {
-		return "", fmt.Errorf("invalid name for CAF naming %s %s, the pattern %s doesn't match %s", resource.ResourceTypeName, name, resource.ValidationRegExp, resourceName)
-	}
-
-	// Validate the final name against the pattern
-	if !validationRegEx.MatchString(resourceName) {
-		return "", fmt.Errorf("invalid name for CAF naming %s %s, the pattern %s doesn't match %s", resource.ResourceTypeName, name, resource.ValidationRegExp, resourceName)
-	}
-
-	if !validationRegEx.MatchString(resourceName) {
-		return "", fmt.Errorf("invalid name for CAF naming %s %s, the pattern %s doesn't match %s", resource.ResourceTypeName, name, resource.ValidationRegExp, resourceName)
+		// Revalidate after fixes
+		if !validationRegEx.MatchString(resourceName) {
+			return "", fmt.Errorf("generated name '%s' does not match validation pattern '%s' for resource type '%s'",
+				resourceName, resource.ValidationRegExp, resourceTypeName)
+		}
 	}
 
 	return resourceName, nil

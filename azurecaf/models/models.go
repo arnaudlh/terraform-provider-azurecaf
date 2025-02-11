@@ -27,6 +27,10 @@ var ResourceMaps = map[string]string{}
 func init() {
     // Load resource definitions from JSON file
     searchPaths := []string{
+        "resourceDefinitions/resourceDefinition.json",
+        "../resourceDefinition.json",
+        "../../resourceDefinition.json",
+        "../../../resourceDefinition.json",
         "/home/ubuntu/repos/terraform-provider-azurecaf/resourceDefinition.json",
         "/home/ubuntu/repos/terraform-provider-azurecaf/tests/e2e/resourceDefinition.json",
     }
