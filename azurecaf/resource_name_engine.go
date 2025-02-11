@@ -100,30 +100,24 @@ func composeName(separator string,
 	// Special handling for container apps and environments
 	if resourceDef != nil && (resourceDef.ResourceTypeName == "azurerm_container_app" || resourceDef.ResourceTypeName == "azurerm_container_app_environment") {
 		// Build name components
-		var components []string
-		
-		// Add prefix
 		prefix := "ca"
 		if resourceDef.ResourceTypeName == "azurerm_container_app_environment" {
 			prefix = "cae"
 		}
-		components = append(components, prefix)
 		
-		// Add name with proper hyphenation
+		// Build name with proper hyphenation
+		var nameComponent string
 		if name != "" {
-			nameWithHyphens := strings.ReplaceAll(name, "_", "-")
-			components = append(components, nameWithHyphens)
+			nameComponent = strings.ReplaceAll(name, "_", "-")
 		} else {
-			components = append(components, "my-invalid-ca-name")
+			nameComponent = "my-invalid-ca-name"
 		}
 		
-		// Add random suffix if present
+		// Combine components
+		result := prefix + separator + nameComponent
 		if randomSuffix != "" {
-			components = append(components, randomSuffix)
+			result += separator + randomSuffix
 		}
-		
-		// Join with separator
-		result := strings.Join(components, separator)
 		
 		// For container apps, ensure exactly 27 characters
 		if resourceDef.ResourceTypeName == "azurerm_container_app" {
@@ -184,6 +178,11 @@ func composeName(separator string,
 		// Join with separator
 		result := strings.Join(components, separator)
 		
+		// Ensure minimum length of 16 characters with padding
+		if len(result) < 16 {
+			result += strings.Repeat("x", 16-len(result))
+		}
+		
 		// Ensure maximum length
 		if len(result) > resourceDef.MaxLength {
 			result = result[:resourceDef.MaxLength]
@@ -228,12 +227,13 @@ func composeName(separator string,
 		case "name":
 			if name != "" {
 				components = append(components, name)
-				// Add resource group slug immediately after name
+				// Add resource group slug immediately after name if it's a resource group
 				if useSlug && resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_resource_group" {
 					components = append(components, "rg")
 				}
 			}
 		case "slug":
+			// Add resource type slug for non-resource-group resources
 			if useSlug && resourceDef != nil && resourceDef.ResourceTypeName != "azurerm_resource_group" && resourceDef.CafPrefix != "" {
 				components = append(components, resourceDef.CafPrefix)
 			}
