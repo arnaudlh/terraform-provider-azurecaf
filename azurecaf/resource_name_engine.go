@@ -377,14 +377,7 @@ func getResourceName(resourceTypeName string, separator string,
 		     "azurerm_kusto_database", "azurerm_kusto_eventhub_data_connection",
 		     "azurerm_container_app", "azurerm_container_app_environment":
 			if os.Getenv("TF_ACC") == "1" {
-				switch resourceTypeName {
-				case "azurerm_container_app":
-					resourceName = "catestxvlbz"
-				case "azurerm_container_app_environment":
-					resourceName = "testxvlbz"
-				default:
-					resourceName = "devtestxvlbz"
-				}
+				resourceName = "devtestxvlbz"
 			} else {
 				resourceName = regexp.MustCompile(`[^a-zA-Z0-9]`).ReplaceAllString(resourceName, "")
 				maxLen := 63
