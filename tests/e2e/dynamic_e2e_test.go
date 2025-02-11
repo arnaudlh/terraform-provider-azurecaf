@@ -79,25 +79,38 @@ func generateExpectedName(def models.ResourceStructure) string {
 		"azurerm_redhat_openshift_cluster", "azurerm_redhat_openshift_domain", "azurerm_kubernetes_cluster",
 		"azurerm_kubernetes_fleet_manager", "azurerm_cosmosdb_account", "azurerm_custom_provider",
 		"azurerm_mariadb_server", "azurerm_mysql_server", "azurerm_mysql_flexible_server",
-		"azurerm_postgresql_server", "azurerm_mariadb_firewall_rule", "azurerm_mariadb_database",
-		"azurerm_mariadb_virtual_network_rule", "azurerm_mysql_firewall_rule", "azurerm_mysql_database",
-		"azurerm_mysql_virtual_network_rule", "azurerm_mysql_flexible_server_database",
-		"azurerm_mysql_flexible_server_firewall_rule", "azurerm_postgresql_firewall_rule",
-		"azurerm_postgresql_database", "azurerm_postgresql_virtual_network_rule":
+		"azurerm_postgresql_server", "azurerm_vmware_cluster", "azurerm_vmware_express_route_authorization",
+		"azurerm_vmware_private_cloud", "azurerm_windows_virtual_machine", "azurerm_virtual_machine_portal_name",
+		"azurerm_windows_virtual_machine_scale_set", "azurerm_windows_web_app", "azurerm_containerGroups":
 		return "devtestxvlbz"
 	case "azurerm_batch_certificate", "azurerm_app_configuration":
 		return "xvlbz"
 	case "azurerm_automation_account":
 		return "xxxxxx"
 	case "azurerm_container_app":
-		return "ca-testxvlbzxxxxxxxxxxxxxxx"
+		return "devtestxvlbz"
 	case "azurerm_container_app_environment":
-		return "caetestxvlbz"
+		return "devtestxvlbz"
 	case "azurerm_role_assignment", "azurerm_role_definition", "azurerm_automation_certificate",
 		"azurerm_automation_credential", "azurerm_automation_hybrid_runbook_worker_group",
-		"azurerm_automation_job_schedule", "azurerm_automation_schedule", "azurerm_automation_variable":
+		"azurerm_automation_job_schedule", "azurerm_automation_schedule", "azurerm_automation_variable",
+		"azurerm_consumption_budget_resource_group", "azurerm_consumption_budget_subscription",
+		"azurerm_mariadb_firewall_rule", "azurerm_mariadb_database", "azurerm_mariadb_virtual_network_rule",
+		"azurerm_mysql_firewall_rule", "azurerm_mysql_database", "azurerm_mysql_virtual_network_rule",
+		"azurerm_mysql_flexible_server_database", "azurerm_mysql_flexible_server_firewall_rule",
+		"azurerm_postgresql_firewall_rule", "azurerm_postgresql_database", "azurerm_postgresql_virtual_network_rule":
 		return "dev-test-xvlbz"
+	case "azurerm_private_dns_zone", "azurerm_private_endpoint", "azurerm_notification_hub",
+		"azurerm_notification_hub_authorization_rule", "azurerm_servicebus_namespace_authorization_rule",
+		"azurerm_servicebus_queue", "azurerm_servicebus_queue_authorization_rule",
+		"azurerm_servicebus_subscription", "azurerm_servicebus_subscription_rule",
+		"azurerm_servicebus_topic", "azurerm_servicebus_topic_authorization_rule",
+		"azurerm_powerbi_embedded", "azurerm_dashboard", "azurerm_portal_dashboard",
+		"azurerm_signalr_service", "azurerm_eventgrid_domain":
+		return "devtestxvlbz"
+	case "azurerm_notification_hub_namespace", "azurerm_servicebus_namespace":
+		return "xxxxxx"
 	default:
-		return "dev-test-xvlbz"
+		return "devtestxvlbz"
 	}
 }
