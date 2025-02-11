@@ -392,29 +392,12 @@ func getResourceName(resourceTypeName string, separator string,
 					resourceName = resourceName[0:49] + resourceName[len(resourceName)-1:]
 				}
 			}
-		{
+		case "azurerm_kusto_cluster":
 			resourceName = regexp.MustCompile(`[^a-zA-Z0-9]`).ReplaceAllString(resourceName, "")
-			maxLen := 63
-			switch resourceTypeName {
-			case "azurerm_container_app":
-				maxLen = 27
-			case "azurerm_container_app_environment":
-				maxLen = 25
-			case "azurerm_kusto_cluster":
-				maxLen = 22
+			if len(resourceName) > 22 {
+				resourceName = resourceName[:22]
 			}
-			if len(resourceName) > maxLen {
-				resourceName = resourceName[:maxLen]
-			}
-		}
-			if os.Getenv("TF_ACC") == "1" {
-				resourceName = "devtestxvlbz"
-			} else {
-				resourceName = regexp.MustCompile(`[^a-zA-Z0-9]`).ReplaceAllString(resourceName, "")
-				if len(resourceName) > 22 {
-					resourceName = resourceName[:22]
-				}
-			}
+
 		default:
 			minLengthRegex := regexp.MustCompile(`\{(\d+),`)
 			if matches := minLengthRegex.FindStringSubmatch(resource.ValidationRegExp); len(matches) > 1 {
