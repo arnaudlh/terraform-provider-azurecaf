@@ -31,20 +31,22 @@ jobs:
 
       - name: Build Provider
         run: |
-          go build -o terraform-provider-azurecaf
-          mkdir -p tests/e2e/terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/2.0.0-preview5/linux_amd64/
-          cp terraform-provider-azurecaf tests/e2e/terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/2.0.0-preview5/linux_amd64/terraform-provider-azurecaf_v2.0.0-preview5
-          chmod +x tests/e2e/terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/2.0.0-preview5/linux_amd64/terraform-provider-azurecaf_v2.0.0-preview5
+          cd tests/e2e
+          go build -o terraform-provider-azurecaf ../../
+          mkdir -p terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/2.0.0-preview5/linux_amd64/
+          mv terraform-provider-azurecaf terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/2.0.0-preview5/linux_amd64/terraform-provider-azurecaf_v2.0.0-preview5
+          chmod +x terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/2.0.0-preview5/linux_amd64/terraform-provider-azurecaf_v2.0.0-preview5
 
       - name: Run E2E Tests
         run: |
           mkdir -p test-results
           cd tests/e2e
           # Run tests and capture both output and generate report
-          go test -v ./... 2>&1 | tee >(go-junit-report > ../../test-results/e2e-tests-report.xml)
+          go test -v -timeout 30m ./... 2>&1 | tee >(go-junit-report > ../../test-results/e2e-tests-report.xml)
         env:
           TF_ACC: "1"
           GO111MODULE: "on"
+          TF_LOG: DEBUG
 
       - name: Generate Test Report
         uses: dorny/test-reporter@v1
