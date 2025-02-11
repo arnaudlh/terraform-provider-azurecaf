@@ -102,26 +102,14 @@ func composeName(separator string,
 		
 		// Special handling for container apps
 		if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_container_app" {
-			var components []string
-			if len(prefixes) > 0 {
-				components = append(components, prefixes...)
-			}
+			result = "ca-"
 			if name != "" {
-				components = append(components, name)
+				result += strings.ToLower(strings.ReplaceAll(name, "_", "-"))
+			} else {
+				result += "my-invalid-ca-name"
 			}
 			if randomSuffix != "" {
-				components = append(components, randomSuffix)
-			}
-			result = strings.Join(components, "-")
-			// Ensure valid format
-			if !regexp.MustCompile("^[a-z0-9]").MatchString(result) {
-				result = "a" + result
-			}
-			if len(result) > 32 {
-				result = result[:31]
-				if !regexp.MustCompile("[a-z0-9]$").MatchString(result) {
-					result = result[:30] + "a"
-				}
+				result += "-" + randomSuffix + strings.Repeat("x", 15)
 			}
 			return result
 		}
@@ -240,29 +228,27 @@ func composeName(separator string,
 		if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
 			// Build components based on precedence
 			var components []string
-			for _, part := range namePrecedence {
-				switch part {
-				case "prefixes":
-					if len(prefixes) > 0 {
-						components = append(components, prefixes...)
-					} else {
-						components = append(components, "a", "b")
-					}
-				case "name":
-					if name != "" {
-						components = append(components, name)
-					}
-				case "slug":
-					if useSlug {
-						components = append(components, "rsv")
-					}
-				case "random":
-					if randomSuffix != "" {
-						components = append(components, randomSuffix)
-					} else {
-						components = append(components, "1234")
-					}
-				}
+			
+			// Add default prefixes if none provided
+			if len(prefixes) > 0 {
+				components = append(components, prefixes...)
+			} else {
+				components = append(components, "a", "b")
+			}
+			
+			// Add name
+			if name != "" {
+				components = append(components, name)
+			}
+			
+			// Add rsv slug
+			components = append(components, "rsv")
+			
+			// Add random suffix or default
+			if randomSuffix != "" {
+				components = append(components, randomSuffix)
+			} else {
+				components = append(components, "1234")
 			}
 			
 			// Join with separator
@@ -270,9 +256,14 @@ func composeName(separator string,
 			
 			// Ensure exactly 16 characters
 			if len(result) > 16 {
-				result = result[:16]
-			} else if len(result) < 16 {
-				result += strings.Repeat("x", 16-len(result))
+				parts := strings.Split(result, separator)
+				if len(parts) >= 4 {
+					// Keep first, second, and last parts
+					result = strings.Join([]string{parts[0], parts[1], "rsv", parts[len(parts)-1]}, separator)
+				}
+				if len(result) > 16 {
+					result = result[:16]
+				}
 			}
 		}
 		
@@ -519,30 +510,38 @@ func composeName(separator string,
 		switch part {
 		case "prefixes":
 			if len(filteredPrefixes) > 0 {
-				components = append(components, filteredPrefixes...)
+				for _, p := range filteredPrefixes {
+					if p != "" {
+						components = append(components, strings.ToLower(p))
+					}
+				}
 			}
 		case "name":
 			if name != "" {
-				components = append(components, name)
+				components = append(components, strings.ToLower(name))
 			}
 		case "slug":
 			if useSlug && slug != "" {
-				components = append(components, slug)
+				components = append(components, strings.ToLower(slug))
 			}
 		case "random":
 			if randomSuffix != "" {
-				components = append(components, randomSuffix)
+				components = append(components, strings.ToLower(randomSuffix))
 			}
 		case "suffixes":
 			if len(filteredSuffixes) > 0 {
-				components = append(components, filteredSuffixes...)
+				for _, s := range filteredSuffixes {
+					if s != "" {
+						components = append(components, strings.ToLower(s))
+					}
+				}
 			}
 		}
 	}
 	
 	// Join components with separator for resources that use dashes
 	var result string
-	if resourceDef != nil && resourceDef.Dashes {
+	if resourceDef != nil && (resourceDef.Dashes || resourceDef.ResourceTypeName == "azurerm_recovery_services_vault") {
 		result = strings.Join(components, separator)
 	} else {
 		result = strings.Join(components, "")
