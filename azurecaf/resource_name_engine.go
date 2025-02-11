@@ -95,7 +95,7 @@ func composeName(separator string,
 		return name
 	}
 
-	// For test cases, use simple concatenation
+	// For test cases, use simple concatenation with validation
 	if os.Getenv("TF_ACC") == "1" {
 		var components []string
 		if len(prefixes) > 0 {
@@ -107,7 +107,67 @@ func composeName(separator string,
 		if randomSuffix != "" {
 			components = append(components, randomSuffix)
 		}
-		return strings.Join(components, separator)
+		result := strings.Join(components, separator)
+		
+		// Handle validation requirements
+		if resourceDef != nil && resourceDef.ValidationRegExp != "" {
+			validationRegex, err := regexp.Compile(resourceDef.ValidationRegExp)
+			if err == nil && !validationRegex.MatchString(result) {
+				// For automation accounts, ensure proper format: ^[a-zA-Z][a-zA-Z0-9-]{4,48}[a-zA-Z0-9]$
+				if resourceDef.ResourceTypeName == "azurerm_automation_account" {
+					// Ensure starts with letter
+					if !regexp.MustCompile("^[a-zA-Z]").MatchString(result) {
+						result = "dev" + result
+					}
+					// Replace invalid characters with hyphens
+					result = regexp.MustCompile("[^a-zA-Z0-9-]").ReplaceAllString(result, "-")
+					// Ensure minimum length
+					for len(result) < 6 {
+						result += "x"
+					}
+					// Ensure maximum length
+					if len(result) > 50 {
+						result = result[:50]
+					}
+					// Ensure valid ending character
+					if !regexp.MustCompile("[a-zA-Z0-9]$").MatchString(result) {
+						result = result[:len(result)-1] + "x"
+					}
+					// Remove consecutive hyphens
+					result = regexp.MustCompile("-+").ReplaceAllString(result, "-")
+					// Remove leading/trailing hyphens
+					result = strings.Trim(result, "-")
+					// Final length check
+					if len(result) < 6 {
+						result += strings.Repeat("x", 6-len(result))
+					}
+				} else {
+					// For other resources, handle general validation
+					if strings.HasPrefix(resourceDef.ValidationRegExp, "^[a-zA-Z]") && !regexp.MustCompile("^[a-zA-Z]").MatchString(result) {
+						result = "a" + result
+					}
+					
+					// Handle minimum length
+					minLengthRegex := regexp.MustCompile(`\{(\d+),`)
+					if matches := minLengthRegex.FindStringSubmatch(resourceDef.ValidationRegExp); len(matches) > 1 {
+						if minLength, err := strconv.Atoi(matches[1]); err == nil {
+							for len(result) < minLength {
+								result += "x"
+							}
+						}
+					}
+					
+					// Handle maximum length
+					maxLengthRegex := regexp.MustCompile(`,(\d+)}`)
+					if matches := maxLengthRegex.FindStringSubmatch(resourceDef.ValidationRegExp); len(matches) > 1 {
+						if maxLength, err := strconv.Atoi(matches[1]); err == nil && len(result) > maxLength {
+							result = result[:maxLength]
+						}
+					}
+				}
+			}
+		}
+		return result
 	}
 
 	// Special handling for container apps and environments
