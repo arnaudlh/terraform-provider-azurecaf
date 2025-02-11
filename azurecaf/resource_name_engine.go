@@ -94,9 +94,6 @@ func composeName(separator string,
 		return name
 	}
 
-	// Initialize components slice
-	var components []string
-	
 	// Special handling for container apps and environments
 	if resourceDef != nil && (resourceDef.ResourceTypeName == "azurerm_container_app" || resourceDef.ResourceTypeName == "azurerm_container_app_environment") {
 		// Build prefix
@@ -146,31 +143,6 @@ func composeName(separator string,
 		if randomSuffix != "" {
 			result += separator + randomSuffix
 		}
-		return result
-		
-		// For container apps, ensure exactly 27 characters
-		if resourceDef.ResourceTypeName == "azurerm_container_app" {
-			currentLength := len(result)
-			if currentLength > 27 {
-				if randomSuffix != "" {
-					// Preserve random suffix
-					baseLength := 27 - len(separator + randomSuffix)
-					result = result[:baseLength] + separator + randomSuffix
-				} else {
-					result = result[:27]
-				}
-			} else if currentLength < 27 {
-				// Add padding between name and random suffix
-				paddingNeeded := 27 - currentLength
-				if randomSuffix != "" {
-					baseLength := len(result) - len(separator + randomSuffix)
-					result = result[:baseLength] + strings.Repeat("-", paddingNeeded) + separator + randomSuffix
-				} else {
-					result += strings.Repeat("-", paddingNeeded)
-				}
-			}
-		}
-		
 		return result
 	}
 	
@@ -347,98 +319,7 @@ func composeName(separator string,
 	
 	return result
 
-	// Special handling for specific resource types
-	if resourceDef != nil {
-		switch resourceDef.ResourceTypeName {
-		case "azurerm_container_app":
-			// For container apps, ensure 27-character name with ca- prefix
-			if passthrough {
-				if len(name) < 27 {
-					return name + strings.Repeat("-", 27-len(name))
-				}
-				return name[:27]
-			}
-			
-			result := "ca-"
-			if len(name) > 0 {
-				result += strings.ReplaceAll(strings.ReplaceAll(name, "_", "-"), "--", "-")
-			} else {
-				result += "my-invalid-ca-name"
-			}
-			if randomSuffix != "" {
-				result = result[:21] + "-" + randomSuffix
-			}
-			if len(result) < 27 {
-				result += strings.Repeat("-", 27-len(result))
-			}
-			return result[:27]
-			
-		case "azurerm_recovery_services_vault":
-			// For RSV, ensure proper component order: prefixes-name-rsv-suffixes
-			var parts []string
-			
-			// Add prefixes (limited to 2)
-			if len(filteredPrefixes) > 0 {
-				count := len(filteredPrefixes)
-				if count > 2 {
-					count = 2
-				}
-				parts = append(parts, filteredPrefixes[:count]...)
-			}
-			
-			// Add name
-			if name != "" {
-				parts = append(parts, name)
-			}
-			
-			// Add rsv slug
-			parts = append(parts, "rsv")
-			
-			// Add suffixes (limited to 2)
-			if len(filteredSuffixes) > 0 {
-				count := len(filteredSuffixes)
-				if count > 2 {
-					count = 2
-				}
-				parts = append(parts, filteredSuffixes[:count]...)
-			}
-			
-			// Join with separator
-			result := strings.Join(parts, separator)
-			
-			// Ensure minimum length of 16 characters
-			if len(result) < 16 {
-				result += strings.Repeat("x", 16-len(result))
-			}
-			
-			// Ensure maximum length
-			if len(result) > resourceDef.MaxLength {
-				result = result[:resourceDef.MaxLength]
-			}
-			
-			return result
-		}
-	}
-	
-	// Join components with separator
-	result := strings.Join(components, separator)
-	
-	// Handle length requirements
-	if resourceDef != nil {
-		currentLength := len(result)
-		
-		// Truncate if too long
-		if currentLength > resourceDef.MaxLength {
-			result = result[:resourceDef.MaxLength]
-		}
-		
-		// Pad if too short
-		if currentLength < resourceDef.MinLength {
-			result += strings.Repeat("x", resourceDef.MinLength-currentLength)
-		}
-	}
-	
-	return result
+
 }
 
 func contains(slice []string, str string) bool {
