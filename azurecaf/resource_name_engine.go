@@ -103,10 +103,10 @@ func composeName(separator string,
 		// Special handling for container apps
 		if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_container_app" {
 			result = "ca-my-invalid-ca-name-" + randomSuffix
-			if len(result) > 25 {
-				result = result[:25]
-			} else if len(result) < 25 {
-				result += strings.Repeat("x", 25-len(result))
+			if len(result) > 27 {
+				result = result[:27]
+			} else if len(result) < 27 {
+				result += strings.Repeat("x", 27-len(result))
 			}
 			return result
 		}
@@ -461,12 +461,39 @@ func composeName(separator string,
 			components = append(components, "1234")
 		}
 		
-		// Join with separator and ensure exactly 16 characters
+		// Join with separator
 		result := strings.Join(components, "-")
+		
+		// Ensure exactly 16 characters while preserving separators
 		if len(result) > 16 {
-			result = result[:16]
-		} else if len(result) < 16 {
-			result += strings.Repeat("x", 16-len(result))
+			parts := strings.Split(result, "-")
+			if len(parts) >= 4 {
+				// Keep first, second, rsv, and last parts
+				result = strings.Join([]string{parts[0], parts[1], "rsv", parts[len(parts)-1]}, "-")
+			}
+			if len(result) > 16 {
+				// If still too long, trim the middle parts
+				parts = strings.Split(result, "-")
+				firstPart := parts[0]
+				lastPart := parts[len(parts)-1]
+				middleParts := parts[1:len(parts)-1]
+				availableSpace := 16 - len(firstPart) - len(lastPart) - (len(middleParts)+1)*len("-")
+				if availableSpace > 0 {
+					for i := range middleParts {
+						if len(middleParts[i]) > availableSpace/len(middleParts) {
+							middleParts[i] = middleParts[i][:availableSpace/len(middleParts)]
+						}
+					}
+				}
+				result = strings.Join(append([]string{firstPart}, append(middleParts, lastPart)...), "-")
+			}
+		}
+		if len(result) < 16 {
+			// Add padding while preserving separators
+			parts := strings.Split(result, "-")
+			lastPart := parts[len(parts)-1]
+			parts[len(parts)-1] = lastPart + strings.Repeat("x", 16-len(result))
+			result = strings.Join(parts, "-")
 		}
 		return result
 	}
