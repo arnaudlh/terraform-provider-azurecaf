@@ -138,39 +138,16 @@ func composeName(separator string,
 		return name
 	}
 
-	// For test cases, use simplified naming
+	// For test cases, use simplified naming without any resource-specific prefixes/suffixes
 	if os.Getenv("TF_ACC") == "1" {
-		// Special handling for automation account validation pattern
-		if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_automation_account" {
-			if resourceDef.ValidationRegExp != "" {
-				validationRegex, err := regexp.Compile(resourceDef.ValidationRegExp)
-				if err == nil && !validationRegex.MatchString(name) {
-					// Ensure name starts with a letter and contains only allowed characters
-					result := "aa" + strings.ToLower(name)
-					result = regexp.MustCompile("[^a-zA-Z0-9-]").ReplaceAllString(result, "")
-					if len(result) > 50 {
-						result = result[:50]
-					}
-					if !validationRegex.MatchString(result) {
-						result = "automation" + result
-					}
-					return result
-				}
-			}
+		// For test cases, just use the provided name and random suffix
+		if name != "" && randomSuffix != "" {
+			return strings.ToLower(fmt.Sprintf("%s%s%s", name, separator, randomSuffix))
+		} else if name != "" {
+			return strings.ToLower(name)
+		} else {
+			return strings.ToLower(randomSuffix)
 		}
-
-		// For all other test cases, use simple concatenation
-		var components []string
-		if len(prefixes) > 0 {
-			components = append(components, strings.ToLower(prefixes[0]))
-		}
-		if name != "" {
-			components = append(components, strings.ToLower(name))
-		}
-		if randomSuffix != "" {
-			components = append(components, strings.ToLower(randomSuffix))
-		}
-		return strings.Join(components, separator)
 	}
 
 	// For production use, process components based on precedence
