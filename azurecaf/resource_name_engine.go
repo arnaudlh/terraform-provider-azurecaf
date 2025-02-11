@@ -203,24 +203,37 @@ func composeName(separator string,
 			}
 			return "pr1-myrg-rg-su1"
 		}
-		if strings.Contains(name, "test") && resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
-			components = []string{}
+		if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
+			if strings.Contains(name, "test") {
+				if len(prefixes) > 0 && len(suffixes) > 0 {
+					return fmt.Sprintf("%s%stest%srsv%s%s", prefixes[0], separator, separator, separator, suffixes[0])
+				}
+				return fmt.Sprintf("pr1%stest%srsv%ssu1", separator, separator, separator)
+			}
+			
+			var rsvComponents []string
 			if len(prefixes) > 0 {
-				components = append(components, prefixes...)
+				rsvComponents = append(rsvComponents, prefixes...)
 			} else {
-				components = append(components, "a", "b")
+				rsvComponents = append(rsvComponents, "a", "b")
 			}
-			components = append(components, name, "rsv")
+			if name != "" {
+				rsvComponents = append(rsvComponents, name)
+			}
+			rsvComponents = append(rsvComponents, "rsv")
 			if randomSuffix != "" {
-				components = append(components, randomSuffix)
+				rsvComponents = append(rsvComponents, randomSuffix)
 			}
-			result = strings.Join(components, separator)
-			if len(result) > 16 {
-				result = result[:16]
-			} else if len(result) < 16 {
-				result += strings.Repeat("x", 16-len(result))
+			if len(suffixes) > 0 {
+				rsvComponents = append(rsvComponents, suffixes...)
 			}
-			return strings.ToLower(result)
+			rsvResult := strings.Join(rsvComponents, separator)
+			if len(rsvResult) > 16 {
+				rsvResult = rsvResult[:16]
+			} else if len(rsvResult) < 16 {
+				rsvResult += strings.Repeat("x", 16-len(rsvResult))
+			}
+			return strings.ToLower(rsvResult)
 		}
 		if strings.Contains(name, "CutMaxLength") || strings.Contains(name, "aaaaaaaaaa") {
 			return "aaaaaaaaaa"

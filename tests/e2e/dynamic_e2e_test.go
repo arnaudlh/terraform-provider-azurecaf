@@ -16,9 +16,25 @@ func TestDynamicResourceTypes(t *testing.T) {
 		t.Skip("Skipping E2E tests in short mode")
 	}
 
-	data, err := os.ReadFile("resourceDefinition.json")
+	// Search for resourceDefinition.json in multiple locations
+	searchPaths := []string{
+		"resourceDefinition.json",
+		"../../resourceDefinition.json",
+		"../resourceDefinition.json",
+		os.Getenv("HOME") + "/repos/terraform-provider-azurecaf/resourceDefinition.json",
+	}
+
+	var data []byte
+	var err error
+	for _, path := range searchPaths {
+		data, err = os.ReadFile(path)
+		if err == nil {
+			t.Logf("Found resource definitions at: %s", path)
+			break
+		}
+	}
 	if err != nil {
-		t.Fatalf("Failed to read resource definitions: %v", err)
+		t.Fatalf("Failed to read resource definitions from any of the search paths: %v", err)
 	}
 
 	var definitions []models.ResourceStructure
