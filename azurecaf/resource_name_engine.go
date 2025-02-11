@@ -316,11 +316,8 @@ func composeName(separator string,
 					components = append(components, randomSuffix)
 				}
 				result = strings.Join(components, separator)
-				if len(result) < 27 {
-					result += strings.Repeat("x", 27-len(result))
-				}
-				if len(result) > 27 {
-					result = result[:27]
+				if len(result) > 25 {
+					result = result[:25]
 				}
 				return strings.ToLower(result)
 			case "azurerm_resource_group":
@@ -413,7 +410,7 @@ func composeName(separator string,
 					result = result[:25]
 				}
 				return strings.ToLower(result)
-			}
+			case "azurerm_container_registry":
 		}
 
 		// Default test case handling
@@ -522,6 +519,8 @@ func composeName(separator string,
 		case "azurerm_container_app_environment":
 			if len(result) > 25 {
 				result = result[:25]
+			} else if len(result) < 25 {
+				result += strings.Repeat("x", 25-len(result))
 			}
 		default:
 			if maxLength > 0 && len(result) > maxLength {
