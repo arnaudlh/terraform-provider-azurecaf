@@ -100,24 +100,30 @@ func composeName(separator string,
 	// Special handling for container apps and environments
 	if resourceDef != nil && (resourceDef.ResourceTypeName == "azurerm_container_app" || resourceDef.ResourceTypeName == "azurerm_container_app_environment") {
 		// Build name components
+		var components []string
+		
+		// Add prefix
 		prefix := "ca"
 		if resourceDef.ResourceTypeName == "azurerm_container_app_environment" {
 			prefix = "cae"
 		}
+		components = append(components, prefix)
 		
-		// Build name with proper hyphenation
-		var nameComponent string
+		// Add name with proper hyphenation
 		if name != "" {
-			nameComponent = strings.ReplaceAll(name, "_", "-")
+			nameComponent := strings.ReplaceAll(name, "_", "-")
+			components = append(components, nameComponent)
 		} else {
-			nameComponent = "my-invalid-ca-name"
+			components = append(components, "my-invalid-ca-name")
 		}
 		
-		// Combine components
-		result := prefix + separator + nameComponent
+		// Add random suffix if present
 		if randomSuffix != "" {
-			result += separator + randomSuffix
+			components = append(components, randomSuffix)
 		}
+		
+		// Join with separator
+		result := strings.Join(components, separator)
 		
 		// For container apps, ensure exactly 27 characters
 		if resourceDef.ResourceTypeName == "azurerm_container_app" {
@@ -178,9 +184,20 @@ func composeName(separator string,
 		// Join with separator
 		result := strings.Join(components, separator)
 		
-		// Ensure minimum length of 16 characters with padding
+		// Ensure minimum length of 16 characters by padding the name component
 		if len(result) < 16 {
-			result += strings.Repeat("x", 16-len(result))
+			nameIndex := -1
+			for i, comp := range components {
+				if comp == name {
+					nameIndex = i
+					break
+				}
+			}
+			if nameIndex >= 0 {
+				padding := strings.Repeat("x", 16-len(result))
+				components[nameIndex] = name + padding
+				result = strings.Join(components, separator)
+			}
 		}
 		
 		// Ensure maximum length
