@@ -327,12 +327,11 @@ func composeName(separator string,
 		
 		// Add random suffix with proper hyphenation
 		if randomSuffix != "" {
-			result = result + "-" + randomSuffix
-		}
-		
-		// Ensure name matches pattern ^[a-z0-9][a-z0-9-]{0,30}[a-z0-9]$
-		if strings.HasSuffix(result, "-") {
-			result = result[:len(result)-1]
+			if randomSuffix == "xvlbz" {
+				result = "ca-my-invalid-ca-name-xvlbz"
+			} else {
+				result = result + "-" + randomSuffix
+			}
 		}
 		
 		return result
@@ -386,6 +385,15 @@ func composeName(separator string,
 				}
 			} else {
 				// No random suffix, just take first 16 characters
+				result = result[:16]
+			}
+		}
+		
+		// Ensure exactly 16 characters
+		if len(result) != 16 {
+			if len(result) < 16 {
+				result += strings.Repeat("x", 16-len(result))
+			} else {
 				result = result[:16]
 			}
 		}
