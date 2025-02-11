@@ -352,11 +352,33 @@ func getResourceName(resourceTypeName string, separator string,
 	}
 
 	if !validationRegEx.MatchString(resourceName) {
-		minLengthRegex := regexp.MustCompile(`\{(\d+),`)
-		if matches := minLengthRegex.FindStringSubmatch(resource.ValidationRegExp); len(matches) > 1 {
-			if minLength, err := strconv.Atoi(matches[1]); err == nil {
-				for len(resourceName) < minLength {
-					resourceName += "x"
+		// Handle special cases for resources with specific patterns
+		switch resourceTypeName {
+		case "azurerm_automation_account":
+			// Ensure name starts with a letter
+			if len(resourceName) > 0 && !regexp.MustCompile(`^[a-zA-Z]`).MatchString(resourceName) {
+				resourceName = "a" + resourceName
+			}
+			// Ensure minimum length with valid characters
+			minLengthRegex := regexp.MustCompile(`\{(\d+),`)
+			if matches := minLengthRegex.FindStringSubmatch(resource.ValidationRegExp); len(matches) > 1 {
+				if minLength, err := strconv.Atoi(matches[1]); err == nil {
+					for len(resourceName) < minLength {
+						resourceName += "x"
+					}
+				}
+			}
+			// Ensure name ends with alphanumeric
+			if len(resourceName) > 0 && !regexp.MustCompile(`[a-zA-Z0-9]$`).MatchString(resourceName) {
+				resourceName = resourceName + "x"
+			}
+		default:
+			minLengthRegex := regexp.MustCompile(`\{(\d+),`)
+			if matches := minLengthRegex.FindStringSubmatch(resource.ValidationRegExp); len(matches) > 1 {
+				if minLength, err := strconv.Atoi(matches[1]); err == nil {
+					for len(resourceName) < minLength {
+						resourceName += "x"
+					}
 				}
 			}
 		}
