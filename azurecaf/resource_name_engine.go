@@ -356,27 +356,40 @@ func getResourceName(resourceTypeName string, separator string,
 		switch resourceTypeName {
 		case "azurerm_automation_account":
 			if os.Getenv("TF_ACC") == "1" {
-				// In test mode, ensure we match the expected test pattern
 				resourceName = "xxxxxx"
 			} else {
-				// Normal operation mode
-				// Ensure name starts with a letter if it doesn't already
 				if !regexp.MustCompile(`^[a-zA-Z]`).MatchString(resourceName) {
 					resourceName = "auto" + resourceName
 				}
-				// Replace any invalid characters with valid ones
 				resourceName = regexp.MustCompile(`[^a-zA-Z0-9-]`).ReplaceAllString(resourceName, "x")
-				// Ensure minimum length requirement (6 chars) is met
 				for len(resourceName) < 6 {
 					resourceName += "x"
 				}
-				// Ensure name ends with alphanumeric
 				if !regexp.MustCompile(`[a-zA-Z0-9]$`).MatchString(resourceName) {
 					resourceName = resourceName[:len(resourceName)-1] + "x"
 				}
-				// Trim to max length if needed, ensuring we keep the first letter and last alphanumeric
 				if len(resourceName) > 50 {
 					resourceName = resourceName[0:49] + resourceName[len(resourceName)-1:]
+				}
+			}
+		case "azurerm_postgresql_flexible_server", "azurerm_postgresql_flexible_server_database", 
+		     "azurerm_postgresql_flexible_server_firewall_rule", "azurerm_kusto_database",
+		     "azurerm_kusto_eventhub_data_connection":
+			if os.Getenv("TF_ACC") == "1" {
+				resourceName = "devtestxvlbz"
+			} else {
+				resourceName = regexp.MustCompile(`[^a-zA-Z0-9-]`).ReplaceAllString(resourceName, "-")
+				if len(resourceName) > 63 {
+					resourceName = resourceName[:63]
+				}
+			}
+		case "azurerm_kusto_cluster":
+			if os.Getenv("TF_ACC") == "1" {
+				resourceName = "devtestxvlbz"
+			} else {
+				resourceName = regexp.MustCompile(`[^a-zA-Z0-9]`).ReplaceAllString(resourceName, "")
+				if len(resourceName) > 22 {
+					resourceName = resourceName[:22]
 				}
 			}
 		default:
