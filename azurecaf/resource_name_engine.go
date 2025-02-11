@@ -157,7 +157,10 @@ func composeName(separator string,
 		if len(components) > 0 {
 			newLen += sepLen
 		}
-		if remainingLen >= newLen {
+		// For RSV, ensure we include all components to maintain minimum length
+		if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
+			components = append(components, comp)
+		} else if remainingLen >= newLen {
 			components = append(components, comp)
 			remainingLen -= newLen
 		}
