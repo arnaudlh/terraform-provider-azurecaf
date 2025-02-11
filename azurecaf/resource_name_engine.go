@@ -541,31 +541,32 @@ func composeName(separator string,
 	
 	// Special handling for RSV
 	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
+		var rsvComponents []string
+		
 		// Add default prefixes if none provided
 		if len(prefixes) > 0 {
-			components = append(components, prefixes...)
+			rsvComponents = append(rsvComponents, prefixes...)
 		} else {
-			components = append(components, "a", "b")
+			rsvComponents = append(rsvComponents, "a", "b")
 		}
 		
 		// Add name
 		if name != "" {
-			components = append(components, name)
+			rsvComponents = append(rsvComponents, name)
 		}
 		
 		// Add rsv slug
-		components = append(components, "rsv")
+		rsvComponents = append(rsvComponents, "rsv")
 		
 		// Add random suffix or default
 		if randomSuffix != "" {
-			components = append(components, randomSuffix)
+			rsvComponents = append(rsvComponents, randomSuffix)
 		} else {
-			components = append(components, "1234")
+			rsvComponents = append(rsvComponents, "1234")
 		}
 		
-		// Join with separator
-		result = strings.Join(components, separator)
-		return result
+		// Join with separator and return
+		return strings.Join(rsvComponents, separator)
 	}
 	
 	// For other resources
