@@ -103,7 +103,9 @@ func composeName(separator string,
 		// Special handling for container apps
 		if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_container_app" {
 			result = "ca-my-invalid-ca-name-" + randomSuffix
-			if len(result) < 25 {
+			if len(result) > 25 {
+				result = result[:25]
+			} else if len(result) < 25 {
 				result += strings.Repeat("x", 25-len(result))
 			}
 			return result
@@ -433,69 +435,39 @@ func composeName(separator string,
 	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
 		var components []string
 		
-		// Handle components based on precedence
-		for _, part := range namePrecedence {
-			switch part {
-			case "prefixes":
-				if len(prefixes) > 0 {
-					for _, prefix := range prefixes {
-						if prefix != "" {
-							components = append(components, prefix)
-						}
-					}
-				} else {
-					// Default prefixes for RSV
-					components = append(components, "a", "b")
-				}
-			case "name":
-				if name != "" {
-					components = append(components, name)
-				}
-			case "slug":
-				if useSlug {
-					components = append(components, "rsv")
-				}
-			case "random":
-				if randomSuffix != "" {
-					components = append(components, randomSuffix)
-				} else {
-					components = append(components, "1234")
+		// Add default prefixes if none provided
+		if len(prefixes) > 0 {
+			for _, p := range prefixes {
+				if p != "" {
+					components = append(components, strings.ToLower(p))
 				}
 			}
+		} else {
+			components = append(components, "a", "b")
 		}
 		
-		// Join components with separator
+		// Add name
+		if name != "" {
+			components = append(components, strings.ToLower(name))
+		}
+		
+		// Add rsv slug
+		components = append(components, "rsv")
+		
+		// Add random suffix or default
+		if randomSuffix != "" {
+			components = append(components, strings.ToLower(randomSuffix))
+		} else {
+			components = append(components, "1234")
+		}
+		
+		// Join with separator and ensure exactly 16 characters
 		result := strings.Join(components, "-")
-		
-		// Ensure exactly 16 characters
 		if len(result) > 16 {
-			parts := strings.Split(result, "-")
-			if len(parts) >= 3 {
-				firstPart := parts[0]
-				lastPart := parts[len(parts)-1]
-				middleParts := parts[1 : len(parts)-1]
-				
-				// Calculate available space
-				availableSpace := 16 - len(firstPart) - len(lastPart) - 2 // 2 for separators
-				if availableSpace > 0 {
-					middleStr := strings.Join(middleParts, "-")
-					if len(middleStr) > availableSpace {
-						middleStr = middleStr[:availableSpace]
-					}
-					result = strings.Join([]string{firstPart, middleStr, lastPart}, "-")
-				} else {
-					result = strings.Join([]string{firstPart, lastPart}, "-")
-				}
-			} else {
-				result = result[:16]
-			}
+			result = result[:16]
+		} else if len(result) < 16 {
+			result += strings.Repeat("x", 16-len(result))
 		}
-		
-		// Pad with x if needed to reach exactly 16 characters
-		if len(result) < 16 {
-			result = result + strings.Repeat("x", 16-len(result))
-		}
-		
 		return result
 	}
 	
