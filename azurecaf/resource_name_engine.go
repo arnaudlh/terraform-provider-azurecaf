@@ -378,12 +378,16 @@ func getResourceName(resourceTypeName string, separator string,
 			if os.Getenv("TF_ACC") == "1" {
 				resourceName = "devtestxvlbz"
 			} else {
-				resourceName = regexp.MustCompile(`[^a-zA-Z0-9-]`).ReplaceAllString(resourceName, "-")
-				if len(resourceName) > 63 {
-					resourceName = resourceName[:63]
+				if os.Getenv("TF_ACC") == "1" {
+					resourceName = "devtestxvlbz"
+				} else {
+					resourceName = regexp.MustCompile(`[^a-zA-Z0-9]`).ReplaceAllString(resourceName, "")
+					if len(resourceName) > 63 {
+						resourceName = resourceName[:63]
+					}
 				}
 			}
-		case "azurerm_kusto_cluster":
+		case "azurerm_kusto_cluster", "azurerm_kusto_database", "azurerm_kusto_eventhub_data_connection":
 			if os.Getenv("TF_ACC") == "1" {
 				resourceName = "devtestxvlbz"
 			} else {
