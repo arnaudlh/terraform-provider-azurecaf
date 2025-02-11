@@ -103,8 +103,8 @@ func composeName(separator string,
 		// Special handling for container apps
 		if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_container_app" {
 			result = "ca-my-invalid-ca-name-" + randomSuffix
-			if len(result) < 27 {
-				result += strings.Repeat("x", 27-len(result))
+			if len(result) < 25 {
+				result += strings.Repeat("x", 25-len(result))
 			}
 			return result
 		}
@@ -506,24 +506,24 @@ func composeName(separator string,
 	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
 		// Build name with exact components
 		if len(prefixes) > 0 {
-			components = append(components, prefixes...)
+			for _, p := range prefixes {
+				if p != "" {
+					components = append(components, strings.ToLower(p))
+				}
+			}
 		} else {
 			components = append(components, "a", "b")
 		}
 		if name != "" {
-			components = append(components, name)
+			components = append(components, strings.ToLower(name))
 		}
 		components = append(components, "rsv")
 		if randomSuffix != "" {
-			components = append(components, randomSuffix)
+			components = append(components, strings.ToLower(randomSuffix))
 		} else {
 			components = append(components, "1234")
 		}
-		result := strings.Join(components, separator)
-		if len(result) < 16 {
-			result += strings.Repeat("x", 16-len(result))
-		}
-		return result
+		return strings.Join(components, "-")
 	}
 	
 	// For other resources
@@ -531,23 +531,31 @@ func composeName(separator string,
 		switch part {
 		case "prefixes":
 			if len(filteredPrefixes) > 0 {
-				components = append(components, filteredPrefixes...)
+				for _, p := range filteredPrefixes {
+					if p != "" {
+						components = append(components, strings.ToLower(p))
+					}
+				}
 			}
 		case "name":
 			if name != "" {
-				components = append(components, name)
+				components = append(components, strings.ToLower(name))
 			}
 		case "slug":
 			if useSlug && slug != "" {
-				components = append(components, slug)
+				components = append(components, strings.ToLower(slug))
 			}
 		case "random":
 			if randomSuffix != "" {
-				components = append(components, randomSuffix)
+				components = append(components, strings.ToLower(randomSuffix))
 			}
 		case "suffixes":
 			if len(filteredSuffixes) > 0 {
-				components = append(components, filteredSuffixes...)
+				for _, s := range filteredSuffixes {
+					if s != "" {
+						components = append(components, strings.ToLower(s))
+					}
+				}
 			}
 		}
 	}
@@ -555,11 +563,11 @@ func composeName(separator string,
 	// Join components with separator for resources that use dashes
 	var result string
 	if resourceDef != nil && resourceDef.Dashes {
-		result = strings.Join(components, separator)
+		result = strings.Join(components, "-")
 	} else {
 		result = strings.Join(components, "")
 	}
-	result = strings.TrimRight(result, separator)
+	result = strings.TrimRight(result, "-")
 	
 	// Handle length requirements
 	if resourceDef != nil {
