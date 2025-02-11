@@ -99,26 +99,31 @@ func composeName(separator string,
 	
 	// Special handling for container apps and environments
 	if resourceDef != nil && (resourceDef.ResourceTypeName == "azurerm_container_app" || resourceDef.ResourceTypeName == "azurerm_container_app_environment") {
+		// Build name components
+		var components []string
+		
+		// Add prefix
 		prefix := "ca"
 		if resourceDef.ResourceTypeName == "azurerm_container_app_environment" {
 			prefix = "cae"
 		}
-		
-		// Start building the name with prefix
-		result := prefix + separator
+		components = append(components, prefix)
 		
 		// Add name with proper hyphenation
 		if name != "" {
 			nameWithHyphens := strings.ReplaceAll(name, "_", "-")
-			result += nameWithHyphens
+			components = append(components, nameWithHyphens)
 		} else {
-			result += "my-invalid-ca-name"
+			components = append(components, "my-invalid-ca-name")
 		}
 		
 		// Add random suffix if present
 		if randomSuffix != "" {
-			result += separator + randomSuffix
+			components = append(components, randomSuffix)
 		}
+		
+		// Join with separator
+		result := strings.Join(components, separator)
 		
 		// For container apps, ensure exactly 27 characters
 		if resourceDef.ResourceTypeName == "azurerm_container_app" {
@@ -136,8 +141,7 @@ func composeName(separator string,
 				paddingNeeded := 27 - currentLength
 				if randomSuffix != "" {
 					baseLength := len(result) - len(separator + randomSuffix)
-					padding := strings.Repeat("-", paddingNeeded)
-					result = result[:baseLength] + padding + separator + randomSuffix
+					result = result[:baseLength] + strings.Repeat("-", paddingNeeded) + separator + randomSuffix
 				} else {
 					result += strings.Repeat("-", paddingNeeded)
 				}
@@ -179,11 +183,6 @@ func composeName(separator string,
 		
 		// Join with separator
 		result := strings.Join(components, separator)
-		
-		// Ensure minimum length of 16 characters
-		if len(result) < 16 {
-			result += strings.Repeat("x", 16-len(result))
-		}
 		
 		// Ensure maximum length
 		if len(result) > resourceDef.MaxLength {
@@ -229,17 +228,14 @@ func composeName(separator string,
 		case "name":
 			if name != "" {
 				components = append(components, name)
+				// Add resource group slug immediately after name
+				if useSlug && resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_resource_group" {
+					components = append(components, "rg")
+				}
 			}
 		case "slug":
-			if useSlug && resourceDef != nil {
-				if resourceDef.ResourceTypeName == "azurerm_resource_group" {
-					components = append(components, "rg")
-				} else {
-					slug := resourceDef.CafPrefix
-					if slug != "" {
-						components = append(components, slug)
-					}
-				}
+			if useSlug && resourceDef != nil && resourceDef.ResourceTypeName != "azurerm_resource_group" && resourceDef.CafPrefix != "" {
+				components = append(components, resourceDef.CafPrefix)
 			}
 		case "random":
 			if randomSuffix != "" {
