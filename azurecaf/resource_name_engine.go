@@ -313,11 +313,6 @@ func composeName(separator string,
 	
 	// For container apps
 	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_container_app" {
-		// Special case for test with seed 123
-		if name == "my-invalid-ca-name" && randomSuffix == "xvlbz" {
-			return "ca-my-invalid-ca-name-xvlbz"
-		}
-		
 		// Build base name
 		result := "ca-"
 		if name != "" {
@@ -326,21 +321,18 @@ func composeName(separator string,
 			result += "my-invalid-ca-name"
 		}
 		
-		// Clean up any double hyphens
+		// Add random suffix with proper hyphenation
+		if randomSuffix != "" {
+			result += "-" + randomSuffix
+		}
+		
+		// Clean up any double hyphens and trailing hyphens
 		result = strings.ReplaceAll(result, "--", "-")
 		result = strings.TrimRight(result, "-")
 		
-		// Add random suffix with proper hyphenation
-		if randomSuffix != "" {
-			result = result + "-" + randomSuffix
-		}
-		
 		// Ensure name matches pattern ^[a-z0-9][a-z0-9-]{0,30}[a-z0-9]$
 		if strings.HasSuffix(result, "-") {
-			result = result + "x"
-		}
-		if len(result) > 32 {
-			result = result[:32]
+			result += "x"
 		}
 		
 		return result
@@ -348,17 +340,16 @@ func composeName(separator string,
 	
 	// For Recovery Services Vault
 	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
-		// Special case for test with prefixes ["pr1"] and suffixes ["su1"]
-		if len(prefixes) == 1 && prefixes[0] == "pr1" && len(suffixes) == 1 && suffixes[0] == "su1" && name == "test" {
-			return "pr1-test-rsv-su1"
-		}
-		
 		// Build base name with prefixes
 		var components []string
 		
-		// Add prefixes
+		// Add prefixes (limited to 2)
 		if len(prefixes) > 0 {
-			components = append(components, prefixes...)
+			count := len(prefixes)
+			if count > 2 {
+				count = 2
+			}
+			components = append(components, prefixes[:count]...)
 		}
 		
 		// Add name
@@ -369,20 +360,28 @@ func composeName(separator string,
 		// Add rsv slug
 		components = append(components, "rsv")
 		
-		// Add suffixes
+		// Add random suffix if present
+		if randomSuffix != "" {
+			components = append(components, randomSuffix)
+		}
+		
+		// Add suffixes (limited to 2)
 		if len(suffixes) > 0 {
-			components = append(components, suffixes...)
+			count := len(suffixes)
+			if count > 2 {
+				count = 2
+			}
+			components = append(components, suffixes[:count]...)
 		}
 		
 		// Join with separator and ensure lowercase
 		result := strings.ToLower(strings.Join(components, separator))
 		
 		// For RSV, we need exactly 16 characters
-		if len(result) < 16 {
-			// Add 'x' characters to reach 16 characters
-			result += strings.Repeat("x", 16-len(result))
-		} else if len(result) > 16 {
-			// Take first 16 characters
+		currentLength := len(result)
+		if currentLength < 16 {
+			result += strings.Repeat("x", 16-currentLength)
+		} else if currentLength > 16 {
 			result = result[:16]
 		}
 		
@@ -390,24 +389,29 @@ func composeName(separator string,
 	}
 	
 	// For all other resources, follow standard precedence
+	components = nil
 	for _, part := range namePrecedence {
 		switch part {
 		case "prefixes":
-			components = append(components, filteredPrefixes...)
+			if len(filteredPrefixes) > 0 {
+				components = append(components, filteredPrefixes...)
+			}
 		case "name":
 			if name != "" {
 				components = append(components, name)
 			}
 		case "slug":
-			if useSlug && resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_resource_group" {
-				components = append(components, "rg")
+			if useSlug && slug != "" {
+				components = append(components, slug)
 			}
 		case "random":
 			if randomSuffix != "" {
 				components = append(components, randomSuffix)
 			}
 		case "suffixes":
-			components = append(components, filteredSuffixes...)
+			if len(filteredSuffixes) > 0 {
+				components = append(components, filteredSuffixes...)
+			}
 		}
 	}
 	
