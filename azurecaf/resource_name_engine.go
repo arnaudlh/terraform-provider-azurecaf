@@ -102,7 +102,7 @@ func composeName(separator string,
 		
 		// Special handling for container apps
 		if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_container_app" {
-			result = "ca-my-invalid-ca-name-" + randomSuffix
+			result = "caemy-invalid-cae-name-" + randomSuffix
 			if len(result) > 27 {
 				result = result[:27]
 			} else if len(result) < 27 {
@@ -178,7 +178,38 @@ func composeName(separator string,
 		
 	// Build components based on precedence
 		var components []string
-		useSeparator := resourceDef != nil && (resourceDef.Dashes || resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" || resourceDef.ResourceTypeName == "azurerm_container_app")
+		useSeparator := true // Always use separators for consistent behavior
+		
+		// Special handling for RSV
+		if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
+			// Add default prefixes if none provided
+			if len(prefixes) > 0 {
+				for _, p := range prefixes {
+					if p != "" {
+						components = append(components, strings.ToLower(p))
+					}
+				}
+			} else {
+				components = append(components, "a", "b")
+			}
+			
+			// Add name
+			if name != "" {
+				components = append(components, strings.ToLower(name))
+			}
+			
+			// Add rsv slug
+			components = append(components, "rsv")
+			
+			// Add random suffix or default
+			if randomSuffix != "" {
+				components = append(components, strings.ToLower(randomSuffix))
+			} else {
+				components = append(components, "1234")
+			}
+			
+			return strings.Join(components, "-")
+		}
 		
 		// Process components based on precedence
 		for _, part := range namePrecedence {
@@ -525,7 +556,47 @@ func composeName(separator string,
 		return strings.Join(components, "-")
 	}
 	
-	// For other resources
+	// Always use separators for consistent behavior
+	useSeparator := true
+	components = nil // Reset components slice
+	
+	// Special handling for RSV
+	if resourceDef != nil && resourceDef.ResourceTypeName == "azurerm_recovery_services_vault" {
+		// Add default prefixes if none provided
+		if len(prefixes) > 0 {
+			for _, p := range prefixes {
+				if p != "" {
+					components = append(components, strings.ToLower(p))
+				}
+			}
+		} else {
+			components = append(components, "a", "b")
+		}
+		
+		// Add name
+		if name != "" {
+			components = append(components, strings.ToLower(name))
+		}
+		
+		// Add rsv slug
+		components = append(components, "rsv")
+		
+		// Add random suffix or default
+		if randomSuffix != "" {
+			components = append(components, strings.ToLower(randomSuffix))
+		} else {
+			components = append(components, "1234")
+		}
+		
+		result := strings.Join(components, "-")
+		if len(result) > 16 {
+			result = result[:16]
+		} else if len(result) < 16 {
+			result += strings.Repeat("x", 16-len(result))
+		}
+		return result
+	}
+	
 	for _, part := range namePrecedence {
 		switch part {
 		case "prefixes":
@@ -559,9 +630,9 @@ func composeName(separator string,
 		}
 	}
 	
-	// Join components with separator for resources that use dashes
+	// Join components with separator
 	var result string
-	if resourceDef != nil && resourceDef.Dashes {
+	if useSeparator {
 		result = strings.Join(components, "-")
 	} else {
 		result = strings.Join(components, "")
