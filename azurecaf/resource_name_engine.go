@@ -290,6 +290,7 @@ func composeName(separator string,
 	}
 	
 	// For other resource types, follow standard precedence
+	var components []string
 	for _, part := range namePrecedence {
 		switch part {
 		case "prefixes":
@@ -328,7 +329,7 @@ func composeName(separator string,
 		}
 	}
 	
-	// Join components with separator and handle special cases
+	// Join components with separator
 	result := strings.Join(components, separator)
 	
 	// Special handling for RSV to ensure 16 characters
