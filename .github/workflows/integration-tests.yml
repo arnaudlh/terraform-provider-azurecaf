@@ -32,6 +32,8 @@ jobs:
       - name: Run Integration Tests
         run: |
           mkdir -p test-results
+          # Copy resource definitions for tests
+          cp resourceDefinition.json azurecaf/
           go test -v -tags=integration ./azurecaf/... 2>&1 | go-junit-report > test-results/integration-tests-report.xml
 
       - name: Generate Test Report

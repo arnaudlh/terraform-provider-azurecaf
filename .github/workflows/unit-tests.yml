@@ -32,6 +32,8 @@ jobs:
       - name: Run Unit Tests
         run: |
           mkdir -p test-results
+          # Copy resource definitions for tests
+          cp resourceDefinition.json azurecaf/
           go test -v -coverprofile=coverage.out ./azurecaf/... 2>&1 | tee >(go-junit-report > test-results/unit-tests-report.xml)
 
       - name: Generate Test Report

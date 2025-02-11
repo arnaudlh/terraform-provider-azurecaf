@@ -41,6 +41,13 @@ jobs:
         run: |
           mkdir -p test-results
           cd tests/e2e
+          # Copy resource definitions
+          cp ../../resourceDefinition.json .
+          # Build and install provider
+          go build -o terraform-provider-azurecaf ../../
+          mkdir -p terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/2.0.0-preview5/linux_amd64/
+          mv terraform-provider-azurecaf terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/2.0.0-preview5/linux_amd64/terraform-provider-azurecaf_v2.0.0-preview5
+          chmod +x terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/2.0.0-preview5/linux_amd64/terraform-provider-azurecaf_v2.0.0-preview5
           # Run tests and capture both output and generate report
           go test -v -timeout 30m ./... 2>&1 | tee >(go-junit-report > ../../test-results/e2e-tests-report.xml)
         env:
