@@ -330,13 +330,9 @@ func composeName(separator string,
 			result = result + "-" + randomSuffix
 		}
 		
-		// Remove any trailing hyphens and ensure proper format
-		result = strings.TrimRight(result, "-")
-		if strings.Contains(result, "xvlbz") {
-			parts := strings.Split(result, "-xvlbz")
-			if len(parts) > 0 {
-				result = parts[0] + "-xvlbz"
-			}
+		// Ensure name matches pattern ^[a-z0-9][a-z0-9-]{0,30}[a-z0-9]$
+		if strings.HasSuffix(result, "-") {
+			result = result[:len(result)-1]
 		}
 		
 		return result
@@ -347,13 +343,9 @@ func composeName(separator string,
 		// Build base name with prefixes
 		var components []string
 		
-		// Add prefixes (limited to 2)
+		// Add prefixes
 		if len(prefixes) > 0 {
-			count := len(prefixes)
-			if count > 2 {
-				count = 2
-			}
-			components = append(components, prefixes[:count]...)
+			components = append(components, prefixes...)
 		}
 		
 		// Add name
@@ -361,21 +353,14 @@ func composeName(separator string,
 			components = append(components, name)
 		}
 		
-		// Add rsv slug
-		components = append(components, "rsv")
-		
 		// Add random suffix if present
 		if randomSuffix != "" {
 			components = append(components, randomSuffix)
 		}
 		
-		// Add suffixes (limited to 2)
+		// Add suffixes
 		if len(suffixes) > 0 {
-			count := len(suffixes)
-			if count > 2 {
-				count = 2
-			}
-			components = append(components, suffixes[:count]...)
+			components = append(components, suffixes...)
 		}
 		
 		// Join with separator and ensure lowercase
@@ -384,9 +369,25 @@ func composeName(separator string,
 		// Ensure exactly 16 characters
 		currentLength := len(result)
 		if currentLength < 16 {
+			// Add 'x' characters to reach 16 characters
 			result += strings.Repeat("x", 16-currentLength)
 		} else if currentLength > 16 {
-			result = result[:16]
+			// If we have a random suffix, try to preserve it
+			if randomSuffix != "" {
+				// Calculate how much space we need for the random suffix
+				suffixLength := len(randomSuffix)
+				baseLength := 16 - suffixLength - 1 // Account for separator
+				if baseLength > 0 {
+					// Take the first part of the base name and append the random suffix
+					result = result[:baseLength] + separator + randomSuffix
+				} else {
+					// If we can't fit both, just take the first 16 characters
+					result = result[:16]
+				}
+			} else {
+				// No random suffix, just take first 16 characters
+				result = result[:16]
+			}
 		}
 		
 		return result
