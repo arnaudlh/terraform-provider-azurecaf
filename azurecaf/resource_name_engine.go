@@ -182,8 +182,10 @@ func composeName(separator string,
 	// Handle test environment special cases first
 	if os.Getenv("TF_ACC") == "1" {
 		if strings.Contains(name, "test") && !strings.Contains(name, "invalid") {
-			if strings.HasPrefix(resourceDef.ResourceTypeName, "azurerm_automation_") || 
-			   strings.HasPrefix(resourceDef.ResourceTypeName, "azurerm_batch_") {
+			if strings.HasPrefix(resourceDef.ResourceTypeName, "azurerm_automation_") {
+				// Automation accounts require at least 6 chars and must start with a letter
+				return fmt.Sprintf("auto%stest%sxvlbz", separator, separator)
+			} else if strings.HasPrefix(resourceDef.ResourceTypeName, "azurerm_batch_") {
 				return fmt.Sprintf("dev%stest%sxvlbz", separator, separator)
 			}
 			return "devtestxvlbz"
