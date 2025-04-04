@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestGetResource(t *testing.T) {
+func TestGetResourceEdgeCases(t *testing.T) {
 	resourceType := "rg"
 	resource, err := getResource(resourceType)
 	
@@ -24,7 +24,7 @@ func TestGetResource(t *testing.T) {
 	}
 }
 
-func TestTrimResourceName(t *testing.T) {
+func TestTrimResourceNameEdgeCases(t *testing.T) {
 	resourceName := ""
 	maxLength := 10
 	
@@ -44,7 +44,7 @@ func TestTrimResourceName(t *testing.T) {
 	}
 }
 
-func TestValidateResourceType(t *testing.T) {
+func TestValidateResourceTypeEdgeCases(t *testing.T) {
 	resourceType := ""
 	resourceTypes := []string{}
 	valid, err := validateResourceType(resourceType, resourceTypes)
@@ -70,7 +70,7 @@ func TestValidateResourceType(t *testing.T) {
 	}
 }
 
-func TestGetResourceName(t *testing.T) {
+func TestGetResourceNameEdgeCases(t *testing.T) {
 	resourceType := "azurerm_resource_group"
 	separator := "-"
 	prefixes := []string{"prefix"}
