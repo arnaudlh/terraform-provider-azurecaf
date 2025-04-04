@@ -1,9 +1,9 @@
 package azurecaf
 
 import (
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"strings"
 	"testing"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func TestGetResourceName_EdgeCases(t *testing.T) {

@@ -178,12 +178,12 @@ func TestGetResult_AllConventions(t *testing.T) {
 
 			d := r.TestResourceData()
 			d.Set("name", "testname")
-			
+
 			if convention != ConventionPassThrough {
 				d.Set("prefix", "prefix")
 				d.Set("postfix", "postfix")
 			}
-			
+
 			d.Set("convention", convention)
 			d.Set("resource_type", "afw")
 			d.Set("max_length", 63)
@@ -370,17 +370,17 @@ func TestGetResult_EdgeCases(t *testing.T) {
 						t.Errorf("Expected lowercase result for storage account, got %s", result)
 					}
 				}
-				
+
 				if d.Id() == "" {
 					t.Error("Expected ID to be set")
 				}
-				
+
 				if tc.convention == ConventionRandom {
 					if strings.Contains(result, tc.resourceName) && tc.resourceName != "" {
 						t.Errorf("Random convention should not include original name, got %s", result)
 					}
 				}
-				
+
 				if tc.convention == ConventionPassThrough {
 					if result != tc.resourceName {
 						t.Errorf("PassThrough convention should preserve original name, expected %s, got %s", tc.resourceName, result)

@@ -114,7 +114,7 @@ func main() {
 	json.Unmarshal(byteValue, &resourceDefinitions)
 
 	os.MkdirAll("resources", 0755)
-	
+
 	tmpl, err := template.New("resource").Parse(resourceTemplate)
 	if err != nil {
 		log.Fatalf("Error parsing template: %v", err)
@@ -149,7 +149,7 @@ func main() {
 			if err != nil {
 				log.Fatalf("Error creating file %s: %v", fileName, err)
 			}
-			
+
 			currentBuilder.Reset()
 		}
 

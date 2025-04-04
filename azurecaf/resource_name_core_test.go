@@ -104,7 +104,7 @@ func TestGetNameResult_SingleResource(t *testing.T) {
 					Type: schema.TypeString,
 				},
 				Optional: true,
-				Default: []interface{}{},
+				Default:  []interface{}{},
 			},
 			"suffixes": {
 				Type: schema.TypeList,
@@ -112,7 +112,7 @@ func TestGetNameResult_SingleResource(t *testing.T) {
 					Type: schema.TypeString,
 				},
 				Optional: true,
-				Default: []interface{}{},
+				Default:  []interface{}{},
 			},
 			"separator": {
 				Type: schema.TypeString,

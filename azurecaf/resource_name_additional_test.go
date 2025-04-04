@@ -9,11 +9,11 @@ import (
 func TestGetResource_MappedResource(t *testing.T) {
 	resourceType := "azurerm_resource_group"
 	resource, err := getResource(resourceType)
-	
+
 	if err != nil {
 		t.Fatalf("getResource returned error for valid mapped resource: %v", err)
 	}
-	
+
 	if resource == nil {
 		t.Fatal("Expected resource to be returned for valid mapped resource")
 	}
@@ -22,9 +22,9 @@ func TestGetResource_MappedResource(t *testing.T) {
 func TestTrimResourceName_NoTrim(t *testing.T) {
 	resourceName := "short-name"
 	maxLength := 20
-	
+
 	result := trimResourceName(resourceName, maxLength)
-	
+
 	if result != resourceName {
 		t.Fatalf("Expected %s, got %s", resourceName, result)
 	}
@@ -109,11 +109,11 @@ func TestGetNameResult_MultipleResourceTypes(t *testing.T) {
 	if len(results) != 2 {
 		t.Fatalf("Expected 2 results, got %d", len(results))
 	}
-	
+
 	if results["azurerm_resource_group"] == "" {
 		t.Fatal("Expected non-empty result for azurerm_resource_group")
 	}
-	
+
 	if results["azurerm_storage_account"] == "" {
 		t.Fatal("Expected non-empty result for azurerm_storage_account")
 	}
@@ -131,13 +131,13 @@ func TestGetResourceName_AllParameters(t *testing.T) {
 	passthrough := false
 	useSlug := true
 	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
-	
+
 	result, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, convention, cleanInput, passthrough, useSlug, namePrecedence)
-	
+
 	if err != nil {
 		t.Fatalf("getResourceName returned error: %v", err)
 	}
-	
+
 	if result == "" {
 		t.Fatal("Expected non-empty result")
 	}
@@ -155,13 +155,13 @@ func TestGetResourceName_Passthrough(t *testing.T) {
 	passthrough := true
 	useSlug := true
 	namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
-	
+
 	result, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, convention, cleanInput, passthrough, useSlug, namePrecedence)
-	
+
 	if err != nil {
 		t.Fatalf("getResourceName returned error: %v", err)
 	}
-	
+
 	if result != name {
 		t.Fatalf("Expected result to be %s, got %s", name, result)
 	}
@@ -223,7 +223,7 @@ func TestGetResult_AllParameters(t *testing.T) {
 	if result == "" {
 		t.Fatal("Expected non-empty result")
 	}
-	
+
 	d = r.TestResourceData()
 	d.Set("name", "testname")
 	d.Set("prefix", "prefix")
@@ -241,7 +241,7 @@ func TestGetResult_AllParameters(t *testing.T) {
 	if result == "" {
 		t.Fatal("Expected non-empty result with ConventionCafRandom")
 	}
-	
+
 	d = r.TestResourceData()
 	d.Set("name", "testname")
 	d.Set("prefix", "prefix")
@@ -259,7 +259,7 @@ func TestGetResult_AllParameters(t *testing.T) {
 	if result == "" {
 		t.Fatal("Expected non-empty result with ConventionRandom")
 	}
-	
+
 	d = r.TestResourceData()
 	d.Set("name", "testname")
 	d.Set("prefix", "prefix")

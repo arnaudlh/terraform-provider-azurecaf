@@ -26,18 +26,18 @@ func TestGetResourceNameImproved(t *testing.T) {
 	if err != nil {
 		t.Fatalf("getResourceName returned unexpected error: %v", err)
 	}
-	
+
 	// Verify result contains expected components
 	if !strings.Contains(result, "rg") {
 		t.Fatalf("Expected result to contain resource group slug 'rg', got %s", result)
 	}
-	
+
 	// Test with invalid resource type
 	_, err = getResourceName("invalid_resource_type", separator, prefixes, name, suffixes, randomSuffix, convention, cleanInput, passthrough, useSlug, namePrecedence)
 	if err == nil {
 		t.Fatal("Expected error for invalid resource type but got none")
 	}
-	
+
 	// Test with passthrough enabled
 	passthrough = true
 	result, err = getResourceName(resourceTypeName, separator, prefixes, name, suffixes, randomSuffix, convention, cleanInput, passthrough, useSlug, namePrecedence)
@@ -47,7 +47,7 @@ func TestGetResourceNameImproved(t *testing.T) {
 	if result != name {
 		t.Fatalf("With passthrough, expected result to be %s, got %s", name, result)
 	}
-	
+
 	// Test with special characters and clean_input disabled
 	passthrough = false
 	cleanInput = false
@@ -56,7 +56,7 @@ func TestGetResourceNameImproved(t *testing.T) {
 	if err == nil {
 		t.Fatal("Expected error for special characters with clean_input disabled but got none")
 	}
-	
+
 	// Test with useSlug disabled
 	cleanInput = true
 	useSlug = false
@@ -169,7 +169,7 @@ func TestGetNameResultImproved(t *testing.T) {
 	if len(results) != 2 {
 		t.Fatalf("Expected 2 results, got %d", len(results))
 	}
-	
+
 	// Test with single resource type
 	d = r.TestResourceData()
 	d.Set("name", "testname")
@@ -192,7 +192,7 @@ func TestGetNameResultImproved(t *testing.T) {
 	if result == "" {
 		t.Fatal("Expected non-empty result")
 	}
-	
+
 	// Test with no resource type specified
 	d = r.TestResourceData()
 	d.Set("name", "testname")
@@ -291,7 +291,7 @@ func TestGetResultImproved(t *testing.T) {
 	if result == "" {
 		t.Fatal("Expected non-empty result with CAF random convention")
 	}
-	
+
 	// Test with max length constraint
 	d = r.TestResourceData()
 	d.Set("name", "testname")
@@ -310,7 +310,7 @@ func TestGetResultImproved(t *testing.T) {
 	if len(result) > 10 {
 		t.Fatalf("Expected result length <= 10, got %d", len(result))
 	}
-	
+
 	// Test with invalid resource type
 	d = r.TestResourceData()
 	d.Set("name", "testname")
@@ -334,20 +334,20 @@ func TestHelperFunctionsImproved(t *testing.T) {
 	if result != "testname" {
 		t.Fatalf("cleanString expected to remove special characters, got %s", result)
 	}
-	
+
 	// Test cleanSlice
 	slice := []string{"test!@#1", "test!@#2"}
 	cleanedSlice := cleanSlice(slice, resource)
 	if cleanedSlice[0] != "test1" || cleanedSlice[1] != "test2" {
 		t.Fatalf("cleanSlice expected to remove special characters, got %v", cleanedSlice)
 	}
-	
+
 	// Test concatenateParameters
 	result = concatenateParameters("-", []string{"prefix"}, []string{"name"}, []string{"suffix"})
 	if result != "prefix-name-suffix" {
 		t.Fatalf("concatenateParameters expected to join with separator, got %s", result)
 	}
-	
+
 	// Test getResource
 	resource, err := getResource("azurerm_resource_group")
 	if err != nil {
@@ -356,37 +356,37 @@ func TestHelperFunctionsImproved(t *testing.T) {
 	if resource.ResourceTypeName != "azurerm_resource_group" {
 		t.Fatalf("getResource expected to return resource with correct name, got %s", resource.ResourceTypeName)
 	}
-	
+
 	// Test getSlug
 	slug := getSlug("azurerm_resource_group", ConventionCafClassic)
 	if slug != "rg" {
 		t.Fatalf("getSlug expected to return 'rg', got %s", slug)
 	}
-	
+
 	// Test trimResourceName
 	result = trimResourceName("abcdefghijklmnopqrstuvwxyz", 10)
 	if result != "abcdefghij" {
 		t.Fatalf("trimResourceName expected to trim to 10 characters, got %s", result)
 	}
-	
+
 	// Test convertInterfaceToString
 	interfaceSlice := []interface{}{"test1", "test2"}
 	stringSlice := convertInterfaceToString(interfaceSlice)
 	if stringSlice[0] != "test1" || stringSlice[1] != "test2" {
 		t.Fatalf("convertInterfaceToString expected to convert to string slice, got %v", stringSlice)
 	}
-	
+
 	// Test validateResourceType
 	valid, err := validateResourceType("azurerm_resource_group", []string{})
 	if !valid || err != nil {
 		t.Fatalf("validateResourceType expected to validate single resource type, got valid=%v, err=%v", valid, err)
 	}
-	
+
 	valid, err = validateResourceType("", []string{"azurerm_resource_group", "azurerm_virtual_machine"})
 	if !valid || err != nil {
 		t.Fatalf("validateResourceType expected to validate multiple resource types, got valid=%v, err=%v", valid, err)
 	}
-	
+
 	valid, err = validateResourceType("", []string{})
 	if valid || err == nil {
 		t.Fatal("validateResourceType expected to fail with no resource types")
@@ -400,19 +400,19 @@ func TestComposeNameImproved(t *testing.T) {
 	if !strings.Contains(result, "name") || !strings.Contains(result, "slug") || !strings.Contains(result, "random") || !strings.Contains(result, "prefix") || !strings.Contains(result, "suffix") {
 		t.Fatalf("composeName expected to include all components, got %s", result)
 	}
-	
+
 	// Test with max length constraint
 	result = composeName("-", []string{"prefix"}, "name", "slug", []string{"suffix"}, "random", 10, []string{"name", "slug", "random", "suffixes", "prefixes"})
 	if len(result) > 10 {
 		t.Fatalf("composeName expected to respect max length, got %s with length %d", result, len(result))
 	}
-	
+
 	// Test with empty components
 	result = composeName("-", []string{}, "", "", []string{}, "", 100, []string{"name", "slug", "random", "suffixes", "prefixes"})
 	if result != "" {
 		t.Fatalf("composeName expected to return empty string with empty components, got %s", result)
 	}
-	
+
 	// Test with multiple prefixes and suffixes
 	result = composeName("-", []string{"prefix1", "prefix2"}, "name", "slug", []string{"suffix1", "suffix2"}, "random", 100, []string{"name", "slug", "random", "suffixes", "prefixes"})
 	if !strings.Contains(result, "prefix1") || !strings.Contains(result, "prefix2") || !strings.Contains(result, "suffix1") || !strings.Contains(result, "suffix2") {
