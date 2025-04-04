@@ -3,7 +3,8 @@ set -e
 export PATH=/usr/lib/go-1.20/bin:$PATH
 
 echo "Running unit tests..."
-go test ./azurecaf
+go test ./azurecaf -v -coverprofile=coverage.out
+go tool cover -func=coverage.out
 
 echo "Building provider..."
 go build -o ./terraform-provider-azurecaf
@@ -17,8 +18,9 @@ cp terraform-provider-azurecaf ~/.terraform.d/plugins/registry.terraform.io/aztf
 
 cd examples/e2e
 go run generator.go
-terraform init
+terraform init -upgrade
 terraform validate
+chmod +x ./validate_results.sh
 ./validate_results.sh
 cd ../..
 
