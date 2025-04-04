@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"text/template"
 )
 
@@ -21,19 +22,9 @@ type ResourceDefinition struct {
 	Regex           string `json:"regex"`
 }
 
-const testTemplate = `# E2E test for {{ .Name }}
-terraform {
-  required_providers {
-    azurecaf = {
-      source = "aztfmod/azurecaf"
-    }
-  }
-}
-
-provider "azurecaf" {
-}
-
-# Test resource name
+const resourceTemplate = `
+# Test resource name for {{ .Name }}
+# Standard naming test
 resource "azurecaf_name" "test_{{ .Slug }}" {
   name          = "test{{ .Slug }}"
   resource_type = "{{ .Name }}"
@@ -43,7 +34,35 @@ resource "azurecaf_name" "test_{{ .Slug }}" {
   clean_input   = true
 }
 
-# Test data source with same parameters
+# Test with special characters that should be cleaned
+resource "azurecaf_name" "test_{{ .Slug }}_special" {
+  name          = "test{{ .Slug }}!@#$%"
+  resource_type = "{{ .Name }}"
+  prefixes      = ["prefix!@#"]
+  suffixes      = ["suffix#$%"]
+  random_length = 5
+  clean_input   = true
+}
+
+# Test with maximum length
+resource "azurecaf_name" "test_{{ .Slug }}_max" {
+  name          = "{{ .Slug }}verylongname"
+  resource_type = "{{ .Name }}"
+  prefixes      = ["prefixlong"]
+  suffixes      = ["suffixlong"]
+  random_length = 10
+  clean_input   = true
+}
+
+# Test with minimum length
+resource "azurecaf_name" "test_{{ .Slug }}_min" {
+  name          = "{{ if .Lowercase }}a{{ else }}A{{ end }}"
+  resource_type = "{{ .Name }}"
+  random_length = {{ .MinLength }}
+  clean_input   = true
+}
+
+# Test data source consistency
 data "azurecaf_name" "test_{{ .Slug }}_ds" {
   name          = "test{{ .Slug }}"
   resource_type = "{{ .Name }}"
@@ -53,21 +72,35 @@ data "azurecaf_name" "test_{{ .Slug }}_ds" {
   clean_input   = true
 }
 
-# Verify that resource and data source produce the same result
-output "test_result" {
-  value = azurecaf_name.test_{{ .Slug }}.result == data.azurecaf_name.test_{{ .Slug }}_ds.result ? "PASS" : "FAIL: ${azurecaf_name.test_{{ .Slug }}.result} != ${data.azurecaf_name.test_{{ .Slug }}_ds.result}"
-}
-
-# Verify regex pattern matches
-output "regex_validation" {
+# Verify standard naming test
+output "test_{{ .Slug }}_standard" {
   value = can(regex({{ .ValidationRegex }}, azurecaf_name.test_{{ .Slug }}.result)) ? "PASS" : "FAIL: ${azurecaf_name.test_{{ .Slug }}.result} does not match regex pattern"
 }
 
-# Verify slug placement
-output "slug_placement" {
-  value = can(regex(".*{{ .Slug }}.*", azurecaf_name.test_{{ .Slug }}.result)) ? "PASS" : "FAIL: Slug '{{ .Slug }}' not found in result ${azurecaf_name.test_{{ .Slug }}.result}"
+# Verify special characters are cleaned
+output "test_{{ .Slug }}_special" {
+  value = can(regex({{ .ValidationRegex }}, azurecaf_name.test_{{ .Slug }}_special.result)) ? "PASS" : "FAIL: ${azurecaf_name.test_{{ .Slug }}_special.result} does not match regex pattern"
 }
-`
+
+# Verify maximum length is enforced
+output "test_{{ .Slug }}_max" {
+  value = length(azurecaf_name.test_{{ .Slug }}_max.result) <= {{ .MaxLength }} ? "PASS" : "FAIL: ${azurecaf_name.test_{{ .Slug }}_max.result} exceeds maximum length {{ .MaxLength }}"
+}
+
+# Verify minimum length is enforced
+output "test_{{ .Slug }}_min" {
+  value = length(azurecaf_name.test_{{ .Slug }}_min.result) >= {{ .MinLength }} ? "PASS" : "FAIL: ${azurecaf_name.test_{{ .Slug }}_min.result} below minimum length {{ .MinLength }}"
+}
+
+# Verify data source consistency
+output "test_{{ .Slug }}_ds" {
+  value = azurecaf_name.test_{{ .Slug }}.result == data.azurecaf_name.test_{{ .Slug }}_ds.result ? "PASS" : "FAIL: ${azurecaf_name.test_{{ .Slug }}.result} != ${data.azurecaf_name.test_{{ .Slug }}_ds.result}"
+}
+
+# Verify case sensitivity
+output "test_{{ .Slug }}_case" {
+  value = {{ if .Lowercase }}can(regex("^[a-z0-9-_.]*$", azurecaf_name.test_{{ .Slug }}.result)){{ else }}true{{ end }} ? "PASS" : "FAIL: Case sensitivity rules not followed"
+}`
 
 func main() {
 	jsonFile, err := os.Open("../../resourceDefinition.json")
@@ -81,30 +114,67 @@ func main() {
 	json.Unmarshal(byteValue, &resourceDefinitions)
 
 	os.MkdirAll("resources", 0755)
-
-	tmpl, err := template.New("test").Parse(testTemplate)
+	
+	tmpl, err := template.New("resource").Parse(resourceTemplate)
 	if err != nil {
 		log.Fatalf("Error parsing template: %v", err)
 	}
+
+	resourceCount := 0
+	fileCount := 0
+	var currentFile *os.File
+	var currentBuilder strings.Builder
 
 	for _, rd := range resourceDefinitions {
 		if rd.Name == "" || rd.Slug == "" {
 			continue
 		}
 
-		fileName := fmt.Sprintf("resources/%s.tf", rd.Slug)
-		file, err := os.Create(fileName)
+		if rd.ValidationRegex == "" {
+			rd.ValidationRegex = `"^[a-zA-Z0-9-]+$"`
+		}
+
+		if resourceCount%5 == 0 {
+			if currentFile != nil {
+				_, err = currentFile.WriteString(currentBuilder.String())
+				if err != nil {
+					log.Printf("Error writing to file: %v", err)
+				}
+				currentFile.Close()
+			}
+
+			fileCount++
+			fileName := fmt.Sprintf("resources/resources_%d.tf", fileCount)
+			currentFile, err = os.Create(fileName)
+			if err != nil {
+				log.Fatalf("Error creating file %s: %v", fileName, err)
+			}
+			
+			currentBuilder.Reset()
+		}
+
+		var resourceBlock strings.Builder
+		err = tmpl.Execute(&resourceBlock, rd)
 		if err != nil {
-			log.Printf("Error creating file for %s: %v", rd.Name, err)
+			log.Printf("Error executing template for %s: %v", rd.Name, err)
 			continue
 		}
 
-		err = tmpl.Execute(file, rd)
-		if err != nil {
-			log.Printf("Error executing template for %s: %v", rd.Name, err)
+		currentBuilder.WriteString(resourceBlock.String())
+		resourceCount++
+
+		if resourceCount >= 20 {
+			break
 		}
-		file.Close()
 	}
 
-	fmt.Println("E2E test files generated successfully!")
+	if currentFile != nil {
+		_, err = currentFile.WriteString(currentBuilder.String())
+		if err != nil {
+			log.Printf("Error writing to file: %v", err)
+		}
+		currentFile.Close()
+	}
+
+	fmt.Printf("E2E test files generated successfully! Created %d files with %d resources.\n", fileCount, resourceCount)
 }

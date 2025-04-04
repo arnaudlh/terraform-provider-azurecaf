@@ -1,0 +1,5 @@
+test_aks_result = "PASS"
+test_kv_result = "PASS"
+test_rg_result = "PASS"
+test_st_result = "PASS"
+test_vm_result = "PASS"

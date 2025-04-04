@@ -1,0 +1,3951 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>azurecaf: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/aztfmod/terraform-provider-azurecaf/azurecaf/data_environment_variable.go (100.0%)</option>
+				
+				<option value="file1">github.com/aztfmod/terraform-provider-azurecaf/azurecaf/data_name.go (100.0%)</option>
+				
+				<option value="file2">github.com/aztfmod/terraform-provider-azurecaf/azurecaf/models.go (100.0%)</option>
+				
+				<option value="file3">github.com/aztfmod/terraform-provider-azurecaf/azurecaf/provider.go (100.0%)</option>
+				
+				<option value="file4">github.com/aztfmod/terraform-provider-azurecaf/azurecaf/resource_name.go (98.0%)</option>
+				
+				<option value="file5">github.com/aztfmod/terraform-provider-azurecaf/azurecaf/resource_name_additional_test2.go (0.0%)</option>
+				
+				<option value="file6">github.com/aztfmod/terraform-provider-azurecaf/azurecaf/resource_name_additional_test3.go (0.0%)</option>
+				
+				<option value="file7">github.com/aztfmod/terraform-provider-azurecaf/azurecaf/resource_name_additional_test4.go (0.0%)</option>
+				
+				<option value="file8">github.com/aztfmod/terraform-provider-azurecaf/azurecaf/resource_name_coverage_complete.go (0.0%)</option>
+				
+				<option value="file9">github.com/aztfmod/terraform-provider-azurecaf/azurecaf/resource_name_coverage_edge_cases.go (0.0%)</option>
+				
+				<option value="file10">github.com/aztfmod/terraform-provider-azurecaf/azurecaf/resource_name_coverage_test2.go (0.0%)</option>
+				
+				<option value="file11">github.com/aztfmod/terraform-provider-azurecaf/azurecaf/resource_name_coverage_test3.go (0.0%)</option>
+				
+				<option value="file12">github.com/aztfmod/terraform-provider-azurecaf/azurecaf/resource_name_final_coverage.go (0.0%)</option>
+				
+				<option value="file13">github.com/aztfmod/terraform-provider-azurecaf/azurecaf/resource_name_test2.go (0.0%)</option>
+				
+				<option value="file14">github.com/aztfmod/terraform-provider-azurecaf/azurecaf/resource_name_test3.go (0.0%)</option>
+				
+				<option value="file15">github.com/aztfmod/terraform-provider-azurecaf/azurecaf/resource_naming_convention.go (98.6%)</option>
+				
+				<option value="file16">github.com/aztfmod/terraform-provider-azurecaf/azurecaf/resource_naming_convention_coverage_test2.go (0.0%)</option>
+				
+				<option value="file17">github.com/aztfmod/terraform-provider-azurecaf/azurecaf/resource_naming_convention_test2.go (0.0%)</option>
+				
+				<option value="file18">github.com/aztfmod/terraform-provider-azurecaf/azurecaf/resource_naming_convention_test3.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package azurecaf
+
+import (
+        "context"
+        "github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+        "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+        "os"
+)
+
+func dataEnvironmentVariable() *schema.Resource <span class="cov8" title="1">{
+        return &amp;schema.Resource{
+                ReadContext: resourceAction,
+                Schema: map[string]*schema.Schema{
+                        "name": {
+                                Type:        schema.TypeString,
+                                Required:    true,
+                                Description: "Name of the environment variable.",
+                        },
+                        "fails_if_empty": {
+                                Type:        schema.TypeBool,
+                                Optional:    true,
+                                Default:     false,
+                                Description: "Throws an error if the environment variable is not set (default: false).",
+                        },
+                        "value": {
+                                Type:        schema.TypeString,
+                                Computed:    true,
+                                Description: "Value of the environment variable.",
+                                Sensitive:   true,
+                        },
+                },
+        }
+}</span>
+
+func resourceAction(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics <span class="cov8" title="1">{
+        var diags diag.Diagnostics
+
+        name := d.Get("name").(string)
+        value, ok := os.LookupEnv(name)
+
+        if !ok </span><span class="cov8" title="1">{
+                return diag.Errorf("Value is not set for environment variable: %s", name)
+        }</span>
+
+        <span class="cov8" title="1">d.SetId(name)
+        _ = d.Set("value", value)
+
+        return diags</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package azurecaf
+
+import (
+        "context"
+
+        "github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+        "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+        "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+)
+
+func dataName() *schema.Resource <span class="cov8" title="1">{
+        resourceMapsKeys := make([]string, 0, len(ResourceDefinitions))
+        for k := range ResourceDefinitions </span><span class="cov8" title="1">{
+                resourceMapsKeys = append(resourceMapsKeys, k)
+        }</span>
+
+        <span class="cov8" title="1">return &amp;schema.Resource{
+                ReadContext: dataNameRead,
+                Schema: map[string]*schema.Schema{
+                        "name": {
+                                Type:     schema.TypeString,
+                                Optional: true,
+                                ForceNew: true,
+                                Default:  "",
+                        },
+                        "prefixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type:         schema.TypeString,
+                                        ValidateFunc: validation.NoZeroValues,
+                                },
+                                Optional: true,
+                                ForceNew: true,
+                        },
+                        "suffixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type:         schema.TypeString,
+                                        ValidateFunc: validation.NoZeroValues,
+                                },
+                                Optional: true,
+                                ForceNew: true,
+                        },
+                        "random_length": {
+                                Type:         schema.TypeInt,
+                                Optional:     true,
+                                ForceNew:     true,
+                                ValidateFunc: validation.IntAtLeast(0),
+                                Default:      0,
+                        },
+                        "result": {
+                                Type:     schema.TypeString,
+                                Computed: true,
+                        },
+                        "separator": {
+                                Type:     schema.TypeString,
+                                Optional: true,
+                                ForceNew: true,
+                                Default:  "-",
+                        },
+                        "clean_input": {
+                                Type:     schema.TypeBool,
+                                Optional: true,
+                                ForceNew: true,
+                                Default:  true,
+                        },
+                        "passthrough": {
+                                Type:     schema.TypeBool,
+                                Optional: true,
+                                ForceNew: true,
+                                Default:  false,
+                        },
+                        "resource_type": {
+                                Type:         schema.TypeString,
+                                Optional:     true,
+                                ValidateFunc: validation.StringInSlice(resourceMapsKeys, false),
+                                ForceNew:     true,
+                        },
+                        "random_seed": {
+                                Type:     schema.TypeInt,
+                                Optional: true,
+                                ForceNew: true,
+                        },
+                        "use_slug": {
+                                Type:     schema.TypeBool,
+                                Optional: true,
+                                ForceNew: true,
+                                Default:  true,
+                        },
+                },
+        }</span>
+}
+
+func dataNameRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics <span class="cov8" title="1">{
+        getNameReadResult(d, meta)
+        return diag.Diagnostics{}
+}</span>
+
+func getNameReadResult(d *schema.ResourceData, meta interface{}) error <span class="cov8" title="1">{
+        name := d.Get("name").(string)
+        prefixes := convertInterfaceToString(d.Get("prefixes").([]interface{}))
+        suffixes := convertInterfaceToString(d.Get("suffixes").([]interface{}))
+        separator := d.Get("separator").(string)
+        resourceType := d.Get("resource_type").(string)
+        cleanInput := d.Get("clean_input").(bool)
+        passthrough := d.Get("passthrough").(bool)
+        useSlug := d.Get("use_slug").(bool)
+        randomLength := d.Get("random_length").(int)
+        randomSeed := int64(d.Get("random_seed").(int))
+
+        convention := ConventionCafClassic
+
+        randomSuffix := randSeq(int(randomLength), &amp;randomSeed)
+
+        namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
+
+        resourceName, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, convention, cleanInput, passthrough, useSlug, namePrecedence)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">d.Set("result", resourceName)
+
+        d.SetId(resourceName)
+        return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package azurecaf
+
+import (
+        "math/rand"
+        "time"
+)
+
+const (
+        // ConventionCafClassic applies the CAF recommended naming convention
+        ConventionCafClassic string = "cafclassic"
+        // ConventionCafRandom defines the CAF random naming convention
+        ConventionCafRandom string = "cafrandom"
+        // ConventionRandom applies a random naming convention based on the max length of the resource
+        ConventionRandom string = "random"
+        // ConventionPassThrough defines the CAF random naming convention
+        ConventionPassThrough string = "passthrough"
+)
+
+const (
+        alphanum    string = "[^0-9A-Za-z]"
+        alphanumh   string = "[^0-9A-Za-z-]"
+        alphanumu   string = "[^0-9A-Za-z_]"
+        alphanumhu  string = "[^0-9A-Za-z_-]"
+        alphanumhup string = "[^0-9A-Za-z_.-]"
+        unicode     string = `[^-\w\._\(\)]`
+        invappi     string = "[%&amp;\\?/]"     //appinisghts invalid character
+        invsqldb    string = "[&lt;&gt;*%&amp;:\\/?]" //sql db invalid character
+
+        //Need to find a way to filter beginning and end of string
+        //alphanumstartletter string = "\\A[^a-z][^0-9A-Za-z]"
+)
+
+const (
+        suffixSeparator string = "-"
+)
+
+// ResourceStructure stores the CafPrefix and the MaxLength of an azure resource
+type ResourceStructure struct {
+        // Resource type name
+        ResourceTypeName string `json:"name"`
+        // Resource prefix as defined in the Azure Cloud Adoption Framework
+        CafPrefix string `json:"slug,omitempty"`
+        // MaxLength attribute define the maximum length of the name
+        MinLength int `json:"min_length"`
+        // MaxLength attribute define the maximum length of the name
+        MaxLength int `json:"max_length"`
+        // enforce lowercase
+        LowerCase bool `json:"lowercase,omitempty"`
+        // Regular expression to apply to the resource type
+        RegEx string `json:"regex,omitempty"`
+        // the Regular expression to validate the generated string
+        ValidationRegExp string `json:"validatation_regex,omitempty"`
+        // can the resource include dashes
+        Dashes bool `json:"dashes"`
+        // The scope of this name where it needs to be unique
+        Scope string `json:"scope,omitempty"`
+}
+
+var (
+        alphagenerator = []rune("abcdefghijklmnopqrstuvwxyz")
+)
+
+// Generate a random value to add to the resource names
+func randSeq(length int, seed *int64) string <span class="cov8" title="1">{
+        if length == 0 </span><span class="cov8" title="1">{
+                return ""
+        }</span>
+        // initialize random seed
+        <span class="cov8" title="1">if seed == nil || *seed == 0 </span><span class="cov8" title="1">{
+                value := time.Now().UnixNano()
+                seed = &amp;value
+        }</span>
+        <span class="cov8" title="1">rand.Seed(*seed)
+        // generate at least one random character
+        b := make([]rune, length)
+        for i := range b </span><span class="cov8" title="1">{
+                // We need the random generated string to start with a letter
+                b[i] = alphagenerator[rand.Intn(len(alphagenerator)-1)]
+        }</span>
+        <span class="cov8" title="1">return string(b)</span>
+}
+
+// Resources currently supported
+var Resources = map[string]ResourceStructure{
+        "aaa":    {"azure automation account", "aaa", 6, 50, false, alphanumh, "^[a-zA-Z][0-9A-Za-z-]{5,49}$", true, "resourceGroup"},
+        "ac":     {"azure container app", "ac", 1, 32, true, alphanumh, "^[a-z0-9][a-z0-9-]{0,30}[a-z0-9]$", true, "resourceGroup"},
+        "ace":    {"azure container app environment", "ace", 1, 60, false, alphanumh, "^[0-9A-Za-z][0-9A-Za-z-]{0,58}[0-9a-zA-Z]$", true, "resourceGroup"},
+        "acr":    {"azure container registry", "acr", 5, 50, true, alphanum, "^[0-9A-Za-z]{5,50}$", true, "resourceGroup"},
+        "afw":    {"azure firewall", "afw", 1, 80, false, alphanumhup, "^[a-zA-Z][0-9A-Za-z_.-]{0,79}$", true, "resourceGroup"},
+        "agw":    {"application gateway", "agw", 1, 80, false, alphanumhup, "^[0-9a-zA-Z][0-9A-Za-z_.-]{0,78}[0-9a-zA-Z_]$", true, "resourceGroup"},
+        "aks":    {"azure kubernetes service", "aks", 1, 63, false, alphanumhu, "^[0-9a-zA-Z][0-9A-Za-z_.-]{0,61}[0-9a-zA-Z]$", true, "resourceGroup"},
+        "aksdns": {"aksdns prefix", "aksdns", 3, 45, false, alphanumh, "^[a-zA-Z][0-9A-Za-z-]{0,43}[0-9a-zA-Z]$", true, "resourceGroup"},
+        "aksnpl": {"aks node pool for Linux", "aksnpl", 2, 12, true, alphanum, "^[a-zA-Z][0-9a-z]{0,11}$", true, "resourceGroup"},
+        "aksnpw": {"aks node pool for Windows", "aksnpw", 2, 6, true, alphanum, "^[a-zA-Z][0-9a-z]{0,5}$", true, "resourceGroup"},
+        "apim":   {"api management", "apim", 1, 50, false, alphanum, "^[a-zA-Z][0-9A-Za-z]{0,49}$", true, "resourceGroup"},
+        "app":    {"web app", "app", 2, 60, false, alphanumh, "^[0-9A-Za-z][0-9A-Za-z-]{0,58}[0-9a-zA-Z]$", true, "resourceGroup"},
+        "appi":   {"application insights", "appi", 1, 260, false, invappi, "^[^%&amp;\\?/. ][^%&amp;\\?/]{0,258}[^%&amp;\\?/. ]$", true, "resourceGroup"},
+        "ase":    {"app service environment", "ase", 2, 36, false, alphanumh, "^[0-9A-Za-z-]{2,36}$", true, "resourceGroup"},
+        "asr":    {"azure site recovery", "asr", 2, 50, false, alphanumh, "^[a-zA-Z][0-9A-Za-z-]{1,49}$", true, "resourceGroup"},
+        "evh":    {"event hub", "evh", 1, 50, false, alphanumh, "^[a-zA-Z][0-9A-Za-z-]{0,48}[0-9a-zA-Z]$", true, "resourceGroup"},
+        "gen":    {"generic", "gen", 1, 24, false, alphanum, "^[0-9a-zA-Z]{1,24}$", true, "resourceGroup"},
+        "kv":     {"keyvault", "kv", 3, 24, true, alphanumh, "^[a-zA-Z][0-9A-Za-z-]{0,22}[0-9a-zA-Z]$", true, "resourceGroup"},
+        "la":     {"loganalytics", "la", 4, 63, false, alphanumh, "^[0-9a-zA-Z][0-9A-Za-z-]{3,61}[0-9a-zA-Z]$", true, "resourceGroup"},
+        "nic":    {"network interface card", "nic", 1, 80, false, alphanumhup, "^[0-9a-zA-Z][0-9A-Za-z_.-]{0,78}[0-9a-zA-Z_]$", true, "resourceGroup"},
+        "nsg":    {"network security group", "nsg", 1, 80, false, alphanumhup, "^[0-9a-zA-Z][0-9A-Za-z_.-]{0,78}[0-9a-zA-Z_]$", true, "resourceGroup"},
+        "pip":    {"public ip address", "pip", 1, 80, false, alphanumhup, "^[0-9a-zA-Z][0-9A-Za-z_.-]{0,78}[0-9a-zA-Z_]$", true, "resourceGroup"},
+        "plan":   {"app service plan", "plan", 1, 40, false, alphanumh, "^[0-9A-Za-z-]{1,40}$", true, "resourceGroup"},
+        "rg":     {"resource group", "rg", 1, 80, false, unicode, `^[-\w\._\(\)]{1,80}$`, true, "resourceGroup"},
+        "snet":   {"virtual network subnet", "snet", 1, 80, false, alphanumhup, "^[0-9a-zA-Z][0-9A-Za-z_.-]{0,78}[0-9a-zA-Z_]$", true, "resourceGroup"},
+        "sql":    {"azure sql db server", "sql", 1, 63, true, alphanumh, "^[0-9a-z][0-9a-z-]{0,61}[0-9a-z]$", true, "resourceGroup"},
+        "sqldb":  {"azure sql db", "sqldb", 1, 128, false, invsqldb, "^[^&lt;&gt;*%&amp;:\\/?. ][^&lt;&gt;*%&amp;:\\/?]{0,126}[^&lt;&gt;*%&amp;:\\/?. ]$", true, "resourceGroup"},
+        "st":     {"storage account", "st", 3, 24, true, alphanum, "^[0-9a-z]{3,24}$", true, "resourceGroup"},
+        "vml":    {"virtual machine (linux)", "vml", 1, 64, false, alphanumh, "^[0-9a-zA-Z][0-9A-Za-z_-]{0,62}[0-9a-zA-Z_]$", true, "resourceGroup"},
+        "vmw":    {"virtual machine (windows)", "vmw", 1, 15, false, alphanumh, "^[0-9a-zA-Z][0-9A-Za-z_-]{0,13}[0-9a-zA-Z_]$", true, "resourceGroup"},
+        "vnet":   {"virtual network", "vnet", 2, 64, false, alphanumhup, "^[0-9a-zA-Z][0-9A-Za-z_.-]{0,62}[0-9a-zA-Z_]$", true, "resourceGroup"},
+}
+
+// ResourcesMapping enforcing new naming convention
+var ResourcesMapping = map[string]ResourceStructure{
+        "azurerm_automation_account":              Resources["aaa"],
+        "azurerm_container_app":                   Resources["ac"],
+        "azurerm_container_app_environment":       Resources["ace"],
+        "azurerm_container_registry":              Resources["acr"],
+        "azurerm_firewall":                        Resources["afw"],
+        "azurerm_application_gateway":             Resources["agw"],
+        "azurerm_api_management":                  Resources["apim"],
+        "azurerm_app_service":                     Resources["app"],
+        "azurerm_application_insights":            Resources["appi"],
+        "azurerm_app_service_environment":         Resources["ase"],
+        "azurerm_recovery_services_vault":         Resources["asr"],
+        "azurerm_eventhub_namespace":              Resources["evh"],
+        "generic":                                 Resources["gen"],
+        "azurerm_key_vault":                       Resources["kv"],
+        "azurerm_kubernetes_cluster":              Resources["aks"],
+        "aks_dns_prefix":                          Resources["aksdns"],
+        "aks_node_pool_linux":                     Resources["aksnpl"],
+        "aks_node_pool_windows":                   Resources["aksnpw"],
+        "azurerm_log_analytics_workspace":         Resources["la"],
+        "azurerm_network_interface":               Resources["nic"],
+        "azurerm_network_security_group":          Resources["nsg"],
+        "azurerm_public_ip":                       Resources["pip"],
+        "azurerm_app_service_plan":                Resources["plan"],
+        "azurerm_resource_group":                  Resources["rg"],
+        "azurerm_subnet":                          Resources["snet"],
+        "azurerm_sql_server":                      Resources["sql"],
+        "azurerm_sql_database":                    Resources["sqldb"],
+        "azurerm_storage_account":                 Resources["st"],
+        "azurerm_windows_virtual_machine_linux":   Resources["vml"],
+        "azurerm_windows_virtual_machine_windows": Resources["vmw"],
+        "azurerm_virtual_network":                 Resources["vnet"],
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package azurecaf
+
+import (
+        "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+)
+
+// Provider returns the provider schema to Terraform.
+func Provider() *schema.Provider <span class="cov8" title="1">{
+        return &amp;schema.Provider{
+                Schema: map[string]*schema.Schema{},
+
+                ResourcesMap: map[string]*schema.Resource{
+                        "azurecaf_naming_convention": resourceNamingConvention(),
+                        "azurecaf_name":              resourceName(),
+                },
+                DataSourcesMap: map[string]*schema.Resource{
+                        "azurecaf_environment_variable": dataEnvironmentVariable(),
+                        "azurecaf_name":                 dataName(),
+                },
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package azurecaf
+
+import (
+        "context"
+        "fmt"
+        "regexp"
+        "strings"
+
+        "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+        "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+)
+
+func resourceNameV2() *schema.Resource <span class="cov8" title="1">{
+        resourceMapsKeys := make([]string, 0, len(ResourceDefinitions))
+        for k := range ResourceDefinitions </span><span class="cov8" title="1">{
+                resourceMapsKeys = append(resourceMapsKeys, k)
+        }</span>
+        <span class="cov8" title="1">return &amp;schema.Resource{
+                Schema: map[string]*schema.Schema{
+                        "name": {
+                                Type:     schema.TypeString,
+                                Optional: true,
+                                ForceNew: true,
+                                Default:  "",
+                        },
+                        "prefixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type:         schema.TypeString,
+                                        ValidateFunc: validation.NoZeroValues,
+                                },
+                                Optional: true,
+                                ForceNew: true,
+                        },
+                        "suffixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type:         schema.TypeString,
+                                        ValidateFunc: validation.NoZeroValues,
+                                },
+                                Optional: true,
+                                ForceNew: true,
+                        },
+                        "random_length": {
+                                Type:         schema.TypeInt,
+                                Optional:     true,
+                                ForceNew:     true,
+                                ValidateFunc: validation.IntAtLeast(0),
+                                Default:      0,
+                        },
+                        "result": {
+                                Type:     schema.TypeString,
+                                Computed: true,
+                        },
+                        "results": {
+                                Type: schema.TypeMap,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                                Computed: true,
+                        },
+                        "separator": {
+                                Type:     schema.TypeString,
+                                Optional: true,
+                                ForceNew: true,
+                                Default:  "-",
+                        },
+                        "clean_input": {
+                                Type:     schema.TypeBool,
+                                Optional: true,
+                                ForceNew: true,
+                                Default:  true,
+                        },
+                        "passthrough": {
+                                Type:     schema.TypeBool,
+                                Optional: true,
+                                ForceNew: true,
+                                Default:  false,
+                        },
+                        "resource_type": {
+                                Type:         schema.TypeString,
+                                Optional:     true,
+                                ValidateFunc: validation.StringInSlice(resourceMapsKeys, false),
+                                ForceNew:     true,
+                        },
+                        "resource_types": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type:         schema.TypeString,
+                                        ValidateFunc: validation.StringInSlice(resourceMapsKeys, false),
+                                },
+                                Optional: true,
+                                ForceNew: true,
+                        },
+                        "random_seed": {
+                                Type:     schema.TypeInt,
+                                Optional: true,
+                                ForceNew: true,
+                        },
+                },
+        }</span>
+}
+
+func resourceNameStateUpgradeV2(ctx context.Context, rawState map[string]interface{}, meta interface{}) (map[string]interface{}, error) <span class="cov8" title="1">{
+        rawState["use_slug"] = true
+
+        return rawState, nil
+}</span>
+
+func resourceName() *schema.Resource <span class="cov8" title="1">{
+        resourceMapsKeys := make([]string, 0, len(ResourceDefinitions))
+        for k := range ResourceDefinitions </span><span class="cov8" title="1">{
+                resourceMapsKeys = append(resourceMapsKeys, k)
+        }</span>
+
+        <span class="cov8" title="1">return &amp;schema.Resource{
+                Create:        resourceNameCreate,
+                Read:          schema.Noop,
+                Delete:        schema.RemoveFromState,
+                SchemaVersion: 3,
+                StateUpgraders: []schema.StateUpgrader{
+                        {
+                                Type:    resourceNameV2().CoreConfigSchema().ImpliedType(),
+                                Upgrade: resourceNameStateUpgradeV2,
+                                Version: 2,
+                        },
+                },
+
+                Schema: map[string]*schema.Schema{
+                        "name": {
+                                Type:     schema.TypeString,
+                                Optional: true,
+                                ForceNew: true,
+                                Default:  "",
+                        },
+                        "prefixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type:         schema.TypeString,
+                                        ValidateFunc: validation.NoZeroValues,
+                                },
+                                Optional: true,
+                                ForceNew: true,
+                        },
+                        "suffixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type:         schema.TypeString,
+                                        ValidateFunc: validation.NoZeroValues,
+                                },
+                                Optional: true,
+                                ForceNew: true,
+                        },
+                        "random_length": {
+                                Type:         schema.TypeInt,
+                                Optional:     true,
+                                ForceNew:     true,
+                                ValidateFunc: validation.IntAtLeast(0),
+                                Default:      0,
+                        },
+                        "result": {
+                                Type:     schema.TypeString,
+                                Computed: true,
+                        },
+                        "results": {
+                                Type: schema.TypeMap,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                                Computed: true,
+                        },
+                        "separator": {
+                                Type:     schema.TypeString,
+                                Optional: true,
+                                ForceNew: true,
+                                Default:  "-",
+                        },
+                        "clean_input": {
+                                Type:     schema.TypeBool,
+                                Optional: true,
+                                ForceNew: true,
+                                Default:  true,
+                        },
+                        "passthrough": {
+                                Type:     schema.TypeBool,
+                                Optional: true,
+                                ForceNew: true,
+                                Default:  false,
+                        },
+                        "resource_type": {
+                                Type:         schema.TypeString,
+                                Optional:     true,
+                                ValidateFunc: validation.StringInSlice(resourceMapsKeys, false),
+                                ForceNew:     true,
+                        },
+                        "resource_types": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type:         schema.TypeString,
+                                        ValidateFunc: validation.StringInSlice(resourceMapsKeys, false),
+                                },
+                                Optional: true,
+                                ForceNew: true,
+                        },
+                        "random_seed": {
+                                Type:     schema.TypeInt,
+                                Optional: true,
+                                ForceNew: true,
+                        },
+                        "use_slug": {
+                                Type:     schema.TypeBool,
+                                Optional: true,
+                                ForceNew: true,
+                                Default:  true,
+                        },
+                },
+        }</span>
+}
+
+func resourceNameCreate(d *schema.ResourceData, meta interface{}) error <span class="cov8" title="1">{
+        return resourceNameRead(d, meta)
+}</span>
+
+func resourceNameRead(d *schema.ResourceData, meta interface{}) error <span class="cov8" title="1">{
+        return getNameResult(d, meta)
+}</span>
+
+func resourceNameDelete(d *schema.ResourceData, meta interface{}) error <span class="cov8" title="1">{
+        return nil
+}</span>
+
+func cleanSlice(names []string, resourceDefinition *ResourceStructure) []string <span class="cov8" title="1">{
+        for i, name := range names </span><span class="cov8" title="1">{
+                names[i] = cleanString(name, resourceDefinition)
+        }</span>
+        <span class="cov8" title="1">return names</span>
+}
+
+func cleanString(name string, resourceDefinition *ResourceStructure) string <span class="cov8" title="1">{
+        myRegex, _ := regexp.Compile(resourceDefinition.RegEx)
+        return myRegex.ReplaceAllString(name, "")
+}</span>
+
+func concatenateParameters(separator string, parameters ...[]string) string <span class="cov8" title="1">{
+        elems := []string{}
+        for _, items := range parameters </span><span class="cov8" title="1">{
+                for _, item := range items </span><span class="cov8" title="1">{
+                        if len(item) &gt; 0 </span><span class="cov8" title="1">{
+                                elems = append(elems, []string{item}...)
+                        }</span>
+                }
+        }
+        <span class="cov8" title="1">return strings.Join(elems, separator)</span>
+}
+
+func getResource(resourceType string) (*ResourceStructure, error) <span class="cov8" title="1">{
+        if resourceKey, existing := ResourceMaps[resourceType]; existing </span><span class="cov8" title="1">{
+                resourceType = resourceKey
+        }</span>
+        <span class="cov8" title="1">if resource, resourceFound := ResourceDefinitions[resourceType]; resourceFound </span><span class="cov8" title="1">{
+                return &amp;resource, nil
+        }</span>
+        <span class="cov8" title="1">return nil, fmt.Errorf("invalid resource type %s", resourceType)</span>
+}
+
+// Retrieve the resource slug / shortname based on the resourceType and the selected convention
+func getSlug(resourceType string, convention string) string <span class="cov8" title="1">{
+        if convention == ConventionCafClassic || convention == ConventionCafRandom </span><span class="cov8" title="1">{
+                if val, ok := ResourceDefinitions[resourceType]; ok </span><span class="cov8" title="1">{
+                        return val.CafPrefix
+                }</span>
+        }
+        <span class="cov8" title="1">return ""</span>
+}
+
+func trimResourceName(resourceName string, maxLength int) string <span class="cov8" title="1">{
+        var length int = len(resourceName)
+
+        if length &gt; maxLength </span><span class="cov8" title="1">{
+                length = maxLength
+        }</span>
+
+        <span class="cov8" title="1">return string(resourceName[0:length])</span>
+}
+
+func convertInterfaceToString(source []interface{}) []string <span class="cov8" title="1">{
+        s := make([]string, len(source))
+        for i, v := range source </span><span class="cov8" title="1">{
+                s[i] = fmt.Sprint(v)
+        }</span>
+        <span class="cov8" title="1">return s</span>
+}
+
+func composeName(separator string,
+        prefixes []string,
+        name string,
+        slug string,
+        suffixes []string,
+        randomSuffix string,
+        maxlength int,
+        namePrecedence []string) string <span class="cov8" title="1">{
+        contents := []string{}
+        currentlength := 0
+
+        for i := 0; i &lt; len(namePrecedence); i++ </span><span class="cov8" title="1">{
+                initialized := 0
+                if len(contents) &gt; 0 </span><span class="cov8" title="1">{
+                        initialized = len(separator)
+                }</span>
+                <span class="cov8" title="1">switch c := namePrecedence[i]; c </span>{
+                case "name":<span class="cov8" title="1">
+                        if len(name) &gt; 0 </span><span class="cov8" title="1">{
+                                if currentlength+len(name)+initialized &lt;= maxlength </span><span class="cov8" title="1">{
+                                        contents = append(contents, name)
+                                        currentlength = currentlength + len(name) + initialized
+                                }</span>
+                        }
+                case "slug":<span class="cov8" title="1">
+                        if len(slug) &gt; 0 </span><span class="cov8" title="1">{
+                                if currentlength+len(slug)+initialized &lt;= maxlength </span><span class="cov8" title="1">{
+                                        contents = append([]string{slug}, contents...)
+                                        currentlength = currentlength + len(slug) + initialized
+                                }</span>
+                        }
+                case "random":<span class="cov8" title="1">
+                        if len(randomSuffix) &gt; 0 </span><span class="cov8" title="1">{
+                                if currentlength+len(randomSuffix)+initialized &lt;= maxlength </span><span class="cov8" title="1">{
+                                        contents = append(contents, randomSuffix)
+                                        currentlength = currentlength + len(randomSuffix) + initialized
+                                }</span>
+                        }
+                case "suffixes":<span class="cov8" title="1">
+                        if len(suffixes) &gt; 0 </span><span class="cov8" title="1">{
+                                if len(suffixes[0]) &gt; 0 </span><span class="cov8" title="1">{
+                                        if currentlength+len(suffixes[0])+initialized &lt;= maxlength </span><span class="cov8" title="1">{
+                                                contents = append(contents, suffixes[0])
+                                                currentlength = currentlength + len(suffixes[0]) + initialized
+                                        }</span>
+                                }
+                                <span class="cov8" title="1">suffixes = suffixes[1:]
+                                if len(suffixes) &gt; 0 </span><span class="cov8" title="1">{
+                                        i--
+                                }</span>
+                        }
+                case "prefixes":<span class="cov8" title="1">
+                        if len(prefixes) &gt; 0 </span><span class="cov8" title="1">{
+                                if len(prefixes[len(prefixes)-1]) &gt; 0 </span><span class="cov8" title="1">{
+                                        if currentlength+len(prefixes[len(prefixes)-1])+initialized &lt;= maxlength </span><span class="cov8" title="1">{
+                                                contents = append([]string{prefixes[len(prefixes)-1]}, contents...)
+                                                currentlength = currentlength + len(prefixes[len(prefixes)-1]) + initialized
+                                        }</span>
+                                }
+                                <span class="cov8" title="1">prefixes = prefixes[:len(prefixes)-1]
+                                if len(prefixes) &gt; 0 </span><span class="cov8" title="1">{
+                                        i--
+                                }</span>
+                        }
+
+                }
+
+        }
+        <span class="cov8" title="1">content := strings.Join(contents, separator)
+        return content</span>
+}
+
+func validateResourceType(resourceType string, resourceTypes []string) (bool, error) <span class="cov8" title="1">{
+        isEmpty := len(resourceType) == 0 &amp;&amp; len(resourceTypes) == 0
+        if isEmpty </span><span class="cov8" title="1">{
+                return false, fmt.Errorf("resource_type and resource_types parameters are empty, you must specify at least one resource type")
+        }</span>
+        <span class="cov8" title="1">errorStrings := []string{}
+        resourceList := resourceTypes
+        if len(resourceType) &gt; 0 </span><span class="cov8" title="1">{
+                resourceList = append(resourceList, resourceType)
+        }</span>
+
+        <span class="cov8" title="1">for _, resource := range resourceList </span><span class="cov8" title="1">{
+                _, err := getResource(resource)
+                if err != nil </span><span class="cov8" title="1">{
+                        errorStrings = append(errorStrings, err.Error())
+                }</span>
+        }
+        <span class="cov8" title="1">if len(errorStrings) &gt; 0 </span><span class="cov8" title="1">{
+                return false, fmt.Errorf(strings.Join(errorStrings, "\n"))
+        }</span>
+        <span class="cov8" title="1">return true, nil</span>
+}
+
+func getResourceName(resourceTypeName string, separator string,
+        prefixes []string,
+        name string,
+        suffixes []string,
+        randomSuffix string,
+        convention string,
+        cleanInput bool,
+        passthrough bool,
+        useSlug bool,
+        namePrecedence []string) (string, error) <span class="cov8" title="1">{
+
+        resource, err := getResource(resourceTypeName)
+        if err != nil </span><span class="cov8" title="1">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">validationRegEx, err := regexp.Compile(resource.ValidationRegExp)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+
+        <span class="cov8" title="1">slug := ""
+        if useSlug </span><span class="cov8" title="1">{
+                slug = getSlug(resourceTypeName, convention)
+        }</span>
+
+        <span class="cov8" title="1">if cleanInput </span><span class="cov8" title="1">{
+                prefixes = cleanSlice(prefixes, resource)
+                suffixes = cleanSlice(suffixes, resource)
+                name = cleanString(name, resource)
+                separator = cleanString(separator, resource)
+                randomSuffix = cleanString(randomSuffix, resource)
+        }</span>
+
+        <span class="cov8" title="1">var resourceName string
+
+        if passthrough </span><span class="cov8" title="1">{
+                resourceName = name
+        }</span> else<span class="cov8" title="1"> {
+                resourceName = composeName(separator, prefixes, name, slug, suffixes, randomSuffix, resource.MaxLength, namePrecedence)
+        }</span>
+        <span class="cov8" title="1">resourceName = trimResourceName(resourceName, resource.MaxLength)
+
+        if resource.LowerCase </span><span class="cov8" title="1">{
+                resourceName = strings.ToLower(resourceName)
+        }</span>
+
+        <span class="cov8" title="1">if !validationRegEx.MatchString(resourceName) </span><span class="cov8" title="1">{
+                return "", fmt.Errorf("invalid name for CAF naming %s %s, the pattern %s doesn't match %s", resource.ResourceTypeName, name, resource.ValidationRegExp, resourceName)
+        }</span>
+
+        <span class="cov8" title="1">return resourceName, nil</span>
+}
+
+func getNameResult(d *schema.ResourceData, meta interface{}) error <span class="cov8" title="1">{
+        name := d.Get("name").(string)
+        prefixes := convertInterfaceToString(d.Get("prefixes").([]interface{}))
+        suffixes := convertInterfaceToString(d.Get("suffixes").([]interface{}))
+        separator := d.Get("separator").(string)
+        resourceType := d.Get("resource_type").(string)
+        resourceTypes := convertInterfaceToString(d.Get("resource_types").([]interface{}))
+        cleanInput := d.Get("clean_input").(bool)
+        passthrough := d.Get("passthrough").(bool)
+        useSlug := d.Get("use_slug").(bool)
+        randomLength := d.Get("random_length").(int)
+        randomSeed := int64(d.Get("random_seed").(int))
+
+        convention := ConventionCafClassic
+
+        randomSuffix := randSeq(int(randomLength), &amp;randomSeed)
+        namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
+
+        isValid, err := validateResourceType(resourceType, resourceTypes)
+        if !isValid </span><span class="cov8" title="1">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">if len(resourceType) &gt; 0 </span><span class="cov8" title="1">{
+                resourceName, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, convention, cleanInput, passthrough, useSlug, namePrecedence)
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov8" title="1">d.Set("result", resourceName)</span>
+        }
+        <span class="cov8" title="1">resourceNames := make(map[string]string, len(resourceTypes))
+        for _, resourceTypeName := range resourceTypes </span><span class="cov8" title="1">{
+                var err error
+                resourceNames[resourceTypeName], err = getResourceName(resourceTypeName, separator, prefixes, name, suffixes, randomSuffix, convention, cleanInput, passthrough, useSlug, namePrecedence)
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+        }
+        <span class="cov8" title="1">d.Set("results", resourceNames)
+        d.SetId(randSeq(16, nil))
+        return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package azurecaf
+
+import (
+        "testing"
+
+        "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+)
+
+func TestGetResource_InvalidResource(t *testing.T) <span class="cov0" title="0">{
+        resourceType := "invalid_resource_type"
+        _, err := getResource(resourceType)
+        
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource type but got none")
+        }</span>
+}
+
+func TestTrimResourceName_WithTrim(t *testing.T) <span class="cov0" title="0">{
+        resourceName := "this-is-a-very-long-resource-name-that-needs-to-be-trimmed"
+        maxLength := 20
+        
+        result := trimResourceName(resourceName, maxLength)
+        
+        if len(result) != maxLength </span><span class="cov0" title="0">{
+                t.Fatalf("Expected length %d, got %d", maxLength, len(result))
+        }</span>
+        
+        <span class="cov0" title="0">if result != resourceName[:maxLength] </span><span class="cov0" title="0">{
+                t.Fatalf("Expected %s, got %s", resourceName[:maxLength], result)
+        }</span>
+}
+
+func TestValidateResourceType_EdgeCases(t *testing.T) <span class="cov0" title="0">{
+        resourceType := ""
+        resourceTypes := []string{}
+        _, err := validateResourceType(resourceType, resourceTypes)
+        
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for empty resource type but got none")
+        }</span>
+}
+
+func TestGetResourceName_InvalidResourceType(t *testing.T) <span class="cov0" title="0">{
+        resourceType := "invalid_resource_type"
+        separator := "-"
+        prefixes := []string{"prefix"}
+        name := "testname"
+        suffixes := []string{"suffix"}
+        randomSuffix := "random"
+        convention := ConventionCafClassic
+        cleanInput := true
+        passthrough := false
+        useSlug := true
+        namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
+        
+        _, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, convention, cleanInput, passthrough, useSlug, namePrecedence)
+        
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource type but got none")
+        }</span>
+}
+
+func TestGetNameResult_InvalidResourceType(t *testing.T) <span class="cov0" title="0">{
+        r := schema.Resource{
+                Schema: map[string]*schema.Schema{
+                        "name": {
+                                Type: schema.TypeString,
+                        },
+                        "prefixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                        },
+                        "suffixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                        },
+                        "separator": {
+                                Type: schema.TypeString,
+                        },
+                        "resource_type": {
+                                Type: schema.TypeString,
+                        },
+                        "clean_input": {
+                                Type: schema.TypeBool,
+                        },
+                        "passthrough": {
+                                Type: schema.TypeBool,
+                        },
+                        "use_slug": {
+                                Type: schema.TypeBool,
+                        },
+                        "random_length": {
+                                Type: schema.TypeInt,
+                        },
+                        "random_seed": {
+                                Type: schema.TypeInt,
+                        },
+                        "result": {
+                                Type: schema.TypeString,
+                        },
+                },
+        }
+
+        d := r.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("prefixes", []interface{}{"prefix"})
+        d.Set("suffixes", []interface{}{"suffix"})
+        d.Set("separator", "-")
+        d.Set("resource_type", "invalid_resource_type")
+        d.Set("clean_input", true)
+        d.Set("passthrough", false)
+        d.Set("use_slug", true)
+        d.Set("random_length", 5)
+        d.Set("random_seed", 123)
+
+        err := getNameResult(d, nil)
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource type but got none")
+        }</span>
+}
+
+func TestGetResult_InvalidResourceType(t *testing.T) <span class="cov0" title="0">{
+        r := schema.Resource{
+                Schema: map[string]*schema.Schema{
+                        "name": {
+                                Type: schema.TypeString,
+                        },
+                        "prefix": {
+                                Type: schema.TypeString,
+                        },
+                        "prefixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                        },
+                        "suffixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                        },
+                        "postfix": {
+                                Type: schema.TypeString,
+                        },
+                        "convention": {
+                                Type: schema.TypeString,
+                        },
+                        "resource_type": {
+                                Type: schema.TypeString,
+                        },
+                        "max_length": {
+                                Type: schema.TypeInt,
+                        },
+                        "result": {
+                                Type: schema.TypeString,
+                        },
+                },
+        }
+
+        d := r.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("prefix", "prefix")
+        d.Set("postfix", "postfix")
+        d.Set("convention", ConventionCafClassic)
+        d.Set("resource_type", "invalid_resource_type")
+        d.Set("max_length", 63)
+
+        err := getResult(d, nil)
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource type but got none")
+        }</span>
+        
+        <span class="cov0" title="0">result := d.Get("result")
+        if result != nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected nil result for invalid resource type")
+        }</span>
+}
+
+func TestGetResult_MaxLengthLessThanDefault(t *testing.T) <span class="cov0" title="0">{
+        r := schema.Resource{
+                Schema: map[string]*schema.Schema{
+                        "name": {
+                                Type: schema.TypeString,
+                        },
+                        "prefix": {
+                                Type: schema.TypeString,
+                        },
+                        "prefixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                        },
+                        "suffixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                        },
+                        "postfix": {
+                                Type: schema.TypeString,
+                        },
+                        "convention": {
+                                Type: schema.TypeString,
+                        },
+                        "resource_type": {
+                                Type: schema.TypeString,
+                        },
+                        "max_length": {
+                                Type: schema.TypeInt,
+                        },
+                        "result": {
+                                Type: schema.TypeString,
+                        },
+                },
+        }
+
+        d := r.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("prefix", "prefix")
+        d.Set("postfix", "postfix")
+        d.Set("convention", ConventionCafClassic)
+        d.Set("resource_type", "azurerm_resource_group")
+        d.Set("max_length", 10) // Less than default max length
+
+        err := getResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResult returned error: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">result := d.Get("result").(string)
+        if len(result) &gt; 10 </span><span class="cov0" title="0">{
+                t.Fatalf("Expected result length &lt;= 10, got %d", len(result))
+        }</span>
+}
+
+func TestGetResult_EmptyName(t *testing.T) <span class="cov0" title="0">{
+        r := schema.Resource{
+                Schema: map[string]*schema.Schema{
+                        "name": {
+                                Type: schema.TypeString,
+                        },
+                        "prefix": {
+                                Type: schema.TypeString,
+                        },
+                        "prefixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                        },
+                        "suffixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                        },
+                        "postfix": {
+                                Type: schema.TypeString,
+                        },
+                        "convention": {
+                                Type: schema.TypeString,
+                        },
+                        "resource_type": {
+                                Type: schema.TypeString,
+                        },
+                        "max_length": {
+                                Type: schema.TypeInt,
+                        },
+                        "result": {
+                                Type: schema.TypeString,
+                        },
+                },
+        }
+
+        d := r.TestResourceData()
+        d.Set("name", "")
+        d.Set("prefix", "")
+        d.Set("postfix", "")
+        d.Set("convention", ConventionCafRandom)
+        d.Set("resource_type", "azurerm_resource_group")
+        d.Set("max_length", 63)
+
+        err := getResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResult returned error: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">result := d.Get("result").(string)
+        if result == "" </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-empty result")
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package azurecaf
+
+import (
+        "testing"
+)
+
+func TestGetResource_AllCases(t *testing.T) <span class="cov0" title="0">{
+        resourceType := "azurerm_resource_group"
+        resource, err := getResource(resourceType)
+        
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResource returned error for valid resource: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">if resource == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected resource to be returned for valid resource")
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = "rg"
+        resource, err = getResource(resourceType)
+        
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResource returned error for valid mapped resource: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">if resource == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected resource to be returned for valid mapped resource")
+        }</span>
+}
+
+func TestTrimResourceName_AllCases(t *testing.T) <span class="cov0" title="0">{
+        resourceName := "short-name"
+        maxLength := 20
+        
+        result := trimResourceName(resourceName, maxLength)
+        
+        if result != resourceName </span><span class="cov0" title="0">{
+                t.Fatalf("Expected %s, got %s", resourceName, result)
+        }</span>
+        
+        <span class="cov0" title="0">resourceName = "this-is-a-very-long-resource-name-that-needs-to-be-trimmed"
+        maxLength = 20
+        
+        result = trimResourceName(resourceName, maxLength)
+        
+        if len(result) != maxLength </span><span class="cov0" title="0">{
+                t.Fatalf("Expected length %d, got %d", maxLength, len(result))
+        }</span>
+        
+        <span class="cov0" title="0">if result != resourceName[:maxLength] </span><span class="cov0" title="0">{
+                t.Fatalf("Expected %s, got %s", resourceName[:maxLength], result)
+        }</span>
+        
+        <span class="cov0" title="0">resourceName = "test"
+        maxLength = 0
+        
+        result = trimResourceName(resourceName, maxLength)
+        
+        if result != "" </span><span class="cov0" title="0">{
+                t.Fatalf("Expected empty string, got %s", result)
+        }</span>
+        
+        <span class="cov0" title="0">resourceName = ""
+        maxLength = 10
+        
+        result = trimResourceName(resourceName, maxLength)
+        
+        if result != "" </span><span class="cov0" title="0">{
+                t.Fatalf("Expected empty string, got %s", result)
+        }</span>
+}
+
+func TestValidateResourceType_AllCases(t *testing.T) <span class="cov0" title="0">{
+        resourceType := "azurerm_resource_group"
+        resourceTypes := []string{}
+        valid, err := validateResourceType(resourceType, resourceTypes)
+        
+        if !valid </span><span class="cov0" title="0">{
+                t.Fatal("Expected valid resource type to be valid")
+        }</span>
+        
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("validateResourceType returned error for valid resource type: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = ""
+        resourceTypes = []string{"azurerm_resource_group", "azurerm_storage_account"}
+        valid, err = validateResourceType(resourceType, resourceTypes)
+        
+        if !valid </span><span class="cov0" title="0">{
+                t.Fatal("Expected valid resource types to be valid")
+        }</span>
+        
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("validateResourceType returned error for valid resource types: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = "azurerm_resource_group"
+        resourceTypes = []string{"azurerm_storage_account"}
+        valid, err = validateResourceType(resourceType, resourceTypes)
+        
+        if !valid </span><span class="cov0" title="0">{
+                t.Fatal("Expected valid resource type and valid resource types to be valid")
+        }</span>
+        
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("validateResourceType returned error for valid resource type and valid resource types: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = "invalid_resource_type"
+        resourceTypes = []string{}
+        valid, err = validateResourceType(resourceType, resourceTypes)
+        
+        if valid </span><span class="cov0" title="0">{
+                t.Fatal("Expected invalid resource type to be invalid")
+        }</span>
+        
+        <span class="cov0" title="0">if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource type but got none")
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = ""
+        resourceTypes = []string{"invalid_resource_type"}
+        valid, err = validateResourceType(resourceType, resourceTypes)
+        
+        if valid </span><span class="cov0" title="0">{
+                t.Fatal("Expected invalid resource types to be invalid")
+        }</span>
+        
+        <span class="cov0" title="0">if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource types but got none")
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = "invalid_resource_type"
+        resourceTypes = []string{"another_invalid_resource_type"}
+        valid, err = validateResourceType(resourceType, resourceTypes)
+        
+        if valid </span><span class="cov0" title="0">{
+                t.Fatal("Expected invalid resource type and invalid resource types to be invalid")
+        }</span>
+        
+        <span class="cov0" title="0">if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource type and invalid resource types but got none")
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = ""
+        resourceTypes = []string{}
+        valid, err = validateResourceType(resourceType, resourceTypes)
+        
+        if valid </span><span class="cov0" title="0">{
+                t.Fatal("Expected empty resource type and empty resource types to be invalid")
+        }</span>
+        
+        <span class="cov0" title="0">if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for empty resource type and empty resource types but got none")
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package azurecaf
+
+import (
+        "testing"
+)
+
+func TestGetResourceEdgeCases(t *testing.T) <span class="cov0" title="0">{
+        resourceType := "rg"
+        resource, err := getResource(resourceType)
+        
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResource returned error for valid mapped resource: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">if resource == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected resource to be returned for valid mapped resource")
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = "nonexistent_resource"
+        _, err = getResource(resourceType)
+        
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for nonexistent resource but got none")
+        }</span>
+}
+
+func TestTrimResourceNameEdgeCases(t *testing.T) <span class="cov0" title="0">{
+        resourceName := ""
+        maxLength := 10
+        
+        result := trimResourceName(resourceName, maxLength)
+        
+        if result != "" </span><span class="cov0" title="0">{
+                t.Fatalf("Expected empty string, got %s", result)
+        }</span>
+        
+        <span class="cov0" title="0">resourceName = "test"
+        maxLength = 0
+        
+        result = trimResourceName(resourceName, maxLength)
+        
+        if result != "" </span><span class="cov0" title="0">{
+                t.Fatalf("Expected empty string, got %s", result)
+        }</span>
+}
+
+func TestValidateResourceTypeEdgeCases(t *testing.T) <span class="cov0" title="0">{
+        resourceType := ""
+        resourceTypes := []string{}
+        valid, err := validateResourceType(resourceType, resourceTypes)
+        
+        if valid </span><span class="cov0" title="0">{
+                t.Fatal("Expected empty resource type and empty resource types to be invalid")
+        }</span>
+        
+        <span class="cov0" title="0">if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for empty resource type and empty resource types but got none")
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = "rg"
+        resourceTypes = []string{}
+        valid, err = validateResourceType(resourceType, resourceTypes)
+        
+        if !valid </span><span class="cov0" title="0">{
+                t.Fatal("Expected valid resource type in ResourceMaps to be valid")
+        }</span>
+        
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("validateResourceType returned error for valid resource type in ResourceMaps: %v", err)
+        }</span>
+}
+
+func TestGetResourceNameEdgeCases(t *testing.T) <span class="cov0" title="0">{
+        resourceType := "azurerm_resource_group"
+        separator := "-"
+        prefixes := []string{"prefix"}
+        name := ""
+        suffixes := []string{"suffix"}
+        randomSuffix := "random"
+        convention := ConventionCafClassic
+        cleanInput := true
+        passthrough := false
+        useSlug := true
+        namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
+        
+        result, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, convention, cleanInput, passthrough, useSlug, namePrecedence)
+        
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResourceName returned error for empty name: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">if result == "" </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-empty result for empty name")
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = "azurerm_resource_group"
+        separator = "-"
+        prefixes = []string{}
+        name = "testname"
+        suffixes = []string{}
+        randomSuffix = "random"
+        convention = ConventionCafClassic
+        cleanInput = true
+        passthrough = false
+        useSlug = true
+        namePrecedence = []string{"name", "slug", "random", "suffixes", "prefixes"}
+        
+        result, err = getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, convention, cleanInput, passthrough, useSlug, namePrecedence)
+        
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResourceName returned error for empty prefixes and suffixes: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">if result == "" </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-empty result for empty prefixes and suffixes")
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package azurecaf
+
+import (
+        "testing"
+)
+
+func TestGetResourceNameCompleteCoverage(t *testing.T) <span class="cov0" title="0">{
+        resource, _ := getResource("azurerm_resource_group")
+        originalRegex := resource.ValidationRegExp
+        resource.ValidationRegExp = "["  // Invalid regex pattern
+        
+        _, err := getResourceName("azurerm_resource_group", "-", []string{}, "test", []string{}, "", "cafrandom", true, false, true, []string{"name", "slug", "random", "suffixes", "prefixes"})
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid regex pattern, got nil")
+        }</span>
+        
+        <span class="cov0" title="0">resource.ValidationRegExp = originalRegex
+        
+        resource.LowerCase = true
+        result, err := getResourceName("azurerm_resource_group", "-", []string{}, "TestName", []string{}, "", "cafrandom", true, false, true, []string{"name", "slug", "random", "suffixes", "prefixes"})
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResourceName with lowercase conversion returned error: %v", err)
+        }</span>
+        <span class="cov0" title="0">if result != "rg-testname" </span><span class="cov0" title="0">{
+                t.Fatalf("Expected lowercase result 'rg-testname', got '%s'", result)
+        }</span>
+        
+        <span class="cov0" title="0">resource.ValidationRegExp = "^[a-z0-9]+$"  // Only allow lowercase letters and numbers
+        _, err = getResourceName("azurerm_resource_group", "-", []string{}, "test-name", []string{}, "", "cafrandom", false, false, true, []string{"name", "slug", "random", "suffixes", "prefixes"})
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid name, got nil")
+        }</span>
+}
+
+func TestGetNameResultCompleteCoverage(t *testing.T) <span class="cov0" title="0">{
+        provider := Provider()
+        
+        nameResource := provider.ResourcesMap["azurecaf_name"]
+        if nameResource == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-nil azurecaf_name resource")
+        }</span>
+        
+        <span class="cov0" title="0">d := nameResource.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("resource_type", "")
+        d.Set("resource_types", []interface{}{})
+        
+        err := getNameResult(d, nil)
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for empty resource_type and resource_types, got nil")
+        }</span>
+        
+        <span class="cov0" title="0">d = nameResource.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("resource_type", "")
+        d.Set("resource_types", []interface{}{"invalid_resource_type1", "invalid_resource_type2"})
+        
+        err = getNameResult(d, nil)
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource_types, got nil")
+        }</span>
+        
+        <span class="cov0" title="0">d = nameResource.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("resource_type", "azurerm_resource_group")
+        d.Set("resource_types", []interface{}{"invalid_resource_type"})
+        
+        err = getNameResult(d, nil)
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource in resource_types, got nil")
+        }</span>
+        
+        <span class="cov0" title="0">d = nameResource.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("resource_type", "")
+        d.Set("resource_types", []interface{}{"azurerm_resource_group", "azurerm_virtual_network"})
+        d.Set("random_length", 5)
+        d.Set("random_seed", 12345)
+        
+        err = getNameResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getNameResult returned error: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">results := d.Get("results").(map[string]interface{})
+        if len(results) != 2 </span><span class="cov0" title="0">{
+                t.Fatalf("Expected 2 results, got %d", len(results))
+        }</span>
+}
+
+func TestGetResultCompleteCoverage(t *testing.T) <span class="cov0" title="0">{
+        provider := Provider()
+        
+        conventionResource := provider.ResourcesMap["azurecaf_naming_convention"]
+        if conventionResource == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-nil azurecaf_naming_convention resource")
+        }</span>
+        
+        <span class="cov0" title="0">d := conventionResource.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("convention", "cafrandom")
+        d.Set("resource_type", "")
+        
+        err := getResult(d, nil)
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for empty resource_type, got nil")
+        }</span>
+        
+        <span class="cov0" title="0">d = conventionResource.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("convention", "cafrandom")
+        d.Set("resource_type", "invalid_resource_type")
+        
+        err = getResult(d, nil)
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource_type, got nil")
+        }</span>
+        
+        <span class="cov0" title="0">d = conventionResource.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("convention", "cafclassic")
+        d.Set("resource_type", "rg")
+        d.Set("random_length", 5)
+        
+        err = getResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResult returned error: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">result := d.Get("result").(string)
+        if result == "" </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-empty result")
+        }</span>
+        
+        <span class="cov0" title="0">d = conventionResource.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("convention", "cafrandom")
+        d.Set("resource_type", "rg")
+        d.Set("random_length", 5)
+        d.Set("random_seed", 12345)
+        
+        err = getResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResult returned error: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">result = d.Get("result").(string)
+        if result == "" </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-empty result")
+        }</span>
+        
+        <span class="cov0" title="0">d = conventionResource.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("convention", "invalid_convention")
+        d.Set("resource_type", "rg")
+        
+        err = getResult(d, nil)
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid convention, got nil")
+        }</span>
+}
+
+func TestComposeNameCompleteCoverage(t *testing.T) <span class="cov0" title="0">{
+        result := composeName("-", 
+                []string{"prefix1", "prefix2"}, 
+                "name", 
+                "slug", 
+                []string{"suffix1", "suffix2"}, 
+                "random", 
+                100, 
+                []string{"name", "slug", "random", "suffixes", "prefixes"})
+        
+        if result != "slug-name-random-suffix1-suffix2-prefix1-prefix2" </span><span class="cov0" title="0">{
+                t.Fatalf("Expected 'slug-name-random-suffix1-suffix2-prefix1-prefix2', got '%s'", result)
+        }</span>
+        
+        <span class="cov0" title="0">result = composeName("-", 
+                []string{"prefix1", "prefix2"}, 
+                "name", 
+                "slug", 
+                []string{"suffix1", "suffix2"}, 
+                "random", 
+                10, 
+                []string{"name", "slug", "random", "suffixes", "prefixes"})
+        
+        if len(result) &gt; 10 </span><span class="cov0" title="0">{
+                t.Fatalf("Expected result length &lt;= 10, got %d", len(result))
+        }</span>
+        
+        <span class="cov0" title="0">result = composeName("-", 
+                []string{}, 
+                "", 
+                "", 
+                []string{}, 
+                "", 
+                100, 
+                []string{"name", "slug", "random", "suffixes", "prefixes"})
+        
+        if result != "" </span><span class="cov0" title="0">{
+                t.Fatalf("Expected empty string, got '%s'", result)
+        }</span>
+}
+
+func TestValidateResourceTypeCompleteCoverage(t *testing.T) <span class="cov0" title="0">{
+        valid, err := validateResourceType("", []string{})
+        if valid || err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for empty resource_type and resource_types, got nil")
+        }</span>
+        
+        <span class="cov0" title="0">valid, err = validateResourceType("azurerm_resource_group", []string{})
+        if !valid || err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("validateResourceType returned error: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">valid, err = validateResourceType("invalid_resource_type", []string{})
+        if valid || err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource_type, got nil")
+        }</span>
+        
+        <span class="cov0" title="0">valid, err = validateResourceType("", []string{"azurerm_resource_group", "azurerm_virtual_network"})
+        if !valid || err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("validateResourceType returned error: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">valid, err = validateResourceType("", []string{"invalid_resource_type1", "invalid_resource_type2"})
+        if valid || err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource_types, got nil")
+        }</span>
+        
+        <span class="cov0" title="0">valid, err = validateResourceType("azurerm_resource_group", []string{"azurerm_virtual_network", "azurerm_subnet"})
+        if !valid || err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("validateResourceType returned error: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">valid, err = validateResourceType("azurerm_resource_group", []string{"invalid_resource_type"})
+        if valid || err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource_types, got nil")
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package azurecaf
+
+import (
+        "testing"
+)
+
+func TestGetResourceNameEdgeCasesSpecial(t *testing.T) <span class="cov0" title="0">{
+        resource, _ := getResource("azurerm_resource_group")
+        originalRegex := resource.ValidationRegExp
+        resource.ValidationRegExp = "["  // Invalid regex pattern
+        
+        _, err := getResourceName("azurerm_resource_group", "-", []string{}, "test", []string{}, "", "cafrandom", true, false, true, []string{"name", "slug", "random", "suffixes", "prefixes"})
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid regex pattern, got nil")
+        }</span>
+        
+        <span class="cov0" title="0">resource.ValidationRegExp = originalRegex
+        
+        resource.ValidationRegExp = "^[a-z0-9]+$"  // Only allow lowercase letters and numbers
+        
+        _, err = getResourceName("azurerm_resource_group", "-", []string{}, "test-name", []string{}, "", "cafrandom", false, false, true, []string{"name", "slug", "random", "suffixes", "prefixes"})
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid name, got nil")
+        }</span>
+        
+        <span class="cov0" title="0">resource.ValidationRegExp = originalRegex</span>
+}
+
+func TestGetNameResultEdgeCasesSpecial(t *testing.T) <span class="cov0" title="0">{
+        provider := Provider()
+        
+        nameResource := provider.ResourcesMap["azurecaf_name"]
+        if nameResource == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-nil azurecaf_name resource")
+        }</span>
+        
+        <span class="cov0" title="0">d := nameResource.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("resource_type", "")
+        d.Set("resource_types", []interface{}{})
+        
+        err := getNameResult(d, nil)
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for empty resource_type and resource_types, got nil")
+        }</span>
+        
+        <span class="cov0" title="0">d = nameResource.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("resource_type", "")
+        d.Set("resource_types", []interface{}{"invalid_resource_type"})
+        
+        err = getNameResult(d, nil)
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource_type in resource_types, got nil")
+        }</span>
+        
+        <span class="cov0" title="0">d = nameResource.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("resource_type", "azurerm_resource_group")
+        d.Set("resource_types", []interface{}{"invalid_resource_type"})
+        
+        err = getNameResult(d, nil)
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource in resource_types, got nil")
+        }</span>
+}
+
+func TestGetResultEdgeCasesSpecial(t *testing.T) <span class="cov0" title="0">{
+        provider := Provider()
+        
+        conventionResource := provider.ResourcesMap["azurecaf_naming_convention"]
+        if conventionResource == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-nil azurecaf_naming_convention resource")
+        }</span>
+        
+        <span class="cov0" title="0">d := conventionResource.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("convention", "invalid_convention")
+        d.Set("resource_type", "rg")
+        
+        err := getResult(d, nil)
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid convention, got nil")
+        }</span>
+        
+        <span class="cov0" title="0">d = conventionResource.TestResourceData()
+        d.Set("name", "testnameverylongstring")
+        d.Set("convention", ConventionCafRandom)
+        d.Set("resource_type", "rg")
+        d.Set("max_length", 25)  // Just enough for the name plus separator
+        
+        err = getResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResult returned error: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">result := d.Get("result").(string)
+        if result == "" </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-empty result")
+        }</span>
+        <span class="cov0" title="0">if len(result) &gt; 25 </span><span class="cov0" title="0">{
+                t.Fatalf("Expected result length &lt;= 25, got %d", len(result))
+        }</span>
+        
+        <span class="cov0" title="0">d = conventionResource.TestResourceData()
+        d.Set("name", "")
+        d.Set("convention", ConventionRandom)
+        d.Set("resource_type", "rg")
+        d.Set("random_length", 5)
+        
+        err = getResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResult returned error: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">result = d.Get("result").(string)
+        if result == "" </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-empty result")
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package azurecaf
+
+import (
+        "strings"
+        "testing"
+
+        "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+)
+
+func TestResourceActionCoverage(t *testing.T) <span class="cov0" title="0">{
+        r := schema.Resource{
+                Schema: map[string]*schema.Schema{
+                        "name": {
+                                Type: schema.TypeString,
+                        },
+                        "fails_if_empty": {
+                                Type: schema.TypeBool,
+                        },
+                        "value": {
+                                Type: schema.TypeString,
+                        },
+                },
+        }
+
+        d := r.TestResourceData()
+        d.Set("name", "PATH")
+        d.Set("fails_if_empty", false)
+
+        t.Skip("Skipping test that requires environment variables")
+}</span>
+
+func TestResourceNameDeleteCoverage(t *testing.T) <span class="cov0" title="0">{
+        r := schema.Resource{
+                Schema: map[string]*schema.Schema{
+                        "name": {
+                                Type: schema.TypeString,
+                        },
+                        "result": {
+                                Type: schema.TypeString,
+                        },
+                },
+        }
+
+        d := r.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("result", "test-result")
+
+        err := resourceNameDelete(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("resourceNameDelete returned error: %v", err)
+        }</span>
+}
+
+func TestResourceNameReadCoverage2(t *testing.T) <span class="cov0" title="0">{
+        r := schema.Resource{
+                Schema: map[string]*schema.Schema{
+                        "name": {
+                                Type: schema.TypeString,
+                        },
+                        "prefixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                        },
+                        "suffixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                        },
+                        "separator": {
+                                Type: schema.TypeString,
+                        },
+                        "resource_type": {
+                                Type: schema.TypeString,
+                        },
+                        "resource_types": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                        },
+                        "clean_input": {
+                                Type: schema.TypeBool,
+                        },
+                        "passthrough": {
+                                Type: schema.TypeBool,
+                        },
+                        "use_slug": {
+                                Type: schema.TypeBool,
+                        },
+                        "random_length": {
+                                Type: schema.TypeInt,
+                        },
+                        "random_seed": {
+                                Type: schema.TypeInt,
+                        },
+                        "result": {
+                                Type: schema.TypeString,
+                        },
+                },
+        }
+
+        d := r.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("prefixes", []interface{}{"prefix"})
+        d.Set("suffixes", []interface{}{"suffix"})
+        d.Set("separator", "-")
+        d.Set("resource_type", "azurerm_resource_group")
+        d.Set("resource_types", []interface{}{"azurerm_storage_account"})
+        d.Set("clean_input", true)
+        d.Set("passthrough", false)
+        d.Set("use_slug", true)
+        d.Set("random_length", 5)
+        d.Set("random_seed", 123)
+
+        err := resourceNameRead(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("resourceNameRead returned error: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">result := d.Get("result").(string)
+        if result == "" </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-empty result")
+        }</span>
+}
+
+func TestResourceNamingConventionDeleteCoverage(t *testing.T) <span class="cov0" title="0">{
+        r := schema.Resource{
+                Schema: map[string]*schema.Schema{
+                        "name": {
+                                Type: schema.TypeString,
+                        },
+                        "result": {
+                                Type: schema.TypeString,
+                        },
+                },
+        }
+
+        d := r.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("result", "test-result")
+
+        err := resourceNamingConventionDelete(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("resourceNamingConventionDelete returned error: %v", err)
+        }</span>
+}
+
+func TestResourceNamingConventionReadCoverage2(t *testing.T) <span class="cov0" title="0">{
+        t.Skip("Skipping test that requires more complex setup")
+}</span>
+
+func TestGetSlugCoverage(t *testing.T) <span class="cov0" title="0">{
+        resourceType := "azurerm_resource_group"
+        convention := ConventionCafClassic
+        slug := getSlug(resourceType, convention)
+        
+        if slug != "rg" </span><span class="cov0" title="0">{
+                t.Fatalf("Expected slug 'rg' for resource type '%s', got '%s'", resourceType, slug)
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = "nonexistent_resource"
+        slug = getSlug(resourceType, convention)
+        
+        if slug != "" </span><span class="cov0" title="0">{
+                t.Fatalf("Expected empty slug for nonexistent resource type, got '%s'", slug)
+        }</span>
+}
+
+func TestComposeNameCoverage(t *testing.T) <span class="cov0" title="0">{
+        separator := "-"
+        prefixes := []string{"prefix1", "prefix2"}
+        name := "testname"
+        slug := "rg"
+        suffixes := []string{"suffix1", "suffix2"}
+        randomSuffix := "random"
+        maxlength := 63
+        namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
+        
+        result := composeName(separator, prefixes, name, slug, suffixes, randomSuffix, maxlength, namePrecedence)
+        
+        if result == "" </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-empty result")
+        }</span>
+        
+        <span class="cov0" title="0">separator = "-"
+        prefixes = []string{}
+        name = ""
+        slug = ""
+        suffixes = []string{}
+        randomSuffix = ""
+        maxlength = 63
+        namePrecedence = []string{"name", "slug", "random", "suffixes", "prefixes"}
+        
+        result = composeName(separator, prefixes, name, slug, suffixes, randomSuffix, maxlength, namePrecedence)
+        
+        if result != "" </span><span class="cov0" title="0">{
+                t.Fatalf("Expected empty result, got '%s'", result)
+        }</span>
+}
+
+func TestCleanSliceCoverage(t *testing.T) <span class="cov0" title="0">{
+        data := []string{"test1", "test2", "test3"}
+        resource := ResourceDefinitions["azurerm_resource_group"]
+        result := cleanSlice(data, &amp;resource)
+        
+        if len(result) != len(data) </span><span class="cov0" title="0">{
+                t.Fatalf("Expected length %d, got %d", len(data), len(result))
+        }</span>
+        
+        <span class="cov0" title="0">for i := range data </span><span class="cov0" title="0">{
+                if result[i] != data[i] </span><span class="cov0" title="0">{
+                        t.Fatalf("Expected '%s' at index %d, got '%s'", data[i], i, result[i])
+                }</span>
+        }
+        
+        <span class="cov0" title="0">data = []string{"test1!", "test2@", "test3#"}
+        resource = ResourceDefinitions["azurerm_resource_group"]
+        result = cleanSlice(data, &amp;resource)
+        
+        if len(result) != len(data) </span><span class="cov0" title="0">{
+                t.Fatalf("Expected length %d, got %d", len(data), len(result))
+        }</span>
+        
+        <span class="cov0" title="0">for i := range data </span><span class="cov0" title="0">{
+                if result[i] == data[i] </span><span class="cov0" title="0">{
+                        t.Fatalf("Expected cleaned string at index %d, got '%s'", i, result[i])
+                }</span>
+        }
+}
+
+func TestConcatenateParametersCoverage(t *testing.T) <span class="cov0" title="0">{
+        separator := "-"
+        prefixes := []string{"prefix1", "prefix2"}
+        name := []string{"testname"}
+        suffixes := []string{"suffix1", "suffix2"}
+        
+        result := concatenateParameters(separator, prefixes, name, suffixes)
+        
+        if !strings.Contains(result, "prefix1") || !strings.Contains(result, "prefix2") || 
+           !strings.Contains(result, "testname") || !strings.Contains(result, "suffix1") || 
+           !strings.Contains(result, "suffix2") </span><span class="cov0" title="0">{
+                t.Fatalf("Expected result to contain all elements, got '%s'", result)
+        }</span>
+        
+        <span class="cov0" title="0">separator = "-"
+        prefixes = []string{}
+        name = []string{"testname"}
+        suffixes = []string{}
+        
+        result = concatenateParameters(separator, prefixes, name, suffixes)
+        expected := "testname"
+        
+        if result != expected </span><span class="cov0" title="0">{
+                t.Fatalf("Expected '%s', got '%s'", expected, result)
+        }</span>
+        
+        <span class="cov0" title="0">separator = "-"
+        prefixes = []string{"prefix1", "prefix2"}
+        name = []string{}
+        suffixes = []string{"suffix1", "suffix2"}
+        
+        result = concatenateParameters(separator, prefixes, name, suffixes)
+        
+        if !strings.Contains(result, "prefix1") || !strings.Contains(result, "prefix2") || 
+           !strings.Contains(result, "suffix1") || !strings.Contains(result, "suffix2") </span><span class="cov0" title="0">{
+                t.Fatalf("Expected result to contain all elements, got '%s'", result)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package azurecaf
+
+import (
+        "testing"
+
+        "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+)
+
+func TestCleanStringCoverage2(t *testing.T) <span class="cov0" title="0">{
+        name := "test!@#$%^&amp;*()_+name"
+        resource := ResourceDefinitions["azurerm_resource_group"]
+        
+        result := cleanString(name, &amp;resource)
+        
+        if result == name </span><span class="cov0" title="0">{
+                t.Fatalf("Expected cleaned string, got '%s'", result)
+        }</span>
+        
+        <span class="cov0" title="0">name = "testname"
+        result = cleanString(name, &amp;resource)
+        
+        if result != name </span><span class="cov0" title="0">{
+                t.Fatalf("Expected '%s', got '%s'", name, result)
+        }</span>
+}
+
+func TestConvertInterfaceToStringCoverage2(t *testing.T) <span class="cov0" title="0">{
+        source := []interface{}{"test1", 2, true, 3.14}
+        
+        result := convertInterfaceToString(source)
+        
+        if len(result) != len(source) </span><span class="cov0" title="0">{
+                t.Fatalf("Expected length %d, got %d", len(source), len(result))
+        }</span>
+        
+        <span class="cov0" title="0">if result[0] != "test1" </span><span class="cov0" title="0">{
+                t.Fatalf("Expected 'test1', got '%s'", result[0])
+        }</span>
+        
+        <span class="cov0" title="0">if result[1] != "2" </span><span class="cov0" title="0">{
+                t.Fatalf("Expected '2', got '%s'", result[1])
+        }</span>
+        
+        <span class="cov0" title="0">if result[2] != "true" </span><span class="cov0" title="0">{
+                t.Fatalf("Expected 'true', got '%s'", result[2])
+        }</span>
+        
+        <span class="cov0" title="0">if result[3] != "3.14" </span><span class="cov0" title="0">{
+                t.Fatalf("Expected '3.14', got '%s'", result[3])
+        }</span>
+        
+        <span class="cov0" title="0">source = []interface{}{}
+        result = convertInterfaceToString(source)
+        
+        if len(result) != 0 </span><span class="cov0" title="0">{
+                t.Fatalf("Expected empty slice, got length %d", len(result))
+        }</span>
+}
+
+func TestRandSeqCoverage2(t *testing.T) <span class="cov0" title="0">{
+        length := 10
+        seed := int64(123)
+        
+        result := randSeq(length, &amp;seed)
+        
+        if len(result) != length </span><span class="cov0" title="0">{
+                t.Fatalf("Expected length %d, got %d", length, len(result))
+        }</span>
+        
+        <span class="cov0" title="0">result2 := randSeq(length, &amp;seed)
+        
+        if result == result2 </span><span class="cov0" title="0">{
+                t.Fatalf("Expected different results with same seed pointer")
+        }</span>
+        
+        <span class="cov0" title="0">result3 := randSeq(length, nil)
+        
+        if len(result3) != length </span><span class="cov0" title="0">{
+                t.Fatalf("Expected length %d, got %d", length, len(result3))
+        }</span>
+        
+        <span class="cov0" title="0">result4 := randSeq(0, nil)
+        
+        if result4 != "" </span><span class="cov0" title="0">{
+                t.Fatalf("Expected empty string, got '%s'", result4)
+        }</span>
+}
+
+func TestGetResourceCoverage2(t *testing.T) <span class="cov0" title="0">{
+        resourceType := "rg"
+        resource, err := getResource(resourceType)
+        
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResource returned error for valid mapped resource: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">if resource == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected resource to be returned for valid mapped resource")
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = "azurerm_resource_group"
+        resource, err = getResource(resourceType)
+        
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResource returned error for valid resource: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">if resource == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected resource to be returned for valid resource")
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = "nonexistent_resource"
+        _, err = getResource(resourceType)
+        
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for nonexistent resource but got none")
+        }</span>
+}
+
+func TestTrimResourceNameCoverage2(t *testing.T) <span class="cov0" title="0">{
+        resourceName := "this-is-a-very-long-resource-name-that-needs-to-be-trimmed"
+        maxLength := 20
+        
+        result := trimResourceName(resourceName, maxLength)
+        
+        if len(result) != maxLength </span><span class="cov0" title="0">{
+                t.Fatalf("Expected length %d, got %d", maxLength, len(result))
+        }</span>
+        
+        <span class="cov0" title="0">if result != resourceName[:maxLength] </span><span class="cov0" title="0">{
+                t.Fatalf("Expected '%s', got '%s'", resourceName[:maxLength], result)
+        }</span>
+        
+        <span class="cov0" title="0">resourceName = "short-name"
+        maxLength = 20
+        
+        result = trimResourceName(resourceName, maxLength)
+        
+        if result != resourceName </span><span class="cov0" title="0">{
+                t.Fatalf("Expected '%s', got '%s'", resourceName, result)
+        }</span>
+        
+        <span class="cov0" title="0">resourceName = ""
+        maxLength = 10
+        
+        result = trimResourceName(resourceName, maxLength)
+        
+        if result != "" </span><span class="cov0" title="0">{
+                t.Fatalf("Expected empty string, got '%s'", result)
+        }</span>
+        
+        <span class="cov0" title="0">resourceName = "test"
+        maxLength = 0
+        
+        result = trimResourceName(resourceName, maxLength)
+        
+        if result != "" </span><span class="cov0" title="0">{
+                t.Fatalf("Expected empty string, got '%s'", result)
+        }</span>
+}
+
+func TestValidateResourceTypeCoverage2(t *testing.T) <span class="cov0" title="0">{
+        resourceType := "azurerm_resource_group"
+        resourceTypes := []string{}
+        valid, err := validateResourceType(resourceType, resourceTypes)
+        
+        if !valid </span><span class="cov0" title="0">{
+                t.Fatal("Expected valid resource type to be valid")
+        }</span>
+        
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("validateResourceType returned error for valid resource type: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = ""
+        resourceTypes = []string{"azurerm_resource_group", "azurerm_storage_account"}
+        valid, err = validateResourceType(resourceType, resourceTypes)
+        
+        if !valid </span><span class="cov0" title="0">{
+                t.Fatal("Expected valid resource types to be valid")
+        }</span>
+        
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("validateResourceType returned error for valid resource types: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = "azurerm_resource_group"
+        resourceTypes = []string{"azurerm_storage_account"}
+        valid, err = validateResourceType(resourceType, resourceTypes)
+        
+        if !valid </span><span class="cov0" title="0">{
+                t.Fatal("Expected valid resource type and valid resource types to be valid")
+        }</span>
+        
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("validateResourceType returned error for valid resource type and valid resource types: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = "invalid_resource_type"
+        resourceTypes = []string{}
+        valid, err = validateResourceType(resourceType, resourceTypes)
+        
+        if valid </span><span class="cov0" title="0">{
+                t.Fatal("Expected invalid resource type to be invalid")
+        }</span>
+        
+        <span class="cov0" title="0">if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource type but got none")
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = ""
+        resourceTypes = []string{"invalid_resource_type"}
+        valid, err = validateResourceType(resourceType, resourceTypes)
+        
+        if valid </span><span class="cov0" title="0">{
+                t.Fatal("Expected invalid resource types to be invalid")
+        }</span>
+        
+        <span class="cov0" title="0">if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource types but got none")
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = "invalid_resource_type"
+        resourceTypes = []string{"another_invalid_resource_type"}
+        valid, err = validateResourceType(resourceType, resourceTypes)
+        
+        if valid </span><span class="cov0" title="0">{
+                t.Fatal("Expected invalid resource type and invalid resource types to be invalid")
+        }</span>
+        
+        <span class="cov0" title="0">if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource type and invalid resource types but got none")
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = ""
+        resourceTypes = []string{}
+        valid, err = validateResourceType(resourceType, resourceTypes)
+        
+        if valid </span><span class="cov0" title="0">{
+                t.Fatal("Expected empty resource type and empty resource types to be invalid")
+        }</span>
+        
+        <span class="cov0" title="0">if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for empty resource type and empty resource types but got none")
+        }</span>
+}
+
+func TestGetResourceNameCoverage2(t *testing.T) <span class="cov0" title="0">{
+        resourceType := "azurerm_resource_group"
+        separator := "-"
+        prefixes := []string{"prefix"}
+        name := "testname"
+        suffixes := []string{"suffix"}
+        randomSuffix := "random"
+        convention := ConventionCafClassic
+        cleanInput := true
+        passthrough := false
+        useSlug := true
+        namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
+        
+        result, err := getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, convention, cleanInput, passthrough, useSlug, namePrecedence)
+        
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResourceName returned error for valid parameters: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">if result == "" </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-empty result for valid parameters")
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = "azurerm_resource_group"
+        separator = "-"
+        prefixes = []string{"prefix"}
+        name = "testname"
+        suffixes = []string{"suffix"}
+        randomSuffix = "random"
+        convention = ConventionCafClassic
+        cleanInput = true
+        passthrough = true
+        useSlug = true
+        namePrecedence = []string{"name", "slug", "random", "suffixes", "prefixes"}
+        
+        result, err = getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, convention, cleanInput, passthrough, useSlug, namePrecedence)
+        
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResourceName returned error for passthrough = true: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">if result != name </span><span class="cov0" title="0">{
+                t.Fatalf("Expected result to be name with passthrough = true, got '%s'", result)
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = "invalid_resource_type"
+        separator = "-"
+        prefixes = []string{"prefix"}
+        name = "testname"
+        suffixes = []string{"suffix"}
+        randomSuffix = "random"
+        convention = ConventionCafClassic
+        cleanInput = true
+        passthrough = false
+        useSlug = true
+        namePrecedence = []string{"name", "slug", "random", "suffixes", "prefixes"}
+        
+        _, err = getResourceName(resourceType, separator, prefixes, name, suffixes, randomSuffix, convention, cleanInput, passthrough, useSlug, namePrecedence)
+        
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource type but got none")
+        }</span>
+}
+
+func TestComposeNameCoverage2(t *testing.T) <span class="cov0" title="0">{
+        separator := "-"
+        prefixes := []string{"prefix1", "prefix2"}
+        name := "testname"
+        slug := "rg"
+        suffixes := []string{"suffix1", "suffix2"}
+        randomSuffix := "random"
+        maxlength := 63
+        namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
+        
+        result := composeName(separator, prefixes, name, slug, suffixes, randomSuffix, maxlength, namePrecedence)
+        
+        if result == "" </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-empty result")
+        }</span>
+        
+        <span class="cov0" title="0">separator = "-"
+        prefixes = []string{}
+        name = ""
+        slug = ""
+        suffixes = []string{}
+        randomSuffix = ""
+        maxlength = 63
+        namePrecedence = []string{"name", "slug", "random", "suffixes", "prefixes"}
+        
+        result = composeName(separator, prefixes, name, slug, suffixes, randomSuffix, maxlength, namePrecedence)
+        
+        if result != "" </span><span class="cov0" title="0">{
+                t.Fatalf("Expected empty result, got '%s'", result)
+        }</span>
+        
+        <span class="cov0" title="0">separator = "-"
+        prefixes = []string{"prefix1", "prefix2"}
+        name = "testname"
+        slug = "rg"
+        suffixes = []string{"suffix1", "suffix2"}
+        randomSuffix = "random"
+        maxlength = 0
+        namePrecedence = []string{"name", "slug", "random", "suffixes", "prefixes"}
+        
+        result = composeName(separator, prefixes, name, slug, suffixes, randomSuffix, maxlength, namePrecedence)
+        
+        if result != "" </span><span class="cov0" title="0">{
+                t.Fatalf("Expected empty result with maxlength = 0, got '%s'", result)
+        }</span>
+        
+        <span class="cov0" title="0">separator = "-"
+        prefixes = []string{"prefix1", "prefix2"}
+        name = "testname"
+        slug = "rg"
+        suffixes = []string{"suffix1", "suffix2"}
+        randomSuffix = "random"
+        maxlength = 5
+        namePrecedence = []string{"name", "slug", "random", "suffixes", "prefixes"}
+        
+        result = composeName(separator, prefixes, name, slug, suffixes, randomSuffix, maxlength, namePrecedence)
+        
+        if len(result) &gt; maxlength </span><span class="cov0" title="0">{
+                t.Fatalf("Expected length &lt;= %d, got %d", maxlength, len(result))
+        }</span>
+}
+
+func TestGetSlugCoverage2(t *testing.T) <span class="cov0" title="0">{
+        resourceType := "azurerm_resource_group"
+        convention := ConventionCafClassic
+        
+        result := getSlug(resourceType, convention)
+        
+        if result != "rg" </span><span class="cov0" title="0">{
+                t.Fatalf("Expected 'rg', got '%s'", result)
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = "azurerm_resource_group"
+        convention = ConventionCafRandom
+        
+        result = getSlug(resourceType, convention)
+        
+        if result != "rg" </span><span class="cov0" title="0">{
+                t.Fatalf("Expected 'rg', got '%s'", result)
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = "azurerm_resource_group"
+        convention = ConventionPassThrough
+        
+        result = getSlug(resourceType, convention)
+        
+        if result != "" </span><span class="cov0" title="0">{
+                t.Fatalf("Expected empty string, got '%s'", result)
+        }</span>
+        
+        <span class="cov0" title="0">resourceType = "invalid_resource_type"
+        convention = ConventionCafClassic
+        
+        result = getSlug(resourceType, convention)
+        
+        if result != "" </span><span class="cov0" title="0">{
+                t.Fatalf("Expected empty string, got '%s'", result)
+        }</span>
+}
+
+func TestGetNameResultCoverage2(t *testing.T) <span class="cov0" title="0">{
+        r := schema.Resource{
+                Schema: map[string]*schema.Schema{
+                        "name": {
+                                Type: schema.TypeString,
+                        },
+                        "prefixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                        },
+                        "suffixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                        },
+                        "separator": {
+                                Type: schema.TypeString,
+                        },
+                        "resource_type": {
+                                Type: schema.TypeString,
+                        },
+                        "resource_types": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                        },
+                        "clean_input": {
+                                Type: schema.TypeBool,
+                        },
+                        "passthrough": {
+                                Type: schema.TypeBool,
+                        },
+                        "use_slug": {
+                                Type: schema.TypeBool,
+                        },
+                        "random_length": {
+                                Type: schema.TypeInt,
+                        },
+                        "random_seed": {
+                                Type: schema.TypeInt,
+                        },
+                        "result": {
+                                Type: schema.TypeString,
+                        },
+                        "results": {
+                                Type: schema.TypeMap,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                        },
+                },
+        }
+
+        d := r.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("prefixes", []interface{}{"prefix"})
+        d.Set("suffixes", []interface{}{"suffix"})
+        d.Set("separator", "-")
+        d.Set("resource_type", "azurerm_resource_group")
+        d.Set("resource_types", []interface{}{})
+        d.Set("clean_input", true)
+        d.Set("passthrough", false)
+        d.Set("use_slug", true)
+        d.Set("random_length", 5)
+        d.Set("random_seed", 123)
+
+        err := getNameResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getNameResult returned error: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">result := d.Get("result").(string)
+        if result == "" </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-empty result")
+        }</span>
+
+        <span class="cov0" title="0">d = r.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("prefixes", []interface{}{"prefix"})
+        d.Set("suffixes", []interface{}{"suffix"})
+        d.Set("separator", "-")
+        d.Set("resource_type", "")
+        d.Set("resource_types", []interface{}{"azurerm_resource_group", "azurerm_storage_account"})
+        d.Set("clean_input", true)
+        d.Set("passthrough", false)
+        d.Set("use_slug", true)
+        d.Set("random_length", 5)
+        d.Set("random_seed", 123)
+
+        err = getNameResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getNameResult returned error: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">d = r.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("prefixes", []interface{}{"prefix"})
+        d.Set("suffixes", []interface{}{"suffix"})
+        d.Set("separator", "-")
+        d.Set("resource_type", "invalid_resource_type")
+        d.Set("resource_types", []interface{}{})
+        d.Set("clean_input", true)
+        d.Set("passthrough", false)
+        d.Set("use_slug", true)
+        d.Set("random_length", 5)
+        d.Set("random_seed", 123)
+
+        err = getNameResult(d, nil)
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource_type but got none")
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package azurecaf
+
+import (
+        "testing"
+)
+
+func TestGetResourceNameFinalCoverageEdgeCases(t *testing.T) <span class="cov0" title="0">{
+        resource, _ := getResource("azurerm_resource_group")
+        resource.ValidationRegExp = "["  // Invalid regex pattern
+        _, err := getResourceName("azurerm_resource_group", "-", []string{}, "test", []string{}, "", "cafrandom", true, false, true, []string{"name", "slug", "random", "suffixes", "prefixes"})
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid regex pattern, got nil")
+        }</span>
+}
+
+func TestGetNameResultFinalCoverageEdgeCases(t *testing.T) <span class="cov0" title="0">{
+        provider := Provider()
+        
+        nameResource := provider.ResourcesMap["azurecaf_name"]
+        if nameResource == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-nil azurecaf_name resource")
+        }</span>
+        
+        <span class="cov0" title="0">d := nameResource.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("resource_type", "")
+        d.Set("resource_types", []interface{}{})
+        
+        err := getNameResult(d, nil)
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for empty resource_type and resource_types, got nil")
+        }</span>
+        
+        <span class="cov0" title="0">d = nameResource.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("resource_type", "")
+        d.Set("resource_types", []interface{}{"invalid_resource_type1", "invalid_resource_type2"})
+        
+        err = getNameResult(d, nil)
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource_types, got nil")
+        }</span>
+}
+
+func TestGetResultFinalCoverageEdgeCases(t *testing.T) <span class="cov0" title="0">{
+        provider := Provider()
+        
+        conventionResource := provider.ResourcesMap["azurecaf_naming_convention"]
+        if conventionResource == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-nil azurecaf_naming_convention resource")
+        }</span>
+        
+        <span class="cov0" title="0">d := conventionResource.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("convention", "cafrandom")
+        d.Set("resource_type", "")
+        
+        err := getResult(d, nil)
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for empty resource_type, got nil")
+        }</span>
+        
+        <span class="cov0" title="0">d = conventionResource.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("convention", "cafclassic")
+        d.Set("resource_type", "rg")
+        d.Set("random_length", 5)
+        
+        err = getResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResult returned error: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">result := d.Get("result").(string)
+        if result == "" </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-empty result")
+        }</span>
+        
+        <span class="cov0" title="0">d = conventionResource.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("convention", "cafrandom")
+        d.Set("resource_type", "rg")
+        d.Set("random_length", 5)
+        d.Set("random_seed", 12345)
+        
+        err = getResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResult returned error: %v", err)
+        }</span>
+        
+        <span class="cov0" title="0">result = d.Get("result").(string)
+        if result == "" </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-empty result")
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package azurecaf
+
+import (
+        "testing"
+
+        "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+)
+
+func TestGetNameResultEdgeCases(t *testing.T) <span class="cov0" title="0">{
+        r := schema.Resource{
+                Schema: map[string]*schema.Schema{
+                        "name": {
+                                Type: schema.TypeString,
+                        },
+                        "prefixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                        },
+                        "suffixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                        },
+                        "separator": {
+                                Type: schema.TypeString,
+                        },
+                        "resource_type": {
+                                Type: schema.TypeString,
+                        },
+                        "resource_types": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                        },
+                        "clean_input": {
+                                Type: schema.TypeBool,
+                        },
+                        "passthrough": {
+                                Type: schema.TypeBool,
+                        },
+                        "use_slug": {
+                                Type: schema.TypeBool,
+                        },
+                        "random_length": {
+                                Type: schema.TypeInt,
+                        },
+                        "random_seed": {
+                                Type: schema.TypeInt,
+                        },
+                        "result": {
+                                Type: schema.TypeString,
+                        },
+                        "results": {
+                                Type: schema.TypeMap,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                        },
+                },
+        }
+
+        d := r.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("prefixes", []interface{}{"prefix"})
+        d.Set("suffixes", []interface{}{"suffix"})
+        d.Set("separator", "-")
+        d.Set("resource_type", "invalid_resource_type")
+        d.Set("resource_types", []interface{}{})
+        d.Set("clean_input", true)
+        d.Set("passthrough", false)
+        d.Set("use_slug", true)
+        d.Set("random_length", 5)
+        d.Set("random_seed", 123)
+
+        err := getNameResult(d, nil)
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource type but got none")
+        }</span>
+
+        <span class="cov0" title="0">d = r.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("prefixes", []interface{}{"prefix"})
+        d.Set("suffixes", []interface{}{"suffix"})
+        d.Set("separator", "-")
+        d.Set("resource_type", "")
+        d.Set("resource_types", []interface{}{"azurerm_resource_group", "invalid_resource_type"})
+        d.Set("clean_input", true)
+        d.Set("passthrough", false)
+        d.Set("use_slug", true)
+        d.Set("random_length", 5)
+        d.Set("random_seed", 123)
+
+        err = getNameResult(d, nil)
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource type in resource_types but got none")
+        }</span>
+
+        <span class="cov0" title="0">d = r.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("prefixes", []interface{}{"prefix"})
+        d.Set("suffixes", []interface{}{"suffix"})
+        d.Set("separator", "-")
+        d.Set("resource_type", "azurerm_resource_group")
+        d.Set("resource_types", []interface{}{})
+        d.Set("clean_input", true)
+        d.Set("passthrough", true)
+        d.Set("use_slug", true)
+        d.Set("random_length", 5)
+        d.Set("random_seed", 123)
+
+        err = getNameResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getNameResult returned error for passthrough = true: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">d = r.TestResourceData()
+        d.Set("name", "")
+        d.Set("prefixes", []interface{}{"prefix"})
+        d.Set("suffixes", []interface{}{"suffix"})
+        d.Set("separator", "-")
+        d.Set("resource_type", "azurerm_resource_group")
+        d.Set("resource_types", []interface{}{})
+        d.Set("clean_input", true)
+        d.Set("passthrough", false)
+        d.Set("use_slug", true)
+        d.Set("random_length", 5)
+        d.Set("random_seed", 123)
+
+        err = getNameResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getNameResult returned error for empty name: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">d = r.TestResourceData()
+        d.Set("name", "test!@#$%^&amp;*()_+name")
+        d.Set("prefixes", []interface{}{"prefix"})
+        d.Set("suffixes", []interface{}{"suffix"})
+        d.Set("separator", "-")
+        d.Set("resource_type", "azurerm_resource_group")
+        d.Set("resource_types", []interface{}{})
+        d.Set("clean_input", true)
+        d.Set("passthrough", false)
+        d.Set("use_slug", true)
+        d.Set("random_length", 5)
+        d.Set("random_seed", 123)
+
+        err = getNameResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getNameResult returned error for name with special characters and clean_input = true: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">d = r.TestResourceData()
+        d.Set("name", "test!@#$%^&amp;*()_+name")
+        d.Set("prefixes", []interface{}{"prefix"})
+        d.Set("suffixes", []interface{}{"suffix"})
+        d.Set("separator", "-")
+        d.Set("resource_type", "azurerm_resource_group")
+        d.Set("resource_types", []interface{}{})
+        d.Set("clean_input", false)
+        d.Set("passthrough", false)
+        d.Set("use_slug", true)
+        d.Set("random_length", 5)
+        d.Set("random_seed", 123)
+
+        err = getNameResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getNameResult returned error for name with special characters and clean_input = false: %v", err)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">package azurecaf
+
+import (
+        "testing"
+
+        "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+)
+
+func TestGetResourceNameComprehensive(t *testing.T) <span class="cov0" title="0">{
+        resourceTypeName := "azurerm_resource_group"
+        separator := "-"
+        prefixes := []string{"prefix1", "prefix2"}
+        name := "testname"
+        suffixes := []string{"suffix1", "suffix2"}
+        randomSuffix := "random"
+        convention := ConventionCafClassic
+        cleanInput := true
+        passthrough := false
+        useSlug := true
+        namePrecedence := []string{"name", "slug", "random", "suffixes", "prefixes"}
+
+        result, err := getResourceName(resourceTypeName, separator, prefixes, name, suffixes, randomSuffix, convention, cleanInput, passthrough, useSlug, namePrecedence)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResourceName returned error: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">if result == "" </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-empty result")
+        }</span>
+
+        <span class="cov0" title="0">resourceTypeName = "invalid_resource_type"
+        _, err = getResourceName(resourceTypeName, separator, prefixes, name, suffixes, randomSuffix, convention, cleanInput, passthrough, useSlug, namePrecedence)
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource type but got none")
+        }</span>
+
+        <span class="cov0" title="0">resourceTypeName = "azurerm_resource_group"
+        passthrough = true
+        result, err = getResourceName(resourceTypeName, separator, prefixes, name, suffixes, randomSuffix, convention, cleanInput, passthrough, useSlug, namePrecedence)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResourceName returned error for passthrough = true: %v", err)
+        }</span>
+        <span class="cov0" title="0">if result != name </span><span class="cov0" title="0">{
+                t.Fatalf("Expected result to be %s for passthrough = true, got %s", name, result)
+        }</span>
+
+        <span class="cov0" title="0">passthrough = false
+        useSlug = false
+        result, err = getResourceName(resourceTypeName, separator, prefixes, name, suffixes, randomSuffix, convention, cleanInput, passthrough, useSlug, namePrecedence)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResourceName returned error for useSlug = false: %v", err)
+        }</span>
+        <span class="cov0" title="0">if result == "" </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-empty result for useSlug = false")
+        }</span>
+
+        <span class="cov0" title="0">useSlug = true
+        cleanInput = false
+        name = "test!@#$%^&amp;*()_+name"
+        result, err = getResourceName(resourceTypeName, separator, prefixes, name, suffixes, randomSuffix, convention, cleanInput, passthrough, useSlug, namePrecedence)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResourceName returned error for cleanInput = false and special characters: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">resourceTypeName = "azurerm_storage_account"
+        name = "UPPERCASE"
+        cleanInput = true
+        result, err = getResourceName(resourceTypeName, separator, prefixes, name, suffixes, randomSuffix, convention, cleanInput, passthrough, useSlug, namePrecedence)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResourceName returned error for storage account: %v", err)
+        }</span>
+        <span class="cov0" title="0">for _, c := range result </span><span class="cov0" title="0">{
+                if c &gt;= 'A' &amp;&amp; c &lt;= 'Z' </span><span class="cov0" title="0">{
+                        t.Fatalf("Expected lowercase result for storage account, got %s", result)
+                }</span>
+        }
+
+        <span class="cov0" title="0">resourceTypeName = "azurerm_resource_group"
+        name = "thisisaverylongnamethatwillbecutoffbythemaxlengthparameter"
+        result, err = getResourceName(resourceTypeName, separator, prefixes, name, suffixes, randomSuffix, convention, cleanInput, passthrough, useSlug, namePrecedence)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResourceName returned error for long name: %v", err)
+        }</span>
+        <span class="cov0" title="0">resource, _ := getResource(resourceTypeName)
+        if len(result) &gt; resource.MaxLength </span><span class="cov0" title="0">{
+                t.Fatalf("Expected result length to be &lt;= %d, got %d", resource.MaxLength, len(result))
+        }</span>
+
+        <span class="cov0" title="0">name = "test@name"
+        cleanInput = false
+        _, err = getResourceName(resourceTypeName, separator, prefixes, name, suffixes, randomSuffix, convention, cleanInput, passthrough, useSlug, namePrecedence)
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid regex pattern but got none")
+        }</span>
+}
+
+func TestGetNameResultComprehensive(t *testing.T) <span class="cov0" title="0">{
+        r := schema.Resource{
+                Schema: map[string]*schema.Schema{
+                        "name": {
+                                Type: schema.TypeString,
+                        },
+                        "prefixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                        },
+                        "suffixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                        },
+                        "separator": {
+                                Type: schema.TypeString,
+                        },
+                        "resource_type": {
+                                Type: schema.TypeString,
+                        },
+                        "resource_types": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                        },
+                        "clean_input": {
+                                Type: schema.TypeBool,
+                        },
+                        "passthrough": {
+                                Type: schema.TypeBool,
+                        },
+                        "use_slug": {
+                                Type: schema.TypeBool,
+                        },
+                        "random_length": {
+                                Type: schema.TypeInt,
+                        },
+                        "random_seed": {
+                                Type: schema.TypeInt,
+                        },
+                        "result": {
+                                Type: schema.TypeString,
+                        },
+                        "results": {
+                                Type: schema.TypeMap,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                        },
+                },
+        }
+
+        d := r.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("prefixes", []interface{}{"prefix"})
+        d.Set("suffixes", []interface{}{"suffix"})
+        d.Set("separator", "-")
+        d.Set("resource_type", "azurerm_resource_group")
+        d.Set("resource_types", []interface{}{})
+        d.Set("clean_input", true)
+        d.Set("passthrough", false)
+        d.Set("use_slug", true)
+        d.Set("random_length", 5)
+        d.Set("random_seed", 123)
+
+        err := getNameResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getNameResult returned error: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">result := d.Get("result").(string)
+        if result == "" </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-empty result")
+        }</span>
+
+        <span class="cov0" title="0">d = r.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("prefixes", []interface{}{"prefix"})
+        d.Set("suffixes", []interface{}{"suffix"})
+        d.Set("separator", "-")
+        d.Set("resource_type", "")
+        d.Set("resource_types", []interface{}{"azurerm_resource_group", "azurerm_storage_account"})
+        d.Set("clean_input", true)
+        d.Set("passthrough", false)
+        d.Set("use_slug", true)
+        d.Set("random_length", 5)
+        d.Set("random_seed", 123)
+
+        err = getNameResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getNameResult returned error: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">results := d.Get("results").(map[string]interface{})
+        if len(results) != 2 </span><span class="cov0" title="0">{
+                t.Fatalf("Expected 2 results, got %d", len(results))
+        }</span>
+
+        <span class="cov0" title="0">d = r.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("prefixes", []interface{}{"prefix"})
+        d.Set("suffixes", []interface{}{"suffix"})
+        d.Set("separator", "-")
+        d.Set("resource_type", "azurerm_resource_group")
+        d.Set("resource_types", []interface{}{"azurerm_storage_account", "azurerm_virtual_network"})
+        d.Set("clean_input", true)
+        d.Set("passthrough", false)
+        d.Set("use_slug", true)
+        d.Set("random_length", 5)
+        d.Set("random_seed", 123)
+
+        err = getNameResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getNameResult returned error: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">result = d.Get("result").(string)
+        if result == "" </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-empty result")
+        }</span>
+
+        <span class="cov0" title="0">results = d.Get("results").(map[string]interface{})
+        if len(results) != 2 </span><span class="cov0" title="0">{
+                t.Fatalf("Expected 2 results, got %d", len(results))
+        }</span>
+
+        <span class="cov0" title="0">d = r.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("prefixes", []interface{}{"prefix"})
+        d.Set("suffixes", []interface{}{"suffix"})
+        d.Set("separator", "-")
+        d.Set("resource_type", "")
+        d.Set("resource_types", []interface{}{})
+        d.Set("clean_input", true)
+        d.Set("passthrough", false)
+        d.Set("use_slug", true)
+        d.Set("random_length", 5)
+        d.Set("random_seed", 123)
+
+        err = getNameResult(d, nil)
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for empty resource_type and resource_types but got none")
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file15" style="display: none">package azurecaf
+
+import (
+        "fmt"
+        "log"
+        "math/rand"
+        "regexp"
+        "strings"
+
+        "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+        "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+)
+
+func resourceNamingConvention() *schema.Resource <span class="cov8" title="1">{
+        resourceMapsKeys := make([]string, 0, len(Resources))
+        for k := range Resources </span><span class="cov8" title="1">{
+                resourceMapsKeys = append(resourceMapsKeys, k)
+        }</span>
+        <span class="cov8" title="1">for k := range ResourcesMapping </span><span class="cov8" title="1">{
+                resourceMapsKeys = append(resourceMapsKeys, k)
+        }</span>
+
+        <span class="cov8" title="1">return &amp;schema.Resource{
+                Create:        resourceNamingConventionCreate,
+                Read:          schema.Noop,
+                Delete:        schema.RemoveFromState,
+                SchemaVersion: 2,
+
+                Schema: map[string]*schema.Schema{
+                        "name": {
+                                Type:     schema.TypeString,
+                                Optional: true,
+                                ForceNew: true,
+                        },
+                        "convention": {
+                                Type:     schema.TypeString,
+                                Optional: true,
+                                Default:  ConventionCafRandom,
+                                ForceNew: true,
+                                ValidateFunc: validation.StringInSlice([]string{
+                                        ConventionCafClassic,
+                                        ConventionCafRandom,
+                                        ConventionRandom,
+                                        ConventionPassThrough,
+                                }, false),
+                        },
+                        "prefix": {
+                                Type:     schema.TypeString,
+                                Optional: true,
+                                ForceNew: true,
+                        },
+                        "prefixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                                Optional: true,
+                                ForceNew: true,
+                        },
+                        "suffixes": {
+                                Type: schema.TypeList,
+                                Elem: &amp;schema.Schema{
+                                        Type: schema.TypeString,
+                                },
+                                Optional: true,
+                                ForceNew: true,
+                        },
+                        "postfix": {
+                                Type:         schema.TypeString,
+                                Optional:     true,
+                                ForceNew:     true,
+                                ValidateFunc: validation.StringIsNotEmpty,
+                        },
+                        "max_length": {
+                                Type:         schema.TypeInt,
+                                Optional:     true,
+                                ForceNew:     true,
+                                ValidateFunc: validation.IntAtLeast(1),
+                        },
+                        "result": {
+                                Type:     schema.TypeString,
+                                Computed: true,
+                        },
+                        "resource_type": {
+                                Type:         schema.TypeString,
+                                Optional:     true,
+                                ValidateFunc: validation.StringInSlice(resourceMapsKeys, false),
+                                ForceNew:     true,
+                        },
+                },
+        }</span>
+}
+
+func resourceNamingConventionCreate(d *schema.ResourceData, meta interface{}) error <span class="cov8" title="1">{
+        return resourceNamingConventionRead(d, meta)
+}</span>
+
+func resourceNamingConventionRead(d *schema.ResourceData, meta interface{}) error <span class="cov8" title="1">{
+        return getResult(d, meta)
+}</span>
+
+func resourceNamingConventionDelete(d *schema.ResourceData, meta interface{}) error <span class="cov8" title="1">{
+        return nil
+}</span>
+
+func getResult(d *schema.ResourceData, meta interface{}) error <span class="cov8" title="1">{
+        name := d.Get("name").(string)
+        prefix := d.Get("prefix").(string)
+        postfix := d.Get("postfix").(string)
+        resourceType := d.Get("resource_type").(string)
+        convention := d.Get("convention").(string)
+        desiredMaxLength := d.Get("max_length").(int)
+
+        // Load the regular expression based on the resource type
+        var regExFilter string
+        var resource ResourceStructure
+        var resourceFound bool = false
+        if resource, resourceFound = Resources[resourceType]; !resourceFound </span><span class="cov8" title="1">{
+                resource, resourceFound = ResourcesMapping[resourceType]
+        }</span>
+        <span class="cov8" title="1">if !resourceFound </span><span class="cov8" title="1">{
+                return fmt.Errorf("Invalid resource type %s", resourceType)
+        }</span>
+
+        <span class="cov8" title="1">regExFilter = string(resource.RegEx)
+        validationRegExPattern := string(resource.ValidationRegExp)
+        log.Printf(regExFilter)
+
+        var cafPrefix string
+        var randomSuffix string = randSeq(int(resource.MaxLength), nil)
+
+        // configuring the prefix, cafprefix, name, postfix depending on the naming convention
+        switch convention </span>{
+        case ConventionCafRandom, ConventionCafClassic:<span class="cov8" title="1">
+                cafPrefix = resource.CafPrefix</span>
+        case ConventionRandom:<span class="cov8" title="1">
+                //clear all the field to generate a random
+                name = ""
+                postfix = ""</span>
+        }
+
+        // joning the elements performing first filter to remove non compatible characters based on the resource type
+        <span class="cov8" title="1">myRegex, _ := regexp.Compile(regExFilter)
+        validationRegEx, _ := regexp.Compile(validationRegExPattern)
+        // clear the name first based on the regexp filter of the resource type
+        nameList := []string{}
+        for _, s := range []string{prefix, cafPrefix, name, postfix} </span><span class="cov8" title="1">{
+                if strings.TrimSpace(s) != "" </span><span class="cov8" title="1">{
+                        nameList = append(nameList, s)
+                }</span>
+        }
+        <span class="cov8" title="1">userInputName := strings.Join(nameList, suffixSeparator)
+        userInputName = myRegex.ReplaceAllString(userInputName, "")
+        randomSuffix = myRegex.ReplaceAllString(randomSuffix, "")
+        // Generate the temporary name based on the concatenation of the values - default case is caf classic
+        generatedName := userInputName
+
+        //calculate the max length
+        var maxLength int = int(resource.MaxLength)
+        if desiredMaxLength &gt; 0 &amp;&amp; desiredMaxLength &lt; maxLength </span><span class="cov8" title="1">{
+                maxLength = desiredMaxLength
+        }</span>
+
+        //does the generated string contains random chars?
+        <span class="cov8" title="1">var containsRandomChar = false
+        switch convention </span>{
+        case ConventionPassThrough:<span class="cov8" title="1"></span>
+                // the naming is already configured
+        case ConventionCafClassic:<span class="cov8" title="1"></span>
+                // the naming is already configured
+        default:<span class="cov8" title="1">
+                if len(userInputName) != 0 </span><span class="cov8" title="1">{
+                        if len(userInputName) &lt; (maxLength - 1) </span><span class="cov8" title="1">{ // prevent adding a suffix separator as the last character
+                                containsRandomChar = true
+                                generatedName = strings.Join([]string{userInputName, randomSuffix}, suffixSeparator)
+                        }</span> else<span class="cov8" title="1"> {
+                                generatedName = userInputName
+                        }</span>
+                } else<span class="cov8" title="1"> {
+                        containsRandomChar = true
+                        generatedName = randomSuffix
+                }</span>
+        }
+
+        // Remove the characters that are not supported in the name based on the regular expression
+        <span class="cov8" title="1">filteredGeneratedName := myRegex.ReplaceAllString(generatedName, "")
+
+        var length int = len(filteredGeneratedName)
+
+        if length &gt; maxLength </span><span class="cov8" title="1">{
+                length = maxLength
+        }</span>
+
+        <span class="cov8" title="1">result := string(filteredGeneratedName[0:length])
+        // making sure the last char is alpha char if we included random string
+        if containsRandomChar &amp;&amp; len(result) &gt; len(userInputName) </span><span class="cov8" title="1">{
+                randomLastChar := alphagenerator[rand.Intn(len(alphagenerator)-1)]
+                resultRune := []rune(result)
+                resultRune[len(resultRune)-1] = randomLastChar
+                result = string(resultRune)
+        }</span>
+
+        <span class="cov8" title="1">if resource.LowerCase </span><span class="cov8" title="1">{
+                result = strings.ToLower(result)
+        }</span>
+
+        <span class="cov8" title="1">if !validationRegEx.MatchString(result) </span><span class="cov0" title="0">{
+                return fmt.Errorf("Invalid name for Random CAF naming %s %s Id:%s , the pattern %s doesn't match %s", resource.ResourceTypeName, name, d.Id(), validationRegExPattern, result)
+        }</span>
+
+        <span class="cov8" title="1">d.Set("result", result)
+        // Set the attribute Id with the value
+        //d.SetId("none")
+        d.SetId(randSeq(16, nil))
+        return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file16" style="display: none">package azurecaf
+
+import (
+        "testing"
+
+        "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+)
+
+func TestGetResultConventions(t *testing.T) <span class="cov0" title="0">{
+        conventions := []string{
+                ConventionCafClassic,
+                ConventionCafRandom,
+                ConventionRandom,
+                ConventionPassThrough,
+        }
+
+        for _, convention := range conventions </span><span class="cov0" title="0">{
+                t.Run(convention, func(t *testing.T) </span><span class="cov0" title="0">{
+                        r := schema.Resource{
+                                Schema: map[string]*schema.Schema{
+                                        "name": {
+                                                Type: schema.TypeString,
+                                        },
+                                        "prefix": {
+                                                Type: schema.TypeString,
+                                        },
+                                        "postfix": {
+                                                Type: schema.TypeString,
+                                        },
+                                        "convention": {
+                                                Type: schema.TypeString,
+                                        },
+                                        "resource_type": {
+                                                Type: schema.TypeString,
+                                        },
+                                        "max_length": {
+                                                Type: schema.TypeInt,
+                                        },
+                                        "result": {
+                                                Type: schema.TypeString,
+                                        },
+                                },
+                        }
+
+                        d := r.TestResourceData()
+                        d.Set("name", "testname")
+                        d.Set("prefix", "prefix")
+                        d.Set("postfix", "postfix")
+                        d.Set("convention", convention)
+                        d.Set("resource_type", "azurerm_resource_group")
+                        d.Set("max_length", 63)
+
+                        err := getResult(d, nil)
+                        if err != nil </span><span class="cov0" title="0">{
+                                t.Fatalf("getResult returned unexpected error: %v", err)
+                        }</span>
+
+                        <span class="cov0" title="0">result := d.Get("result").(string)
+                        if result == "" </span><span class="cov0" title="0">{
+                                t.Fatal("Expected non-empty result")
+                        }</span>
+
+                        <span class="cov0" title="0">switch convention </span>{
+                        case ConventionPassThrough:<span class="cov0" title="0">
+                                if result != "testname" </span><span class="cov0" title="0">{
+                                        t.Errorf("PassThrough should return original name, got %s", result)
+                                }</span>
+                        case ConventionCafClassic:<span class="cov0" title="0">
+                                if result != "prefix-rg-testname-postfix" </span><span class="cov0" title="0">{
+                                        t.Errorf("CafClassic should return prefix-rg-name-postfix, got %s", result)
+                                }</span>
+                        case ConventionCafRandom, ConventionRandom:<span class="cov0" title="0">
+                                if len(result) &lt;= len("prefix-rg-testname-postfix") </span><span class="cov0" title="0">{
+                                        t.Errorf("Random conventions should include random characters, got %s", result)
+                                }</span>
+                        }
+                })
+        }
+}
+
+func TestGetResultEdgeCases2(t *testing.T) <span class="cov0" title="0">{
+        testCases := []struct {
+                name         string
+                resourceName string
+                prefix       string
+                postfix      string
+                convention   string
+                resourceType string
+                maxLength    int
+                expectError  bool
+        }{
+                {
+                        name:         "Empty name",
+                        resourceName: "",
+                        prefix:       "prefix",
+                        postfix:      "postfix",
+                        convention:   ConventionCafRandom,
+                        resourceType: "azurerm_resource_group",
+                        maxLength:    63,
+                        expectError:  false,
+                },
+                {
+                        name:         "Very long name",
+                        resourceName: "thisisaverylongnamethatwillbetrimmedaccordingtothemaxlengthparameter",
+                        prefix:       "prefix",
+                        postfix:      "postfix",
+                        convention:   ConventionCafClassic,
+                        resourceType: "azurerm_resource_group",
+                        maxLength:    20,
+                        expectError:  false,
+                },
+                {
+                        name:         "Special characters in name",
+                        resourceName: "test!@#$%^&amp;*()name",
+                        prefix:       "prefix",
+                        postfix:      "postfix",
+                        convention:   ConventionCafClassic,
+                        resourceType: "azurerm_resource_group",
+                        maxLength:    63,
+                        expectError:  false,
+                },
+                {
+                        name:         "Storage account with uppercase",
+                        resourceName: "TESTNAME",
+                        prefix:       "PREFIX",
+                        postfix:      "POSTFIX",
+                        convention:   ConventionCafClassic,
+                        resourceType: "azurerm_storage_account",
+                        maxLength:    24,
+                        expectError:  false,
+                },
+        }
+
+        for _, tc := range testCases </span><span class="cov0" title="0">{
+                t.Run(tc.name, func(t *testing.T) </span><span class="cov0" title="0">{
+                        r := schema.Resource{
+                                Schema: map[string]*schema.Schema{
+                                        "name": {
+                                                Type: schema.TypeString,
+                                        },
+                                        "prefix": {
+                                                Type: schema.TypeString,
+                                        },
+                                        "postfix": {
+                                                Type: schema.TypeString,
+                                        },
+                                        "convention": {
+                                                Type: schema.TypeString,
+                                        },
+                                        "resource_type": {
+                                                Type: schema.TypeString,
+                                        },
+                                        "max_length": {
+                                                Type: schema.TypeInt,
+                                        },
+                                        "result": {
+                                                Type: schema.TypeString,
+                                        },
+                                },
+                        }
+
+                        d := r.TestResourceData()
+                        d.Set("name", tc.resourceName)
+                        d.Set("prefix", tc.prefix)
+                        d.Set("postfix", tc.postfix)
+                        d.Set("convention", tc.convention)
+                        d.Set("resource_type", tc.resourceType)
+                        d.Set("max_length", tc.maxLength)
+
+                        err := getResult(d, nil)
+
+                        if tc.expectError </span><span class="cov0" title="0">{
+                                if err == nil </span><span class="cov0" title="0">{
+                                        t.Errorf("Expected error but got none")
+                                }</span>
+                        } else<span class="cov0" title="0"> {
+                                if err != nil </span><span class="cov0" title="0">{
+                                        t.Errorf("Unexpected error: %v", err)
+                                }</span>
+
+                                <span class="cov0" title="0">result := d.Get("result").(string)
+                                if result == "" </span><span class="cov0" title="0">{
+                                        t.Error("Expected non-empty result")
+                                }</span>
+
+                                <span class="cov0" title="0">if len(result) &gt; tc.maxLength </span><span class="cov0" title="0">{
+                                        t.Errorf("Expected result length &lt;= %d, got %d", tc.maxLength, len(result))
+                                }</span>
+
+                                <span class="cov0" title="0">if tc.resourceType == "azurerm_storage_account" </span><span class="cov0" title="0">{
+                                        if result != result[:len(result)] </span><span class="cov0" title="0">{
+                                                t.Errorf("Expected lowercase result for storage account, got %s", result)
+                                        }</span>
+                                }
+                        }
+                })
+        }
+}
+
+func TestResourceNamingConventionCreateDelete(t *testing.T) <span class="cov0" title="0">{
+        r := schema.Resource{
+                Schema: map[string]*schema.Schema{
+                        "name": {
+                                Type: schema.TypeString,
+                        },
+                        "prefix": {
+                                Type: schema.TypeString,
+                        },
+                        "postfix": {
+                                Type: schema.TypeString,
+                        },
+                        "convention": {
+                                Type: schema.TypeString,
+                        },
+                        "resource_type": {
+                                Type: schema.TypeString,
+                        },
+                        "max_length": {
+                                Type: schema.TypeInt,
+                        },
+                        "result": {
+                                Type: schema.TypeString,
+                        },
+                },
+        }
+
+        d := r.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("prefix", "prefix")
+        d.Set("postfix", "postfix")
+        d.Set("convention", ConventionCafClassic)
+        d.Set("resource_type", "azurerm_resource_group")
+        d.Set("max_length", 63)
+
+        err := resourceNamingConventionCreate(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("resourceNamingConventionCreate returned unexpected error: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">result := d.Get("result").(string)
+        if result == "" </span><span class="cov0" title="0">{
+                t.Fatal("Expected non-empty result after create")
+        }</span>
+
+        <span class="cov0" title="0">err = resourceNamingConventionDelete(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("resourceNamingConventionDelete returned unexpected error: %v", err)
+        }</span>
+}
+
+func TestResourceNamingConventionResource(t *testing.T) <span class="cov0" title="0">{
+        resource := resourceNamingConvention()
+        
+        if resource.Schema["name"] == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected name field in schema")
+        }</span>
+        <span class="cov0" title="0">if resource.Schema["convention"] == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected convention field in schema")
+        }</span>
+        <span class="cov0" title="0">if resource.Schema["prefix"] == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected prefix field in schema")
+        }</span>
+        <span class="cov0" title="0">if resource.Schema["postfix"] == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected postfix field in schema")
+        }</span>
+        <span class="cov0" title="0">if resource.Schema["resource_type"] == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected resource_type field in schema")
+        }</span>
+        <span class="cov0" title="0">if resource.Schema["max_length"] == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected max_length field in schema")
+        }</span>
+        <span class="cov0" title="0">if resource.Schema["result"] == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected result field in schema")
+        }</span>
+        
+        <span class="cov0" title="0">if resource.Create == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected Create function")
+        }</span>
+        <span class="cov0" title="0">if resource.Read == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected Read function")
+        }</span>
+        <span class="cov0" title="0">if resource.Delete == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected Delete function")
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file17" style="display: none">package azurecaf
+
+import (
+        "testing"
+
+        "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+)
+
+func TestGetResultEdgeCases(t *testing.T) <span class="cov0" title="0">{
+        r := schema.Resource{
+                Schema: map[string]*schema.Schema{
+                        "name": {
+                                Type: schema.TypeString,
+                        },
+                        "prefix": {
+                                Type: schema.TypeString,
+                        },
+                        "postfix": {
+                                Type: schema.TypeString,
+                        },
+                        "convention": {
+                                Type: schema.TypeString,
+                        },
+                        "resource_type": {
+                                Type: schema.TypeString,
+                        },
+                        "max_length": {
+                                Type: schema.TypeInt,
+                        },
+                        "result": {
+                                Type: schema.TypeString,
+                        },
+                },
+        }
+
+        d := r.TestResourceData()
+        d.Set("name", "")
+        d.Set("prefix", "")
+        d.Set("postfix", "")
+        d.Set("convention", ConventionCafClassic)
+        d.Set("resource_type", "azurerm_resource_group")
+        d.Set("max_length", 0)
+
+        err := getResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResult returned error for empty name: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">d = r.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("prefix", "prefix")
+        d.Set("postfix", "postfix")
+        d.Set("convention", ConventionCafClassic)
+        d.Set("resource_type", "invalid_resource_type")
+        d.Set("max_length", 63)
+
+        err = getResult(d, nil)
+        if err == nil </span><span class="cov0" title="0">{
+                t.Fatal("Expected error for invalid resource type but got none")
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file18" style="display: none">package azurecaf
+
+import (
+        "testing"
+
+        "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+)
+
+func TestGetResultConventionCases(t *testing.T) <span class="cov0" title="0">{
+        r := schema.Resource{
+                Schema: map[string]*schema.Schema{
+                        "name": {
+                                Type: schema.TypeString,
+                        },
+                        "prefix": {
+                                Type: schema.TypeString,
+                        },
+                        "postfix": {
+                                Type: schema.TypeString,
+                        },
+                        "convention": {
+                                Type: schema.TypeString,
+                        },
+                        "resource_type": {
+                                Type: schema.TypeString,
+                        },
+                        "max_length": {
+                                Type: schema.TypeInt,
+                        },
+                        "result": {
+                                Type: schema.TypeString,
+                        },
+                },
+        }
+
+        d := r.TestResourceData()
+        d.Set("name", "")
+        d.Set("prefix", "")
+        d.Set("postfix", "")
+        d.Set("convention", ConventionRandom)
+        d.Set("resource_type", "azurerm_resource_group")
+        d.Set("max_length", 0)
+
+        err := getResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResult returned error for ConventionRandom and empty name: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">d = r.TestResourceData()
+        d.Set("name", "short")
+        d.Set("prefix", "")
+        d.Set("postfix", "")
+        d.Set("convention", ConventionCafRandom)
+        d.Set("resource_type", "azurerm_resource_group")
+        d.Set("max_length", 63)
+
+        err = getResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResult returned error for ConventionCafRandom and short name: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">d = r.TestResourceData()
+        d.Set("name", "thisisaverylongnamethatwillbecutoffbythemaxlengthparameter")
+        d.Set("prefix", "")
+        d.Set("postfix", "")
+        d.Set("convention", ConventionCafRandom)
+        d.Set("resource_type", "azurerm_resource_group")
+        d.Set("max_length", 20)
+
+        err = getResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResult returned error for ConventionCafRandom and long name: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">result := d.Get("result").(string)
+        if len(result) &gt; 20 </span><span class="cov0" title="0">{
+                t.Fatalf("Expected result length to be &lt;= 20, got %d", len(result))
+        }</span>
+
+        <span class="cov0" title="0">d = r.TestResourceData()
+        d.Set("name", "testname")
+        d.Set("prefix", "prefix")
+        d.Set("postfix", "postfix")
+        d.Set("convention", ConventionPassThrough)
+        d.Set("resource_type", "azurerm_resource_group")
+        d.Set("max_length", 63)
+
+        err = getResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResult returned error for ConventionPassThrough: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">d = r.TestResourceData()
+        d.Set("name", "UPPERCASE")
+        d.Set("prefix", "")
+        d.Set("postfix", "")
+        d.Set("convention", ConventionCafClassic)
+        d.Set("resource_type", "azurerm_storage_account") // Storage accounts require lowercase
+        d.Set("max_length", 63)
+
+        err = getResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResult returned error for lowercase resource: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">result = d.Get("result").(string)
+        for _, c := range result </span><span class="cov0" title="0">{
+                if c &gt;= 'A' &amp;&amp; c &lt;= 'Z' </span><span class="cov0" title="0">{
+                        t.Fatalf("Expected lowercase result for storage account, got %s", result)
+                }</span>
+        }
+
+        <span class="cov0" title="0">d = r.TestResourceData()
+        d.Set("name", "exactlength")
+        d.Set("prefix", "")
+        d.Set("postfix", "")
+        d.Set("convention", ConventionCafClassic)
+        d.Set("resource_type", "azurerm_resource_group")
+        d.Set("max_length", 11) // "exactlength" is 11 characters
+
+        err = getResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResult returned error for name length exactly at max length: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">result = d.Get("result").(string)
+        if len(result) != 11 </span><span class="cov0" title="0">{
+                t.Fatalf("Expected result length to be 11, got %d", len(result))
+        }</span>
+
+        <span class="cov0" title="0">d = r.TestResourceData()
+        d.Set("name", "test!@#$%^&amp;*()_+name")
+        d.Set("prefix", "")
+        d.Set("postfix", "")
+        d.Set("convention", ConventionCafClassic)
+        d.Set("resource_type", "azurerm_resource_group")
+        d.Set("max_length", 63)
+
+        err = getResult(d, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("getResult returned error for name with special characters: %v", err)
+        }</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
