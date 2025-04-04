@@ -1,0 +1,73 @@
+name: Pull Request Validation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+  checks: write
+
+jobs:
+  pr-validation:
+    name: Basic PR Quality Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Check for large files
+        run: |
+          large_files=$(find . -type f -not -path "*/\.*" -size +5M | grep -v "\.git" || true)
+          if [ -n "$large_files" ]; then
+            echo "::warning::Found large files (>5MB):"
+            echo "$large_files"
+          fi
+
+      - name: Check for PR description
+        if: github.event.pull_request.body == ''
+        run: echo "::warning::This PR doesn't have a description. Please add one to help reviewers understand your changes."
+
+      - name: Run tests for modified packages
+        run: |
+          # Get modified Go files
+          if [ -n "${{ github.base_ref }}" ]; then
+            echo "Comparing changes against ${{ github.base_ref }}"
+            modified_files=$(git diff --name-only origin/${{ github.base_ref }} HEAD)
+          else
+            echo "No base ref, comparing against HEAD~1"
+            modified_files=$(git diff --name-only HEAD~1 HEAD)
+          fi
+          
+          # Filter Go files
+          go_files=$(echo "$modified_files" | grep "\.go$" || true)
+          
+          if [ -n "$go_files" ]; then
+            echo "Modified Go files:"
+            echo "$go_files"
+            
+            # Run go vet on all packages
+            go vet ./...
+            
+            # Run tests with coverage
+            go test -v ./... -coverprofile=pr-coverage.out
+          else
+            echo "No Go files modified, skipping targeted tests"
+          fi
+
+      - name: Upload test coverage 
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-test-coverage
+          path: pr-coverage.out
+          if-no-files-found: ignore
+          retention-days: 7

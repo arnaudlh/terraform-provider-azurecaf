@@ -1,0 +1,21 @@
+linters:
+  disable-all: true
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+
+run:
+  timeout: 5m
+  skip-files:
+    - ".*_test\\.go$"
+    - ".*_generated\\.go$"
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - errcheck

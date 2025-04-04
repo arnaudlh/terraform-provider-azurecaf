@@ -368,7 +368,7 @@ func validateResourceType(resourceType string, resourceTypes []string) (bool, er
 	if isEmpty {
 		return false, fmt.Errorf("resource_type and resource_types parameters are empty, you must specify at least one resource type")
 	}
-	errorStrings := []string{}
+	errorStrings := make([]string, 0)
 	resourceList := resourceTypes
 	if len(resourceType) > 0 {
 		resourceList = append(resourceList, resourceType)
@@ -381,7 +381,7 @@ func validateResourceType(resourceType string, resourceTypes []string) (bool, er
 		}
 	}
 	if len(errorStrings) > 0 {
-		return false, fmt.Errorf(strings.Join(errorStrings, "\n"))
+		return false, fmt.Errorf("%s", strings.Join(errorStrings, "\n"))
 	}
 	return true, nil
 }

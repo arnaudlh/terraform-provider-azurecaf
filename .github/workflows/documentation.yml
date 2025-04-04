@@ -1,0 +1,50 @@
+name: Documentation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**/*.go'
+      - '**/*.md'
+  pull_request:
+    branches: [main]
+    paths:
+      - '**/*.go'
+      - '**/*.md'
+  workflow_dispatch:
+
+jobs:
+  markdown-check:
+    name: Check Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Find markdown files
+        id: find_md
+        run: |
+          md_files=$(find . -name "*.md" -not -path "*/\.*" | sort)
+          echo "Found markdown files:"
+          echo "$md_files"
+          
+          if [ -z "$md_files" ]; then
+            echo "No markdown files found."
+          fi
+      
+      - name: Check Go docs
+        run: |
+          if [ -d "docs" ]; then
+            echo "Documentation structure:"
+            find docs -type f -name "*.md" | sort
+          else
+            echo "No docs directory found."
+          fi
+          
+      - name: Run markdown lint
+        uses: DavidAnson/markdownlint-cli2-action@v13
+        continue-on-error: true
+        with:
+          globs: |
+            **/*.md
+            !node_modules/**
