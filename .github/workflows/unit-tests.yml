@@ -1,0 +1,102 @@
+name: Unit Tests
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - "v*"
+  pull_request:
+    branches: [main]
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - 'go.sum'
+      - '.github/workflows/unit-tests.yml'
+      - 'Makefile'
+
+# Avoid duplicate workflows on PRs from the same repository
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test-group: [
+          "resource_name",
+          "resource_naming_convention",
+          "data_name",
+          "data_environment_variable",
+          "provider"
+        ]
+      fail-fast: false
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: './go.mod'
+        id: go
+
+      - name: Install golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+
+      - name: Run golangci-lint
+        run: golangci-lint run ./...
+
+      - name: Run unit tests with coverage
+        run: |
+          go test -v -race -coverprofile=coverage.${{ matrix.test-group }}.out -covermode=atomic ./azurecaf -run ${{ matrix.test-group }}
+          go tool cover -func=coverage.${{ matrix.test-group }}.out
+          
+      - name: Check coverage threshold
+        run: |
+          COVERAGE=$(go tool cover -func=coverage.${{ matrix.test-group }}.out | grep total | awk '{print $3}' | tr -d '%')
+          echo "Total coverage: $COVERAGE%"
+          if (( $(echo "$COVERAGE < 100" | bc -l) )); then
+            echo "Test coverage is below 100%"
+            exit 1
+          fi
+        
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.${{ matrix.test-group }}.out
+          fail_ci_if_error: false
+          
+  coverage-merge:
+    name: Merge Coverage Reports
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: './go.mod'
+          
+      - name: Download coverage reports
+        uses: actions/download-artifact@v3
+        
+      - name: Install gocovmerge
+        run: go install github.com/wadey/gocovmerge@latest
+        
+      - name: Merge coverage reports
+        run: |
+          gocovmerge coverage.*.out > coverage.total.out
+          go tool cover -func=coverage.total.out
+          
+      - name: Upload merged coverage report
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.total.out
+          fail_ci_if_error: false

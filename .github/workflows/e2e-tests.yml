@@ -1,0 +1,118 @@
+name: End-to-End Tests
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - "v*"
+  pull_request:
+    branches: [main]
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'examples/e2e/**'
+      - '.github/workflows/e2e-tests.yml'
+      - 'resourceDefinition.json'
+      - 'Makefile'
+
+# Avoid duplicate workflows on PRs from the same repository
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generate-tests:
+    name: Generate E2E Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: './go.mod'
+        id: go
+
+      - name: Generate E2E Tests
+        run: |
+          cd examples/e2e
+          go run generator.go
+          
+      - name: Upload generated tests
+        uses: actions/upload-artifact@v3
+        with:
+          name: e2e-tests
+          path: examples/e2e/resources/
+          
+  e2e-tests:
+    name: End-to-End Tests
+    needs: generate-tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        resource-group: [1, 2, 3, 4, 5]
+      fail-fast: false
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: './go.mod'
+        id: go
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: "1.5.0"
+
+      - name: Build provider
+        run: make build
+
+      - name: Download generated tests
+        uses: actions/download-artifact@v3
+        with:
+          name: e2e-tests
+          path: examples/e2e/resources/
+
+      - name: Setup provider for local development
+        run: |
+          mkdir -p ~/.terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/1.2.10/linux_amd64
+          cp terraform-provider-azurecaf ~/.terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/1.2.10/linux_amd64/
+
+      - name: Split tests into groups
+        run: |
+          cd examples/e2e/resources
+          total_files=$(ls -1 *.tf | wc -l)
+          files_per_group=$((total_files / 5 + 1))
+          mkdir -p ../group${{ matrix.resource-group }}
+          ls -1 *.tf | awk "NR % 5 == ${{ matrix.resource-group }} - 1" | xargs -I{} cp {} ../group${{ matrix.resource-group }}/{}
+          
+      - name: Run E2E Tests for Group ${{ matrix.resource-group }}
+        run: |
+          cd examples/e2e
+          cp main.tf group${{ matrix.resource-group }}/
+          cd group${{ matrix.resource-group }}
+          terraform init
+          terraform validate
+          terraform apply -auto-approve > apply_output.txt
+          
+          # Check if any outputs contain "FAIL"
+          if grep -q "FAIL" apply_output.txt; then
+            echo "E2E test failures detected:"
+            grep "FAIL" apply_output.txt
+            exit 1
+          fi
+          
+          # Check if all outputs contain "PASS"
+          PASS_COUNT=$(grep -c "PASS" apply_output.txt)
+          EXPECTED_PASS_COUNT=$(grep -c "= \"PASS\"" apply_output.txt)
+          
+          if [ "$PASS_COUNT" -ne "$EXPECTED_PASS_COUNT" ]; then
+            echo "Not all tests passed. Expected $EXPECTED_PASS_COUNT PASS results, got $PASS_COUNT"
+            exit 1
+          fi
+          echo "All E2E tests in Group ${{ matrix.resource-group }} passed!"
