@@ -37,7 +37,7 @@ resource "azurecaf_name" "azurerm_cognitive_deployment" {
 }
 
 output "azurerm_cognitive_deployment" {
-  value = azurecaf_name.azurerm_cognitive_deployment.result
+  value       = azurecaf_name.azurerm_cognitive_deployment.result
   description = "Random result based on the resource type"
 }
 
