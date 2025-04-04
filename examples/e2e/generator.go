@@ -1,26 +1,24 @@
 package main
 
 import (
-    "encoding/json"
-    "fmt"
-    "io/ioutil"
-    "log"
-    "os"
-    "path/filepath"
-    "strings"
-    "text/template"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
+	"text/template"
 )
 
 type ResourceDefinition struct {
-    Name            string `json:"name"`
-    MinLength       int    `json:"min_length"`
-    MaxLength       int    `json:"max_length"`
-    ValidationRegex string `json:"validation_regex"`
-    Scope           string `json:"scope"`
-    Slug            string `json:"slug"`
-    Dashes          bool   `json:"dashes"`
-    Lowercase       bool   `json:"lowercase"`
-    Regex           string `json:"regex"`
+	Name            string `json:"name"`
+	MinLength       int    `json:"min_length"`
+	MaxLength       int    `json:"max_length"`
+	ValidationRegex string `json:"validation_regex"`
+	Scope           string `json:"scope"`
+	Slug            string `json:"slug"`
+	Dashes          bool   `json:"dashes"`
+	Lowercase       bool   `json:"lowercase"`
+	Regex           string `json:"regex"`
 }
 
 const testTemplate = `# E2E test for {{ .Name }}
@@ -72,41 +70,41 @@ output "slug_placement" {
 `
 
 func main() {
-    jsonFile, err := os.Open("../../resourceDefinition.json")
-    if err != nil {
-        log.Fatalf("Error opening resourceDefinition.json: %v", err)
-    }
-    defer jsonFile.Close()
+	jsonFile, err := os.Open("../../resourceDefinition.json")
+	if err != nil {
+		log.Fatalf("Error opening resourceDefinition.json: %v", err)
+	}
+	defer jsonFile.Close()
 
-    byteValue, _ := ioutil.ReadAll(jsonFile)
-    var resourceDefinitions []ResourceDefinition
-    json.Unmarshal(byteValue, &resourceDefinitions)
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+	var resourceDefinitions []ResourceDefinition
+	json.Unmarshal(byteValue, &resourceDefinitions)
 
-    os.MkdirAll("resources", 0755)
+	os.MkdirAll("resources", 0755)
 
-    tmpl, err := template.New("test").Parse(testTemplate)
-    if err != nil {
-        log.Fatalf("Error parsing template: %v", err)
-    }
+	tmpl, err := template.New("test").Parse(testTemplate)
+	if err != nil {
+		log.Fatalf("Error parsing template: %v", err)
+	}
 
-    for _, rd := range resourceDefinitions {
-        if rd.Name == "" || rd.Slug == "" {
-            continue
-        }
+	for _, rd := range resourceDefinitions {
+		if rd.Name == "" || rd.Slug == "" {
+			continue
+		}
 
-        fileName := fmt.Sprintf("resources/%s.tf", rd.Slug)
-        file, err := os.Create(fileName)
-        if err != nil {
-            log.Printf("Error creating file for %s: %v", rd.Name, err)
-            continue
-        }
+		fileName := fmt.Sprintf("resources/%s.tf", rd.Slug)
+		file, err := os.Create(fileName)
+		if err != nil {
+			log.Printf("Error creating file for %s: %v", rd.Name, err)
+			continue
+		}
 
-        err = tmpl.Execute(file, rd)
-        if err != nil {
-            log.Printf("Error executing template for %s: %v", rd.Name, err)
-        }
-        file.Close()
-    }
+		err = tmpl.Execute(file, rd)
+		if err != nil {
+			log.Printf("Error executing template for %s: %v", rd.Name, err)
+		}
+		file.Close()
+	}
 
-    fmt.Println("E2E test files generated successfully!")
+	fmt.Println("E2E test files generated successfully!")
 }
