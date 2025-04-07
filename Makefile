@@ -24,6 +24,13 @@ unittest: 	## Init go test
 test: # Start a terraform test / invisible help comment
 	cd ./examples && terraform init && terraform plan && terraform apply -auto-approve
 
+e2etest: build ## Run end-to-end tests
+	cd ./examples/e2e && go run generator.go
+	cd ./examples/e2e && terraform init && terraform validate
+	cd ./examples/e2e && ./validate_results.sh
+
+test-all: unittest test e2etest ## Run all tests (unit, integration, e2e)
+
 generate_resource_table:  	## Generate resource table (output only)
 	cat resourceDefinition.json | jq -r '.[] | "| \(.name)| \(.slug)| \(.min_length)| \(.max_length)| \(.lowercase)| \(.validation_regex)|"'
 	cat resourceDefinition_out_of_docs.json | jq -r '.[] | "| \(.name)| \(.slug)| \(.min_length)| \(.max_length)| \(.lowercase)| \(.validation_regex)|"'

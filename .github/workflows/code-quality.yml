@@ -1,0 +1,66 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - "v*"
+  pull_request:
+    branches: [main]
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - 'go.sum'
+      - '.github/workflows/code-quality.yml'
+      - 'Makefile'
+
+# Avoid duplicate workflows on PRs from the same repository
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: './go.mod'
+        id: go
+
+      - name: Install golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+
+      - name: Run golangci-lint
+        run: golangci-lint run ./...
+        
+      - name: Install staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
+        
+      - name: Run staticcheck
+        run: staticcheck ./...
+        
+      - name: Run go vet
+        run: go vet ./...
+        
+      - name: Install gosec
+        run: go install github.com/securego/gosec/v2/cmd/gosec@latest
+        
+      - name: Run gosec
+        run: gosec ./...
+        
+      - name: Verify gofmt
+        run: |
+          gofmt_files=$(gofmt -l .)
+          if [[ -n "${gofmt_files}" ]]; then
+            echo "The following files need formatting with gofmt:"
+            echo "${gofmt_files}"
+            exit 1
+          fi

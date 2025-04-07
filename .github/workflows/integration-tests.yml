@@ -1,0 +1,74 @@
+name: Integration Tests
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - "v*"
+  pull_request:
+    branches: [main]
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'examples/**'
+      - '.github/workflows/integration-tests.yml'
+      - 'Makefile'
+
+# Avoid duplicate workflows on PRs from the same repository
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test-dir: [
+          "cafclassic",
+          "cafrandom",
+          "passthrough",
+          "random",
+          "resource_name",
+          "integration"
+        ]
+      fail-fast: false
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.20'
+        id: go
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: "1.5.0"
+
+      - name: Build provider
+        run: make build
+
+      - name: Setup provider for local development
+        run: |
+          mkdir -p ~/.terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/1.2.10/linux_amd64
+          cp terraform-provider-azurecaf ~/.terraform.d/plugins/registry.terraform.io/aztfmod/azurecaf/1.2.10/linux_amd64/
+
+      - name: Run integration tests for ${{ matrix.test-dir }}
+        run: |
+          if [ -d "examples/${{ matrix.test-dir }}" ]; then
+            cd examples/${{ matrix.test-dir }}
+          else
+            cd examples
+            # Only process the specific test file
+            mkdir -p test_${{ matrix.test-dir }}
+            cp ${{ matrix.test-dir }}.tf test_${{ matrix.test-dir }}/
+            cd test_${{ matrix.test-dir }}
+          fi
+          terraform init
+          terraform validate
+          terraform plan
