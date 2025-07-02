@@ -1,4 +1,4 @@
-name: Go
+name: CI/CD Pipeline
 
 on:
   push:
@@ -9,19 +9,57 @@ on:
     branches: [main]
   repository_dispatch:
 
+# Global environment variables to reduce duplication
+env:
+  CHECKPOINT_DISABLE: 1
+  TF_IN_AUTOMATION: 1
+  TF_CLI_ARGS_init: "-upgrade=false"
+
 # Restrict permissions for all jobs by default
 permissions:
   contents: read
 
 jobs:
-  build:
-    name: Build
+  # Preliminary checks and setup
+  changes:
+    name: Detect Changes
     runs-on: ubuntu-latest
-    permissions:
-      contents: write  # Required for creating releases
-      id-token: write  # Required for keyless signing
+    outputs:
+      go-files: ${{ steps.changes.outputs.go-files }}
+      terraform-files: ${{ steps.changes.outputs.terraform-files }}
+      workflows: ${{ steps.changes.outputs.workflows }}
     steps:
-      - name: Check out code into the Go module directory
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect file changes
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            go-files:
+              - '**/*.go'
+              - 'go.mod'
+              - 'go.sum'
+            terraform-files:
+              - '**/*.tf'
+              - '**/*.tfvars'
+              - 'examples/**'
+            workflows:
+              - '.github/workflows/**'
+
+  # Build and basic validation
+  build:
+    name: Build & Validate
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.go-files == 'true' || github.event_name == 'push'
+    outputs:
+      cache-key: ${{ steps.cache-key.outputs.key }}
+    steps:
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -30,6 +68,24 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: './go.mod'
+          cache: true
+
+      - name: Generate cache key
+        id: cache-key
+        run: echo "key=go-deps-${{ hashFiles('**/go.sum') }}" >> $GITHUB_OUTPUT
+
+      - name: Cache Go modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ steps.cache-key.outputs.key }}
+          restore-keys: |
+            go-deps-
+
+      - name: Install dependencies
+        run: go mod download
 
       - name: Install tfproviderlint
         run: |
@@ -41,115 +97,209 @@ jobs:
         with:
           terraform_version: "~> 1.12.0"
 
-      - name: Build
+      - name: Verify Go formatting
+        run: |
+          if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then
+            echo "The following files are not properly formatted:"
+            gofmt -s -l .
+            exit 1
+          fi
+
+      - name: Run Go vet
+        run: go vet ./...
+
+      - name: Run tfproviderlint
+        run: tfproviderlint ./...
+
+      - name: Build provider
         run: go build -v ./...
 
-      - name: Resource Definition Validation
-        run: make test_resource_definitions
-        env:
-          CHECKPOINT_DISABLE: 1
-          TF_IN_AUTOMATION: 1
-          TF_CLI_ARGS_init: "-upgrade=false"
+  # Unit and resource definition tests  
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: [build, changes]
+    if: needs.changes.outputs.go-files == 'true' || github.event_name == 'push'
+    strategy:
+      matrix:
+        test-type: 
+          - resource_definitions
+          - resource_matrix  
+          - resource_coverage
+          - unittest
+          - coverage
+    steps:
 
-      - name: Resource Matrix Testing
-        run: make test_resource_matrix
-        env:
-          CHECKPOINT_DISABLE: 1
-          TF_IN_AUTOMATION: 1
-          TF_CLI_ARGS_init: "-upgrade=false"
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Resource Coverage Analysis
-        run: make test_resource_coverage
-        env:
-          CHECKPOINT_DISABLE: 1
-          TF_IN_AUTOMATION: 1
-          TF_CLI_ARGS_init: "-upgrade=false"
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: './go.mod'
+          cache: true
 
-      - name: Unit Tests
-        run: make unittest
-        env:
-          CHECKPOINT_DISABLE: 1
-          TF_IN_AUTOMATION: 1
-          TF_CLI_ARGS_init: "-upgrade=false"
+      - name: Cache Go modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ needs.build.outputs.cache-key }}
+          restore-keys: |
+            go-deps-
 
-      - name: Test Coverage
-        run: make test_coverage
-        env:
-          CHECKPOINT_DISABLE: 1
-          TF_IN_AUTOMATION: 1
-          TF_CLI_ARGS_init: "-upgrade=false"
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~> 1.12.0"
 
-      - name: Test Coverage HTML
-        run: make test_coverage_html
-        env:
-          CHECKPOINT_DISABLE: 1
-          TF_IN_AUTOMATION: 1
-          TF_CLI_ARGS_init: "-upgrade=false"
+      - name: Run test
+        run: make test_${{ matrix.test-type }}
 
-      - name: Test Integration
-        run: make test_integration
-        env:
-          CHECKPOINT_DISABLE: 1
-          TF_IN_AUTOMATION: 1
-          TF_CLI_ARGS_init: "-upgrade=false"
+      - name: Upload coverage reports
+        if: matrix.test-type == 'coverage'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: |
+            coverage.out
+            coverage.html
+          retention-days: 7
 
-      - name: Test Data Sources
-        run: make test_data_sources
-        env:
-          CHECKPOINT_DISABLE: 1
-          TF_IN_AUTOMATION: 1
-          TF_CLI_ARGS_init: "-upgrade=false"
+  # Integration tests
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: [build, changes]
+    if: needs.changes.outputs.go-files == 'true' || github.event_name == 'push'
+    strategy:
+      matrix:
+        test-suite:
+          - integration
+          - data_sources
+          - error_handling
+          - resource_naming
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Test Error Handling
-        run: make test_error_handling
-        env:
-          CHECKPOINT_DISABLE: 1
-          TF_IN_AUTOMATION: 1
-          TF_CLI_ARGS_init: "-upgrade=false"
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: './go.mod'
+          cache: true
 
-      - name: Test Resource Naming
-        run: make test_resource_naming
-        env:
-          CHECKPOINT_DISABLE: 1
-          TF_IN_AUTOMATION: 1
-          TF_CLI_ARGS_init: "-upgrade=false"
+      - name: Cache Go modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ needs.build.outputs.cache-key }}
+          restore-keys: |
+            go-deps-
 
-      - name: Comprehensive CI Tests
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~> 1.12.0"
+
+      - name: Run integration tests
+        run: make test_${{ matrix.test-suite }}
+
+  # Comprehensive CI tests - only for PRs and main branch pushes
+  comprehensive-tests:
+    name: Comprehensive Tests
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests]
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: './go.mod'
+          cache: true
+
+      - name: Cache Go modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ needs.build.outputs.cache-key }}
+          restore-keys: |
+            go-deps-
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~> 1.12.0"
+
+      - name: Run comprehensive CI tests
         run: make test_ci
-        env:
-          CHECKPOINT_DISABLE: 1
-          TF_IN_AUTOMATION: 1
-          TF_CLI_ARGS_init: "-upgrade=false"
 
-      - name: E2E Tests (Quick)
+      - name: Run quick E2E tests
         run: make test_e2e_quick
-        env:
-          CHECKPOINT_DISABLE: 1
-          TF_IN_AUTOMATION: 1
-          TF_CLI_ARGS_init: "-upgrade=false"
 
-      - name: E2E Tests (Full) - Pull Requests Only
-        if: github.event_name == 'pull_request'
-        run: make test_e2e
-        env:
-          CHECKPOINT_DISABLE: 1
-          TF_IN_AUTOMATION: 1
-          TF_CLI_ARGS_init: "-upgrade=false"
+  # Release job - only for tags
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests]
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write  # Required for creating releases
+      id-token: write  # Required for keyless signing
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: './go.mod'
+          cache: true
 
       - name: Import GPG key
         id: import_gpg
         uses: crazy-max/ghaction-import-gpg@v6
-        if: startsWith(github.ref, 'refs/tags/')
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
-        if: startsWith(github.ref, 'refs/tags/')
         with:
           version: '~> v2'
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
+
+  # Test summary job
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests, comprehensive-tests]
+    if: always()
+    steps:
+      - name: Check test results
+        run: |
+          if [ "${{ needs.unit-tests.result }}" == "success" ] && \
+             [ "${{ needs.integration-tests.result }}" == "success" ] && \
+             [ "${{ needs.comprehensive-tests.result }}" == "success" || "${{ needs.comprehensive-tests.result }}" == "skipped" ]; then
+            echo "✅ All tests passed successfully!"
+            echo "🚀 Provider is ready for deployment"
+          else
+            echo "❌ Some tests failed"
+            echo "Unit tests: ${{ needs.unit-tests.result }}"
+            echo "Integration tests: ${{ needs.integration-tests.result }}"
+            echo "Comprehensive tests: ${{ needs.comprehensive-tests.result }}"
+            exit 1
+          fi

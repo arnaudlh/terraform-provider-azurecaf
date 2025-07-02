@@ -1,28 +1,13 @@
 version: 2
 updates:
-  # Enable version updates for Go modules
-  - package-ecosystem: "gomod"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
-      timezone: "Etc/UTC"
-    open-pull-requests-limit: 10
-    commit-message:
-      prefix: "deps"
-      include: "scope"
-    labels:
-      - "dependencies"
-      - "go"
-
-  # Enable version updates for GitHub Actions
+  # Enable version updates for GitHub Actions only
+  # Go modules are handled by the custom dependencies workflow for better testing control
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
-      time: "09:00"
+      day: "tuesday"  # Avoid conflict with dependencies workflow (Monday)
+      time: "10:00"
       timezone: "Etc/UTC"
     open-pull-requests-limit: 5
     commit-message:
@@ -31,3 +16,11 @@ updates:
     labels:
       - "dependencies"
       - "github-actions"
+      - "ci-cd"
+    reviewers:
+      - "@terraform-provider-azurecaf/maintainers"
+    # Group related updates together
+    groups:
+      github-actions:
+        patterns:
+          - "*"

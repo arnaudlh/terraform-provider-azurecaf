@@ -5,6 +5,7 @@ provider "registry.terraform.io/aztfmod/azurecaf" {
   version     = "1.2.29"
   constraints = ">= 1.2.0"
   hashes = [
+    "h1:oqlV7UH3Yl6Bj1NxeLFPioK4DaytSOvFoyu2Ekn8iok=",
     "h1:pfk7fOcXQMUS2u8mlzWl6PPZJxBl2N2cm8nzIIQTwao=",
     "zh:0639481c6a4790ae5c9bdb17b3c4a3284e3411654ff5cd44972e7ceccf6080ec",
     "zh:1fed4b550e45cb0b13aa00ed9990aadcc1068a472d94eb7117afbe52b4249c39",

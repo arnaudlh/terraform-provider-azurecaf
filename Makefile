@@ -1,11 +1,5 @@
 default: help
 
-# Add help text after each target name starting with '\#\#'
-# Found here: https://gist.github.com/prwhite/8168133
-.PHONY: help
-help:  ## Display help
-	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
-
 dev_container:
 	go generate
 	go fmt
@@ -69,10 +63,6 @@ test_resource_matrix: 	## Test resources by category and validate constraints
 	CHECKPOINT_DISABLE=1 TF_IN_AUTOMATION=1 TF_CLI_ARGS_init="-upgrade=false" go test -v ./azurecaf/... -run="TestResourceMatrix|TestResourceConstraints"
 
 test_complete: test_all test_all_resources test_resource_coverage	## Complete test suite including all resource types
-
-clean:	## Clean up build artifacts and test results
-	rm -f coverage.out coverage.html terraform-provider-azurecaf
-	go clean
 
 test: ## Run terraform examples with local provider
 	# First build the provider
@@ -143,4 +133,116 @@ test_e2e_verbose: 	## Run e2e tests with verbose output
 test_complete_with_e2e: test_complete test_e2e	## Run complete test suite including e2e tests
 
 test_ci_with_e2e: test_ci test_e2e_quick	## Run CI tests including quick e2e tests
+
+# Performance and Quality Targets
+
+benchmark: 	## Run benchmark tests
+	@echo "Running benchmark tests..."
+	go test -bench=. -benchmem -run=^$ ./...
+
+benchmark_verbose: 	## Run benchmark tests with verbose output
+	@echo "Running benchmark tests with verbose output..."
+	go test -bench=. -benchmem -benchtime=10s -run=^$ -v ./...
+
+profile_mem: 	## Run tests with memory profiling
+	@echo "Running tests with memory profiling..."
+	go test -memprofile=mem.prof -run=TestAcc ./azurecaf/...
+	@if [ -f mem.prof ]; then echo "Memory profile saved to mem.prof"; fi
+
+profile_cpu: 	## Run tests with CPU profiling
+	@echo "Running tests with CPU profiling..."
+	go test -cpuprofile=cpu.prof -run=TestAcc ./azurecaf/...
+	@if [ -f cpu.prof ]; then echo "CPU profile saved to cpu.prof"; fi
+
+profile_analyze: 	## Analyze existing profiles
+	@echo "Analyzing profiles..."
+	@if [ -f mem.prof ]; then go tool pprof -text mem.prof > memory-analysis.txt && echo "Memory analysis saved to memory-analysis.txt"; fi
+	@if [ -f cpu.prof ]; then go tool pprof -text cpu.prof > cpu-analysis.txt && echo "CPU analysis saved to cpu-analysis.txt"; fi
+
+lint: 	## Run comprehensive linting
+	@echo "Running comprehensive linting..."
+	go vet ./...
+	tfproviderlint ./...
+	@if command -v golangci-lint >/dev/null 2>&1; then golangci-lint run; else echo "golangci-lint not installed, skipping"; fi
+
+format: 	## Format Go code
+	@echo "Formatting Go code..."
+	go fmt ./...
+	@if command -v goimports >/dev/null 2>&1; then goimports -w .; else echo "goimports not installed, using go fmt only"; fi
+
+clean: 	## Clean build artifacts and test files
+	@echo "Cleaning build artifacts..."
+	rm -f terraform-provider-azurecaf
+	rm -f *.prof
+	rm -f *.out
+	rm -f *.html
+	rm -f *.txt
+	rm -f coverage.*
+	rm -rf .terraform/
+	rm -f terraform.tfstate*
+	rm -f .terraform.lock.hcl
+
+clean_all: clean 	## Clean all artifacts including temporary documentation
+	@echo "Cleaning all temporary files..."
+	rm -f *SUMMARY*.md
+	rm -f *GUIDE*.md
+	rm -f *PLAN*.md
+	rm -f *ANALYSIS*.md
+	@echo "Cleanup complete"
+
+security_scan: 	## Run security scanning tools
+	@echo "Running security scans..."
+	@if command -v gosec >/dev/null 2>&1; then gosec ./...; else echo "gosec not installed, skipping"; fi
+	@if command -v govulncheck >/dev/null 2>&1; then govulncheck ./...; else echo "govulncheck not installed, skipping"; fi
+
+dependency_check: 	## Check for outdated dependencies
+	@echo "Checking for outdated dependencies..."
+	go list -u -m all
+	@if command -v go-mod-outdated >/dev/null 2>&1; then go list -u -m -json all | go-mod-outdated -update -direct; else echo "go-mod-outdated not installed, using basic check"; fi
+
+# Quality Assurance Targets
+
+qa: lint format test_coverage 	## Run comprehensive quality assurance checks
+
+qa_full: qa security_scan dependency_check benchmark 	## Run full quality assurance suite
+
+ci_local: build lint unittest test_coverage 	## Run CI-equivalent tests locally
+
+ci_full: ci_local test_integration test_e2e_quick 	## Run full CI suite locally
+
+# Development Helpers
+
+dev_setup: 	## Set up development environment
+	@echo "Setting up development environment..."
+	go mod download
+	@if ! command -v tfproviderlint >/dev/null 2>&1; then go install github.com/bflad/tfproviderlint/cmd/tfproviderlint@latest; fi
+	@if ! command -v golangci-lint >/dev/null 2>&1; then echo "Consider installing golangci-lint for enhanced linting"; fi
+	@if ! command -v gosec >/dev/null 2>&1; then echo "Consider installing gosec for security scanning"; fi
+
+dev_build: 	## Build for development (with local installation)
+	go generate
+	go fmt ./...
+	go build -o ~/.terraform.d/plugins/terraform-provider-azurecaf
+	@echo "Provider built and installed for local development"
+
+watch_tests: 	## Watch for file changes and run tests
+	@echo "Watching for changes... (requires 'entr' tool)"
+	@if command -v entr >/dev/null 2>&1; then \
+		find . -name "*.go" | entr -c make unittest; \
+	else \
+		echo "Install 'entr' tool to use watch functionality"; \
+		echo "Example: apt-get install entr (Ubuntu) or brew install entr (macOS)"; \
+	fi
+
+# Help improvement
+.PHONY: help
+help:  ## Display help (improved version)
+	@awk 'BEGIN {FS = ":.*##"; printf "\n\033[1m\033[34mTerraform Provider AzureCAF - Available Targets\033[0m\n\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
+	@echo ""
+	@echo "\033[1m\033[33mCommon workflows:\033[0m"
+	@echo "  \033[36mmake ci_local\033[0m          - Run CI tests locally"
+	@echo "  \033[36mmake qa\033[0m                - Run quality assurance checks"
+	@echo "  \033[36mmake dev_setup\033[0m         - Set up development environment"
+	@echo "  \033[36mmake clean\033[0m             - Clean all build artifacts"
+	@echo ""
 

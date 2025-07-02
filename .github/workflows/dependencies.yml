@@ -1,0 +1,261 @@
+name: Go Dependency Management
+
+on:
+  schedule:
+    # Check for Go dependency updates weekly on Mondays at 9 AM UTC
+    # GitHub Actions are handled by Dependabot (Tuesdays) to avoid conflicts
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+    inputs:
+      update_type:
+        description: 'Type of dependency update'
+        required: true
+        default: 'minor'
+        type: choice
+        options:
+        - patch
+        - minor
+        - major
+      create_pr:
+        description: 'Create PR if updates available'
+        required: false
+        default: true
+        type: boolean
+
+# Global environment variables
+env:
+  CHECKPOINT_DISABLE: 1
+  TF_IN_AUTOMATION: 1
+
+permissions:
+  contents: read
+
+jobs:
+  # Check for outdated Go dependencies
+  check-dependencies:
+    name: Check Go Dependencies
+    runs-on: ubuntu-latest
+    outputs:
+      has-updates: ${{ steps.check.outputs.has-updates }}
+      updates-summary: ${{ steps.check.outputs.summary }}
+      critical-updates: ${{ steps.check.outputs.critical-updates }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: './go.mod'
+          cache: true
+
+      - name: Install go-mod-outdated
+        run: go install github.com/psampaz/go-mod-outdated@latest
+
+      - name: Check for outdated Go dependencies
+        id: check
+        run: |
+          go list -u -m -json all | go-mod-outdated -update -direct > outdated.json || true
+          
+          if [ -s outdated.json ]; then
+            echo "has-updates=true" >> $GITHUB_OUTPUT
+            
+            # Generate summary
+            echo "summary<<EOF" >> $GITHUB_OUTPUT
+            cat outdated.json | jq -r '.[] | "\(.Module.Path): \(.Module.Version) -> \(.Update.Version)"'
+            echo "EOF" >> $GITHUB_OUTPUT
+            
+            # Check for critical updates (major version changes or security-related)
+            CRITICAL_COUNT=$(cat outdated.json | jq '[.[] | select(.Update.Version | test("^[0-9]+\\.0\\.0"))] | length')
+            echo "critical-updates=$CRITICAL_COUNT" >> $GITHUB_OUTPUT
+          else
+            echo "has-updates=false" >> $GITHUB_OUTPUT
+            echo "summary=No Go dependency updates available" >> $GITHUB_OUTPUT
+            echo "critical-updates=0" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload Go dependency report
+        if: steps.check.outputs.has-updates == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-dependency-updates-${{ github.run_number }}
+          path: |
+            outdated.json
+          retention-days: 7
+
+  # Update Go dependencies if needed
+  update-dependencies:
+    name: Update Go Dependencies
+    runs-on: ubuntu-latest
+    needs: check-dependencies
+    if: needs.check-dependencies.outputs.has-updates == 'true' && (github.event.inputs.create_pr != 'false' || github.event_name == 'schedule')
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: './go.mod'
+          cache: true
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Update Go dependencies
+        run: |
+          UPDATE_TYPE="${{ github.event.inputs.update_type || 'minor' }}"
+          
+          case $UPDATE_TYPE in
+            "patch")
+              go get -u=patch ./...
+              ;;
+            "minor")
+              go get -u ./...
+              ;;
+            "major")
+              # Major updates require manual review
+              echo "Major updates require manual intervention"
+              exit 0
+              ;;
+          esac
+          
+          go mod tidy
+          go mod verify
+
+      - name: Run comprehensive tests with updated dependencies
+        run: |
+          echo "Running comprehensive test suite..."
+          make unittest
+          make test_coverage
+          make lint
+          
+          # Run integration tests if available
+          if make -n test_integration >/dev/null 2>&1; then
+            make test_integration
+          fi
+
+      - name: Create Pull Request
+        if: success()
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: |
+            deps(go): update Go dependencies (${{ github.event.inputs.update_type || 'minor' }})
+            
+            Updates:
+            ${{ needs.check-dependencies.outputs.updates-summary }}
+          title: 'deps(go): update Go dependencies (${{ github.event.inputs.update_type || 'minor' }})'
+          body: |
+            ## Go Dependency Updates
+            
+            This PR updates Go dependencies to their latest ${{ github.event.inputs.update_type || 'minor' }} versions.
+            
+            ### Updated Dependencies
+            ```
+            ${{ needs.check-dependencies.outputs.updates-summary }}
+            ```
+            
+            ### Critical Updates
+            ${{ needs.check-dependencies.outputs.critical-updates }} major version changes detected.
+            ${{ needs.check-dependencies.outputs.critical-updates > 0 && '⚠️ **Please review breaking changes carefully**' || '✅ No major version changes' }}
+            
+            ### Testing Results
+            - [x] Unit tests pass
+            - [x] Coverage tests pass  
+            - [x] Linting passes
+            - [x] Integration tests pass (if available)
+            
+            ### Review Checklist
+            - [ ] Review breaking changes in updated dependencies
+            - [ ] Verify compatibility with current Go version
+            - [ ] Check for security advisories in updated packages
+            - [ ] Test with terraform provider acceptance tests
+            
+            > **Note**: Go dependencies are managed by custom workflow for enhanced testing.  
+            > GitHub Actions are managed by Dependabot separately.
+            
+            Auto-generated by Go dependency management workflow.
+          branch: deps/go-dependencies-${{ github.run_number }}
+          delete-branch: true
+          labels: |
+            dependencies
+            go
+            automated-pr
+
+  # Security audit of Go dependencies
+  security-audit:
+    name: Go Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: './go.mod'
+          cache: true
+
+      - name: Run Go vulnerability check
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          govulncheck ./...
+
+      - name: Generate dependency security report
+        run: |
+          echo "# Go Dependency Security Report" > security-report.md
+          echo "Generated: $(date)" >> security-report.md
+          echo "" >> security-report.md
+          
+          go list -json -deps ./... | jq -r '.Module | select(.Path and .Version) | .Path + "@" + .Version' | sort -u > deps.txt
+          echo "Analyzed $(wc -l < deps.txt) Go dependencies for known vulnerabilities." >> security-report.md
+          
+          # Upload report as artifact
+          echo "report-generated=true" >> $GITHUB_OUTPUT
+
+      - name: Upload security report
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-security-report-${{ github.run_number }}
+          path: security-report.md
+          retention-days: 30
+
+  # Dependency summary and reporting
+  dependency-summary:
+    name: Go Dependency Summary
+    runs-on: ubuntu-latest
+    needs: [check-dependencies, update-dependencies, security-audit]
+    if: always()
+    steps:
+      - name: Generate comprehensive summary
+        run: |
+          echo "## Go Dependency Management Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Dependency Check:** ${{ needs.check-dependencies.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Updates Available:** ${{ needs.check-dependencies.outputs.has-updates }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Critical Updates:** ${{ needs.check-dependencies.outputs.critical-updates }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Update Process:** ${{ needs.update-dependencies.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Security Audit:** ${{ needs.security-audit.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.check-dependencies.outputs.has-updates }}" == "true" ]; then
+            echo "**Available Updates:**" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "${{ needs.check-dependencies.outputs.updates-summary }}" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ All Go dependencies are up to date" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "*Go dependencies managed by custom workflow for enhanced testing.*" >> $GITHUB_STEP_SUMMARY
+          echo "*GitHub Actions managed by Dependabot separately.*" >> $GITHUB_STEP_SUMMARY

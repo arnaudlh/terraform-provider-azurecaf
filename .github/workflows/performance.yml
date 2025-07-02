@@ -1,0 +1,290 @@
+name: Performance Monitoring
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**/*.go'
+      - 'go.mod'
+      - 'go.sum'
+  pull_request:
+    branches: [main]
+    paths:
+      - '**/*.go'
+      - 'go.mod'
+      - 'go.sum'
+  schedule:
+    # Run performance tests weekly on Sundays at 3 AM UTC
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+
+# Global environment variables
+env:
+  CHECKPOINT_DISABLE: 1
+  TF_IN_AUTOMATION: 1
+  TF_CLI_ARGS_init: "-upgrade=false"
+
+permissions:
+  contents: read
+
+jobs:
+  # Benchmark tests
+  benchmark:
+    name: Benchmark Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: './go.mod'
+          cache: true
+
+      - name: Run benchmark tests
+        run: |
+          go test -bench=. -benchmem -run=^$ ./... > benchmark-results.txt 2>&1 || true
+          cat benchmark-results.txt
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results-${{ github.run_number }}
+          path: benchmark-results.txt
+          retention-days: 30
+
+  # Memory profiling
+  memory-profile:
+    name: Memory Profiling
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: './go.mod'
+          cache: true
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~> 1.12.0"
+
+      - name: Run memory profiling
+        run: |
+          # Run tests with memory profiling
+          go test -memprofile=mem.prof -run=TestAcc ./azurecaf/... || true
+          
+          # Generate memory profile report
+          if [ -f mem.prof ]; then
+            go tool pprof -text mem.prof > memory-profile.txt 2>&1 || true
+            echo "Memory profile generated"
+          else
+            echo "No memory profile generated"
+          fi
+
+      - name: Upload memory profile
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: memory-profile-${{ github.run_number }}
+          path: |
+            mem.prof
+            memory-profile.txt
+          retention-days: 30
+
+  # CPU profiling
+  cpu-profile:
+    name: CPU Profiling
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: './go.mod'
+          cache: true
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~> 1.12.0"
+
+      - name: Run CPU profiling
+        run: |
+          # Run tests with CPU profiling
+          go test -cpuprofile=cpu.prof -run=TestAcc ./azurecaf/... || true
+          
+          # Generate CPU profile report
+          if [ -f cpu.prof ]; then
+            go tool pprof -text cpu.prof > cpu-profile.txt 2>&1 || true
+            echo "CPU profile generated"
+          else
+            echo "No CPU profile generated"
+          fi
+
+      - name: Upload CPU profile
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpu-profile-${{ github.run_number }}
+          path: |
+            cpu.prof
+            cpu-profile.txt
+          retention-days: 30
+
+  # Test execution time monitoring
+  test-timing:
+    name: Test Execution Timing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: './go.mod'
+          cache: true
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~> 1.12.0"
+
+      - name: Run tests with timing
+        run: |
+          echo "Running unit tests with timing..."
+          time go test -v ./azurecaf/... -run="^Test[^A]" > unit-test-timing.txt 2>&1 || true
+          
+          echo "Running integration tests with timing..."
+          time go test -v ./azurecaf/... -run="TestAcc" > integration-test-timing.txt 2>&1 || true
+
+      - name: Analyze test timing
+        run: |
+          echo "## Test Timing Analysis" > timing-analysis.md
+          echo "" >> timing-analysis.md
+          
+          echo "### Unit Tests" >> timing-analysis.md
+          if [ -f unit-test-timing.txt ]; then
+            grep -E "(PASS|FAIL)" unit-test-timing.txt | head -20 >> timing-analysis.md || true
+          fi
+          
+          echo "" >> timing-analysis.md
+          echo "### Integration Tests" >> timing-analysis.md
+          if [ -f integration-test-timing.txt ]; then
+            grep -E "(PASS|FAIL)" integration-test-timing.txt | head -20 >> timing-analysis.md || true
+          fi
+
+      - name: Upload timing analysis
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-timing-analysis-${{ github.run_number }}
+          path: |
+            unit-test-timing.txt
+            integration-test-timing.txt
+            timing-analysis.md
+          retention-days: 30
+
+  # Code coverage performance
+  coverage-performance:
+    name: Coverage Performance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: './go.mod'
+          cache: true
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~> 1.12.0"
+
+      - name: Run coverage analysis
+        run: |
+          echo "Running coverage analysis..."
+          time go test -coverprofile=coverage.out -covermode=count ./... > coverage-timing.txt 2>&1 || true
+          
+          if [ -f coverage.out ]; then
+            go tool cover -func=coverage.out > coverage-summary.txt
+            go tool cover -html=coverage.out -o coverage.html
+            
+            # Extract coverage percentage
+            COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print $3}')
+            echo "Total Coverage: $COVERAGE" >> coverage-summary.txt
+            
+            # Check if coverage is below threshold
+            COVERAGE_NUM=$(echo $COVERAGE | sed 's/%//')
+            if (( $(echo "$COVERAGE_NUM < 80" | bc -l) )); then
+              echo "⚠️ Coverage is below 80%: $COVERAGE" >> coverage-summary.txt
+            else
+              echo "✅ Coverage meets threshold: $COVERAGE" >> coverage-summary.txt
+            fi
+          fi
+
+      - name: Upload coverage performance data
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-performance-${{ github.run_number }}
+          path: |
+            coverage.out
+            coverage.html
+            coverage-summary.txt
+            coverage-timing.txt
+          retention-days: 30
+
+  # Performance summary
+  performance-summary:
+    name: Performance Summary
+    runs-on: ubuntu-latest
+    needs: [benchmark, memory-profile, cpu-profile, test-timing, coverage-performance]
+    if: always()
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: performance-artifacts
+
+      - name: Generate performance summary
+        run: |
+          echo "# Performance Monitoring Summary" > performance-summary.md
+          echo "" >> performance-summary.md
+          echo "**Run ID:** ${{ github.run_number }}" >> performance-summary.md
+          echo "**Commit:** ${{ github.sha }}" >> performance-summary.md
+          echo "**Date:** $(date -u)" >> performance-summary.md
+          echo "" >> performance-summary.md
+          
+          echo "## Job Results" >> performance-summary.md
+          echo "- **Benchmark Tests:** ${{ needs.benchmark.result }}" >> performance-summary.md
+          echo "- **Memory Profiling:** ${{ needs.memory-profile.result }}" >> performance-summary.md
+          echo "- **CPU Profiling:** ${{ needs.cpu-profile.result }}" >> performance-summary.md
+          echo "- **Test Timing:** ${{ needs.test-timing.result }}" >> performance-summary.md
+          echo "- **Coverage Performance:** ${{ needs.coverage-performance.result }}" >> performance-summary.md
+          echo "" >> performance-summary.md
+          
+          # Check for performance artifacts and summarize
+          if [ -d "performance-artifacts" ]; then
+            echo "## Available Performance Data" >> performance-summary.md
+            find performance-artifacts -name "*.txt" -o -name "*.md" | while read file; do
+              echo "- $(basename "$file")" >> performance-summary.md
+            done
+          fi
+          
+          cat performance-summary.md
+
+      - name: Upload consolidated summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-summary-${{ github.run_number }}
+          path: performance-summary.md
+          retention-days: 90

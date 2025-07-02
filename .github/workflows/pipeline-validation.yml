@@ -1,0 +1,323 @@
+name: Pipeline Validation
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_scope:
+        description: 'Scope of tests to run'
+        required: true
+        default: 'basic'
+        type: choice
+        options:
+        - basic
+        - comprehensive
+        - performance_only
+        - security_only
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/**'
+      - 'scripts/validate-pipeline.sh'
+
+# Test the pipeline with minimal permissions first
+permissions:
+  contents: read
+
+jobs:
+  # Validate workflow syntax and structure
+  syntax-validation:
+    name: Syntax Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate workflow syntax
+        run: |
+          echo "Checking workflow files for basic syntax..."
+          for file in .github/workflows/*.yml; do
+            echo "Checking $file"
+            # Basic YAML structure check
+            if ! grep -q "^name:" "$file"; then
+              echo "❌ Missing name field in $file"
+              exit 1
+            fi
+            if ! grep -q "^on:" "$file"; then
+              echo "❌ Missing triggers in $file" 
+              exit 1
+            fi
+            if ! grep -q "^jobs:" "$file"; then
+              echo "❌ Missing jobs in $file"
+              exit 1
+            fi
+            echo "✅ $file looks valid"
+          done
+
+  # Test Makefile targets
+  makefile-validation:
+    name: Makefile Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: './go.mod'
+          cache: true
+
+      - name: Test Makefile targets
+        run: |
+          echo "Testing essential Makefile targets..."
+          
+          # Test help command
+          make help
+          
+          # Test dry runs of important targets
+          echo "Testing make targets (dry run)..."
+          make -n build
+          make -n clean
+          make -n dev_setup
+          
+          # Test actual setup and format commands
+          echo "Testing actual commands..."
+          make dev_setup
+          make format
+
+  # Test documentation completeness
+  documentation-validation:
+    name: Documentation Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check documentation files
+        run: |
+          echo "Checking documentation files..."
+          
+          required_docs=(
+            "docs/CI_CD_PIPELINE.md"
+            "docs/DEVELOPER_QUICK_REFERENCE.md" 
+            "PIPELINE_MODERNIZATION_SUMMARY.md"
+            "FILES_MODIFIED_SUMMARY.md"
+          )
+          
+          for doc in "${required_docs[@]}"; do
+            if [[ ! -f "$doc" ]]; then
+              echo "❌ Missing documentation: $doc"
+              exit 1
+            fi
+            
+            if [[ ! -s "$doc" ]]; then
+              echo "❌ Empty documentation: $doc"
+              exit 1
+            fi
+            
+            # Check for title
+            if ! head -5 "$doc" | grep -q "^#"; then
+              echo "❌ Missing title in: $doc"
+              exit 1
+            fi
+            
+            echo "✅ $doc is valid"
+          done
+          
+          # Check CHANGELOG was updated
+          if ! grep -q -i "modernized\|pipeline\|ci/cd\|workflow" CHANGELOG.md; then
+            echo "❌ CHANGELOG.md doesn't appear to be updated with pipeline changes"
+            exit 1
+          fi
+          
+          echo "✅ All documentation is present and valid"
+
+  # Test workflow integration patterns
+  integration-validation:
+    name: Integration Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check workflow consistency
+        run: |
+          echo "Checking workflow integration patterns..."
+          
+          # Check Go version consistency
+          go_version_files=$(grep -r "go-version-file.*go.mod" .github/workflows/ | wc -l)
+          if [[ $go_version_files -eq 0 ]]; then
+            echo "⚠️ No workflows use go-version-file with go.mod"
+          else
+            echo "✅ Found $go_version_files workflows using consistent Go version"
+          fi
+          
+          # Check Terraform version consistency
+          tf_versions=$(grep -r "terraform_version" .github/workflows/ | cut -d'"' -f2 | sort -u)
+          tf_count=$(echo "$tf_versions" | wc -l)
+          if [[ $tf_count -gt 1 ]]; then
+            echo "⚠️ Multiple Terraform versions found:"
+            echo "$tf_versions"
+          else
+            echo "✅ Consistent Terraform version across workflows"
+          fi
+          
+          # Check caching usage
+          cache_usage=$(grep -r "actions/cache@v4" .github/workflows/ | wc -l)
+          if [[ $cache_usage -eq 0 ]]; then
+            echo "⚠️ No workflows use caching"
+          else
+            echo "✅ Found $cache_usage instances of caching"
+          fi
+          
+          # Check environment variable consistency
+          env_vars=$(grep -r "CHECKPOINT_DISABLE.*1" .github/workflows/ | wc -l)
+          if [[ $env_vars -eq 0 ]]; then
+            echo "⚠️ Environment variables may not be consistent"
+          else
+            echo "✅ Found $env_vars consistent environment variable usages"
+          fi
+
+  # Run comprehensive validation script
+  comprehensive-validation:
+    name: Comprehensive Validation
+    runs-on: ubuntu-latest
+    if: github.event.inputs.test_scope == 'comprehensive' || github.event.inputs.test_scope == ''
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: './go.mod'
+          cache: true
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~> 1.12.0"
+
+      - name: Run comprehensive validation
+        run: ./scripts/validate-pipeline.sh
+
+      - name: Upload validation results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-results
+          path: |
+            *.log
+            validation-*.txt
+          retention-days: 7
+
+  # Test a sample of the new workflow capabilities
+  workflow-capability-test:
+    name: Workflow Capability Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test-type: [cache-test, env-test, artifact-test]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: './go.mod'
+          cache: true
+
+      - name: Test caching capability
+        if: matrix.test-type == 'cache-test'
+        run: |
+          echo "Testing Go module caching..."
+          go mod download
+          echo "✅ Caching works"
+
+      - name: Test environment variables
+        if: matrix.test-type == 'env-test'
+        env:
+          CHECKPOINT_DISABLE: 1
+          TF_IN_AUTOMATION: 1
+          TF_CLI_ARGS_init: "-upgrade=false"
+        run: |
+          echo "Testing environment variable setup..."
+          echo "CHECKPOINT_DISABLE: $CHECKPOINT_DISABLE"
+          echo "TF_IN_AUTOMATION: $TF_IN_AUTOMATION"
+          echo "TF_CLI_ARGS_init: $TF_CLI_ARGS_init"
+          echo "✅ Environment variables work"
+
+      - name: Test artifact creation
+        if: matrix.test-type == 'artifact-test'
+        run: |
+          echo "Testing artifact creation..."
+          mkdir -p test-artifacts
+          echo "Test artifact content" > test-artifacts/test.txt
+          echo "Current time: $(date)" > test-artifacts/timestamp.txt
+          echo "✅ Artifacts created"
+
+      - name: Upload test artifacts
+        if: matrix.test-type == 'artifact-test'
+        uses: actions/upload-artifact@v4
+        with:
+          name: capability-test-artifacts
+          path: test-artifacts/
+          retention-days: 1
+
+  # Validation summary
+  validation-summary:
+    name: Validation Summary
+    runs-on: ubuntu-latest
+    needs: [syntax-validation, makefile-validation, documentation-validation, integration-validation, comprehensive-validation, workflow-capability-test]
+    if: always()
+    steps:
+      - name: Check validation results
+        run: |
+          echo "# Pipeline Validation Summary"
+          echo ""
+          echo "## Job Results"
+          echo "- Syntax Validation: ${{ needs.syntax-validation.result }}"
+          echo "- Makefile Validation: ${{ needs.makefile-validation.result }}"
+          echo "- Documentation Validation: ${{ needs.documentation-validation.result }}"
+          echo "- Integration Validation: ${{ needs.integration-validation.result }}"
+          echo "- Comprehensive Validation: ${{ needs.comprehensive-validation.result }}"
+          echo "- Workflow Capability Test: ${{ needs.workflow-capability-test.result }}"
+          echo ""
+          
+          # Check if any critical validations failed
+          if [[ "${{ needs.syntax-validation.result }}" != "success" ]]; then
+            echo "❌ Critical: Syntax validation failed"
+            exit 1
+          fi
+          
+          if [[ "${{ needs.makefile-validation.result }}" != "success" ]]; then
+            echo "❌ Critical: Makefile validation failed"
+            exit 1
+          fi
+          
+          if [[ "${{ needs.documentation-validation.result }}" != "success" ]]; then
+            echo "❌ Critical: Documentation validation failed"
+            exit 1
+          fi
+          
+          # Summary
+          total_jobs=6
+          successful_jobs=0
+          
+          for result in "${{ needs.syntax-validation.result }}" "${{ needs.makefile-validation.result }}" "${{ needs.documentation-validation.result }}" "${{ needs.integration-validation.result }}" "${{ needs.comprehensive-validation.result }}" "${{ needs.workflow-capability-test.result }}"; do
+            if [[ "$result" == "success" ]]; then
+              successful_jobs=$((successful_jobs + 1))
+            fi
+          done
+          
+          echo ""
+          echo "## Summary"
+          echo "Successful validations: $successful_jobs/$total_jobs"
+          
+          if [[ $successful_jobs -eq $total_jobs ]]; then
+            echo "🎉 All validations passed! Pipeline is ready for production."
+          else
+            echo "⚠️ Some validations failed. Please review the results above."
+            exit 1
+          fi

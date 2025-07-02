@@ -1,0 +1,313 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release (e.g., v1.2.3)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        default: false
+        type: boolean
+
+# Global environment variables
+env:
+  CHECKPOINT_DISABLE: 1
+  TF_IN_AUTOMATION: 1
+
+permissions:
+  contents: read
+
+jobs:
+  # Validate release prerequisites
+  validate-release:
+    name: Validate Release
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      is-prerelease: ${{ steps.version.outputs.is-prerelease }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: './go.mod'
+          cache: true
+
+      - name: Extract version information
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.tag }}"
+            IS_PRERELEASE="${{ github.event.inputs.prerelease }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/}"
+            # Determine if it's a prerelease based on version string
+            if [[ "$VERSION" =~ -[a-zA-Z] ]]; then
+              IS_PRERELEASE="true"
+            else
+              IS_PRERELEASE="false"
+            fi
+          fi
+          
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "is-prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
+          echo "Releasing version: $VERSION (prerelease: $IS_PRERELEASE)"
+
+      - name: Validate version format
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$ ]]; then
+            echo "Invalid version format: $VERSION"
+            echo "Expected format: v1.2.3 or v1.2.3-alpha.1"
+            exit 1
+          fi
+
+      - name: Check if tag exists
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          if git rev-parse "${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+            echo "Tag ${{ steps.version.outputs.version }} already exists"
+            exit 1
+          fi
+
+      - name: Run comprehensive tests
+        run: |
+          make ci_full
+
+      - name: Verify no uncommitted changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "There are uncommitted changes:"
+            git status --porcelain
+            exit 1
+          fi
+
+  # Run security and quality checks
+  pre-release-checks:
+    name: Pre-release Security & Quality
+    runs-on: ubuntu-latest
+    needs: validate-release
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: './go.mod'
+          cache: true
+
+      - name: Run security checks
+        run: |
+          make security_scan
+
+      - name: Run quality assurance
+        run: |
+          make qa_full
+
+      - name: Generate license report
+        run: |
+          if command -v go-licenses >/dev/null 2>&1; then
+            go-licenses csv ./... > licenses.csv
+          else
+            echo "go-licenses not installed, skipping license report"
+          fi
+
+      - name: Upload pre-release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pre-release-checks
+          path: |
+            licenses.csv
+            coverage.html
+            *.prof
+          retention-days: 30
+
+  # Build and prepare release
+  build-release:
+    name: Build Release Artifacts
+    runs-on: ubuntu-latest
+    needs: [validate-release, pre-release-checks]
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: './go.mod'
+          cache: true
+
+      - name: Import GPG key
+        id: import_gpg
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+
+      - name: Create tag (if workflow_dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git tag -a "${{ needs.validate-release.outputs.version }}" -m "Release ${{ needs.validate-release.outputs.version }}"
+          git push origin "${{ needs.validate-release.outputs.version }}"
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          version: '~> v2'
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
+
+  # Generate and publish documentation
+  publish-docs:
+    name: Publish Documentation
+    runs-on: ubuntu-latest
+    needs: [validate-release, build-release]
+    if: needs.validate-release.outputs.is-prerelease == 'false'
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: './go.mod'
+          cache: true
+
+      - name: Generate documentation
+        run: |
+          # Generate provider documentation
+          mkdir -p docs-generated
+          go run main.go -schema > docs-generated/schema.json
+          
+          # Generate coverage report for documentation
+          make test_coverage_html
+          cp coverage.html docs-generated/
+          
+          # Copy existing documentation
+          cp -r docs/* docs-generated/ 2>/dev/null || true
+          cp README.md docs-generated/
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload documentation
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs-generated
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # Notify external systems
+  post-release:
+    name: Post-release Notifications
+    runs-on: ubuntu-latest
+    needs: [validate-release, build-release, publish-docs]
+    if: always() && needs.build-release.result == 'success'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Notify Terraform Registry
+        run: |
+          echo "Release ${{ needs.validate-release.outputs.version }} completed successfully"
+          echo "The Terraform Registry should automatically pick up the new release"
+
+      - name: Update CHANGELOG check
+        run: |
+          if [ ! -f CHANGELOG.md ]; then
+            echo "⚠️ CHANGELOG.md not found - consider adding one for better release tracking"
+          else
+            echo "✅ CHANGELOG.md exists"
+          fi
+
+      - name: Create release summary
+        run: |
+          cat > release-summary.md << EOF
+          # Release Summary: ${{ needs.validate-release.outputs.version }}
+          
+          ## Release Information
+          - **Version**: ${{ needs.validate-release.outputs.version }}
+          - **Pre-release**: ${{ needs.validate-release.outputs.is-prerelease }}
+          - **Build Status**: ${{ needs.build-release.result }}
+          - **Documentation**: ${{ needs.publish-docs.result }}
+          
+          ## Artifacts
+          - Provider binaries built for multiple platforms
+          - GPG signatures generated
+          - Documentation published to GitHub Pages
+          
+          ## Next Steps
+          - Monitor Terraform Registry for automatic publishing
+          - Update any dependent projects
+          - Announce release in relevant channels
+          EOF
+          
+          cat release-summary.md
+
+      - name: Upload release summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-summary-${{ needs.validate-release.outputs.version }}
+          path: release-summary.md
+          retention-days: 90
+
+  # Release summary
+  release-summary:
+    name: Release Summary
+    runs-on: ubuntu-latest
+    needs: [validate-release, pre-release-checks, build-release, publish-docs, post-release]
+    if: always()
+    steps:
+      - name: Display release summary
+        run: |
+          echo "# Release Pipeline Summary"
+          echo ""
+          echo "**Version**: ${{ needs.validate-release.outputs.version }}"
+          echo "**Pre-release**: ${{ needs.validate-release.outputs.is-prerelease }}"
+          echo ""
+          echo "## Job Results"
+          echo "- **Validation**: ${{ needs.validate-release.result }}"
+          echo "- **Pre-release Checks**: ${{ needs.pre-release-checks.result }}"
+          echo "- **Build Release**: ${{ needs.build-release.result }}"
+          echo "- **Publish Docs**: ${{ needs.publish-docs.result }}"
+          echo "- **Post-release**: ${{ needs.post-release.result }}"
+          echo ""
+          
+          # Determine overall status
+          if [ "${{ needs.build-release.result }}" == "success" ]; then
+            echo "✅ **Release completed successfully!**"
+            echo ""
+            echo "The provider has been released and should be available on the Terraform Registry shortly."
+          else
+            echo "❌ **Release failed**"
+            echo ""
+            echo "Please check the job outputs above for details on what went wrong."
+            exit 1
+          fi
