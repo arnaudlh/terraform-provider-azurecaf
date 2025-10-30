@@ -212,6 +212,10 @@ parse_args() {
 check_prerequisites() {
   log_stage_start "Checking Prerequisites"
   
+  log_info "PROJECT_ROOT: ${PROJECT_ROOT}"
+  log_info "RESOURCE_DEFINITION: ${RESOURCE_DEFINITION}"
+  log_info "Checking if ${RESOURCE_DEFINITION} exists..."
+  
   require_command "go" "Go compiler required for building provider"
   require_command "jq" "jq required for JSON processing"
   require_file "${RESOURCE_DEFINITION}" "Resource definition file not found"
