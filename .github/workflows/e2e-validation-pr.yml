@@ -1,0 +1,360 @@
+name: E2E Validation - Pull Request
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'resourceDefinition.json'
+      - '.github/workflows/e2e-validation-pr.yml'
+      - '.github/e2e-tests/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  GO_VERSION: '1.24'
+  TERRAFORM_VERSION: '1.8.0'
+  
+jobs:
+  e2e-validation-quick:
+    name: Quick E2E Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+          cache-dependency-path: |
+            go.sum
+            e2e/go.sum
+            
+      - name: Build Provider
+        id: build
+        run: |
+          echo "::group::Building provider binary"
+          ./.github/e2e-tests/scripts/build-provider.sh
+          echo "::endgroup::"
+          
+          # Extract build metadata
+          if [ -f .build-metadata.json ]; then
+            BUILD_DURATION=$(jq -r '.build_duration' .build-metadata.json)
+            BINARY_HASH=$(jq -r '.binary_hash' .build-metadata.json)
+            echo "build_duration=${BUILD_DURATION}" >> $GITHUB_OUTPUT
+            echo "binary_hash=${BINARY_HASH}" >> $GITHUB_OUTPUT
+            
+            echo "### Build Results" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "✅ Provider built successfully" >> $GITHUB_STEP_SUMMARY
+            echo "- **Duration**: ${BUILD_DURATION}s" >> $GITHUB_STEP_SUMMARY
+            echo "- **Binary Hash**: \`${BINARY_HASH}\`" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+      - name: Upload Provider Binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-provider-azurecaf
+          path: |
+            terraform-provider-azurecaf
+            .build-metadata.json
+            .build-hash
+            .build-duration
+          retention-days: 7
+          
+      - name: Upload Build Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: /tmp/e2e-build-*.log
+          retention-days: 7
+          if-no-files-found: ignore
+          
+      - name: Setup Terraform
+        if: success()
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
+          
+      - name: Run Plan Validation
+        if: success()
+        id: plan
+        run: |
+          echo "::group::Running plan validation"
+          ./.github/e2e-tests/scripts/run-validation.sh \
+            --mode quick \
+            --terraform-version ${{ env.TERRAFORM_VERSION }} \
+            --provider-binary ./terraform-provider-azurecaf \
+            --skip-cleanup
+          echo "::endgroup::"
+          
+          # Extract validation results
+          WORKSPACE=$(find /tmp -type d -name "e2e-quick-*" -type d | sort -r | head -n 1)
+          echo "workspace=${WORKSPACE}" >> $GITHUB_OUTPUT
+          
+          if [ -f "$WORKSPACE/validation-report.json" ]; then
+            TOTAL_TESTS=$(jq -r '.tests | length' "$WORKSPACE/validation-report.json")
+            PASSED_TESTS=$(jq -r '[.tests[] | select(.status == "pass")] | length' "$WORKSPACE/validation-report.json")
+            FAILED_TESTS=$(jq -r '[.tests[] | select(.status == "fail")] | length' "$WORKSPACE/validation-report.json")
+            PASS_RATE=$(jq -r '.summary.pass_rate // 0' "$WORKSPACE/validation-report.json")
+            
+            echo "total_tests=${TOTAL_TESTS}" >> $GITHUB_OUTPUT
+            echo "passed_tests=${PASSED_TESTS}" >> $GITHUB_OUTPUT
+            echo "failed_tests=${FAILED_TESTS}" >> $GITHUB_OUTPUT
+            echo "pass_rate=${PASS_RATE}" >> $GITHUB_OUTPUT
+            
+            echo "### 📋 Plan Validation Results" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "✅ Plan validation completed" >> $GITHUB_STEP_SUMMARY
+            echo "- **Total Tests**: ${TOTAL_TESTS}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Passed**: ${PASSED_TESTS}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Failed**: ${FAILED_TESTS}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Pass Rate**: ${PASS_RATE}%" >> $GITHUB_STEP_SUMMARY
+            
+            # Show sample plan outputs for each convention
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 📝 Sample Generated Names" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            for convention in cafclassic cafrandom random passthrough; do
+              if [ -f "$WORKSPACE/plan-${convention}.json" ]; then
+                echo "<details>" >> $GITHUB_STEP_SUMMARY
+                echo "<summary><b>${convention}</b> - Click to expand</summary>" >> $GITHUB_STEP_SUMMARY
+                echo "" >> $GITHUB_STEP_SUMMARY
+                echo '```json' >> $GITHUB_STEP_SUMMARY
+                jq -r '.planned_values.outputs.all_names.value' "$WORKSPACE/plan-${convention}.json" | head -20 >> $GITHUB_STEP_SUMMARY
+                echo '```' >> $GITHUB_STEP_SUMMARY
+                echo "</details>" >> $GITHUB_STEP_SUMMARY
+                echo "" >> $GITHUB_STEP_SUMMARY
+              fi
+            done
+          fi
+          
+      - name: Show Plan Details
+        if: success()
+        run: |
+          WORKSPACE="${{ steps.plan.outputs.workspace }}"
+          
+          echo "::group::Plan Output - cafclassic"
+          if [ -f "$WORKSPACE/plan-cafclassic.log" ]; then
+            cat "$WORKSPACE/plan-cafclassic.log"
+          fi
+          echo "::endgroup::"
+          
+          echo "::group::Plan Output - cafrandom"
+          if [ -f "$WORKSPACE/plan-cafrandom.log" ]; then
+            cat "$WORKSPACE/plan-cafrandom.log"
+          fi
+          echo "::endgroup::"
+          
+          echo "::group::Generated Names Summary"
+          if [ -f "$WORKSPACE/validation-report.json" ]; then
+            echo "All generated names:"
+            jq -r '.tests[] | "\(.resource_type) (\(.convention)): \(.status)"' "$WORKSPACE/validation-report.json"
+          fi
+          echo "::endgroup::"
+          
+      - name: Run Apply Validation
+        if: success() && github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'test-apply')
+        id: apply
+        run: |
+          WORKSPACE="${{ steps.plan.outputs.workspace }}"
+          
+          echo "::group::Running apply validation"
+          ./.github/e2e-tests/scripts/run-validation.sh \
+            --mode quick \
+            --terraform-version ${{ env.TERRAFORM_VERSION }} \
+            --provider-binary ./terraform-provider-azurecaf \
+            --enable-apply \
+            --skip-cleanup \
+            --skip-build
+          echo "::endgroup::"
+          
+          # Extract apply results
+          WORKSPACE=$(find /tmp -type d -name "e2e-quick-*" -type d | sort -r | head -n 1)
+          
+          echo "### 🚀 Apply Validation Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          APPLIED_COUNT=0
+          FAILED_COUNT=0
+          
+          for convention in cafclassic cafrandom random passthrough; do
+            if [ -f "$WORKSPACE/apply-${convention}.log" ]; then
+              if grep -q "Apply complete!" "$WORKSPACE/apply-${convention}.log"; then
+                APPLIED_COUNT=$((APPLIED_COUNT + 1))
+                echo "- ✅ **${convention}**: Apply successful" >> $GITHUB_STEP_SUMMARY
+              else
+                FAILED_COUNT=$((FAILED_COUNT + 1))
+                echo "- ❌ **${convention}**: Apply failed" >> $GITHUB_STEP_SUMMARY
+              fi
+            fi
+          done
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Summary**: ${APPLIED_COUNT} successful, ${FAILED_COUNT} failed" >> $GITHUB_STEP_SUMMARY
+          
+          echo "applied_count=${APPLIED_COUNT}" >> $GITHUB_OUTPUT
+          echo "failed_count=${FAILED_COUNT}" >> $GITHUB_OUTPUT
+          
+      - name: Show Apply Details
+        if: success() && steps.apply.outcome == 'success'
+        run: |
+          WORKSPACE="${{ steps.plan.outputs.workspace }}"
+          
+          for convention in cafclassic cafrandom random passthrough; do
+            echo "::group::Apply Output - ${convention}"
+            if [ -f "$WORKSPACE/apply-${convention}.log" ]; then
+              cat "$WORKSPACE/apply-${convention}.log"
+            fi
+            echo "::endgroup::"
+            
+            echo "::group::Destroy Output - ${convention}"
+            if [ -f "$WORKSPACE/destroy-${convention}.log" ]; then
+              cat "$WORKSPACE/destroy-${convention}.log"
+            fi
+            echo "::endgroup::"
+          done
+          
+      - name: Upload Plan Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: plan-validation-results
+          path: |
+            /tmp/e2e-quick-*/validation-report.json
+            /tmp/e2e-quick-*/plan-*.json
+            /tmp/e2e-quick-*/plan-*.log
+            /tmp/e2e-quick-*/apply-*.log
+            /tmp/e2e-quick-*/destroy-*.log
+            /tmp/e2e-quick-*/init.log
+          retention-days: 7
+          if-no-files-found: ignore
+          
+      - name: Report Build Failure
+        if: failure() && steps.build.outcome == 'failure'
+        run: |
+          echo "### ❌ Build Failed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The provider binary could not be built. Please check the build logs for details." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Common causes:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Compilation errors in Go code" >> $GITHUB_STEP_SUMMARY
+          echo "- Missing or incorrect dependencies" >> $GITHUB_STEP_SUMMARY
+          echo "- Go version incompatibility" >> $GITHUB_STEP_SUMMARY
+          
+      - name: Report Plan Failure
+        if: failure() && steps.plan.outcome == 'failure'
+        run: |
+          echo "### ❌ Plan Validation Failed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Terraform plan validation failed. Please check the [validation logs](../actions/runs/${{ github.run_id }}) for details." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Common causes:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Invalid resource configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- Name generation errors" >> $GITHUB_STEP_SUMMARY
+          echo "- Constraint validation failures" >> $GITHUB_STEP_SUMMARY
+          
+      - name: Comment on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const buildStatus = '${{ steps.build.outcome }}';
+            const buildDuration = '${{ steps.build.outputs.build_duration }}' || 'N/A';
+            const binaryHash = '${{ steps.build.outputs.binary_hash }}' || 'N/A';
+            const planStatus = '${{ steps.plan.outcome }}';
+            const totalTests = '${{ steps.plan.outputs.total_tests }}' || 'N/A';
+            const passedTests = '${{ steps.plan.outputs.passed_tests }}' || 'N/A';
+            const failedTests = '${{ steps.plan.outputs.failed_tests }}' || 'N/A';
+            const passRate = '${{ steps.plan.outputs.pass_rate }}' || 'N/A';
+            const applyStatus = '${{ steps.apply.outcome }}';
+            const appliedCount = '${{ steps.apply.outputs.applied_count }}' || '0';
+            const applyFailedCount = '${{ steps.apply.outputs.failed_count }}' || '0';
+            
+            let commentBody = '## E2E Validation - Quick Mode\n\n';
+            
+            // Build results
+            if (buildStatus === 'success') {
+              commentBody += '### ✅ Build Successful\n\n';
+              commentBody += `- **Duration**: ${buildDuration}s\n`;
+              commentBody += `- **Binary Hash**: \`${binaryHash}\`\n\n`;
+            } else {
+              commentBody += '### ❌ Build Failed\n\n';
+              commentBody += 'The provider binary could not be built. Please check the [build logs](../actions/runs/${{ github.run_id }}) for details.\n\n';
+              commentBody += '**Common causes:**\n';
+              commentBody += '- Compilation errors in Go code\n';
+              commentBody += '- Missing or incorrect dependencies\n';
+              commentBody += '- Go version incompatibility\n\n';
+            }
+            
+            // Plan validation results
+            if (planStatus === 'success') {
+              commentBody += '### ✅ Plan Validation Successful\n\n';
+              commentBody += '| Metric | Value |\n';
+              commentBody += '|--------|-------|\n';
+              commentBody += `| Total Tests | ${totalTests} |\n`;
+              commentBody += `| Passed | ${passedTests} |\n`;
+              commentBody += `| Failed | ${failedTests} |\n`;
+              commentBody += `| Pass Rate | ${passRate}% |\n\n`;
+              commentBody += '> All Terraform configurations generated valid resource names.\n';
+            } else if (planStatus === 'failure') {
+              commentBody += '### ❌ Plan Validation Failed\n\n';
+              commentBody += `- **Total Tests**: ${totalTests}\n`;
+              commentBody += `- **Passed**: ${passedTests}\n`;
+              commentBody += `- **Failed**: ${failedTests}\n`;
+              commentBody += `- **Pass Rate**: ${passRate}%\n\n`;
+              commentBody += 'Please check the [validation logs](../actions/runs/${{ github.run_id }}) for details.\n';
+            } else if (buildStatus === 'success') {
+              commentBody += '### ⏭️ Plan Validation Skipped\n\n';
+              commentBody += 'Plan validation was skipped.\n\n';
+            }
+            
+            // Apply validation results
+            if (applyStatus === 'success') {
+              commentBody += '### 🚀 Apply Validation Results\n\n';
+              commentBody += `- **Applied**: ${appliedCount} conventions\n`;
+              commentBody += `- **Failed**: ${applyFailedCount} conventions\n\n`;
+              commentBody += '> Terraform apply executed successfully and resources were created/destroyed.\n\n';
+              commentBody += '💡 **Note**: Apply validation runs only when PR has `test-apply` label.\n';
+            }
+            
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('E2E Validation - Quick Mode')
+            );
+            
+            if (botComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: commentBody
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            }
