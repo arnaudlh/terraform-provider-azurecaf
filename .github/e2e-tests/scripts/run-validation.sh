@@ -25,8 +25,9 @@ source "${LIB_DIR}/result-tracker.sh"
 readonly SCRIPT_NAME="run-validation"
 readonly SCRIPT_VERSION="1.0.0"
 
-# Paths
-readonly PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
+# Paths  
+# SCRIPT_DIR is .github/e2e-tests/scripts, so we need to go up 3 levels to reach project root
+readonly PROJECT_ROOT="$(realpath "${SCRIPT_DIR}/../../..")"
 readonly CONFIG_DIR="${SCRIPT_DIR}/../configs"
 readonly RESOURCE_DEFINITION="${PROJECT_ROOT}/resourceDefinition.json"
 
