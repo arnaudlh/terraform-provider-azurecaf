@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **E2E Terraform Validation Pipeline (Phase 1-4)**: Implemented comprehensive end-to-end validation infrastructure for the azurecaf Terraform provider
+  - Created E2E test directory structure at `.github/e2e-tests/` with configs, scripts, and library subdirectories
+  - Implemented 7 foundational library scripts for config loading, resource selection, logging, error handling, workspace management, and result tracking
+  - Added JSON schema validator for test configuration validation
+  - Created `build-provider.sh` script with build duration tracking, binary hash calculation, and metadata generation
+  - Implemented `setup-terraform.sh` script for Terraform version management, provider installation, and workspace initialization
+  - Created `run-validation.sh` orchestrator for coordinating build, plan, apply, drift, and cleanup stages
+  - Added 5 Terraform test configurations for quick validation mode testing all 4 naming conventions (cafclassic, cafrandom, random, passthrough)
+  - Implemented GitHub Actions workflow `e2e-validation-pr.yml` for automated PR validation with build and plan stages
+  - Added comprehensive E2E validation documentation at `docs/E2E_VALIDATION.md` covering architecture, modes, CI/CD integration, local development, and troubleshooting
+  - Phase 1-2: Setup and foundational infrastructure (12 tasks completed)
+  - Phase 3: User Story 1 - Automated Provider Build Verification (8 tasks completed)
+  - Phase 4: User Story 2 - Terraform Plan Validation (14 tasks completed)
+  - Impact: High - Enables continuous validation of provider builds and Terraform plan generation across all naming conventions
+  - Validation Modes: Quick (5-8 min, 20 resources), Standard (10-15 min, 100 resources), Comprehensive (25-30 min, 395 resources)
+  - Exit Codes: Standardized exit codes for build failures (1), dependency errors (2), plan failures (10-12), apply failures (20-22), drift detection (30-31), cleanup warnings (40-41)
+  - Coverage: Tests 20 representative Azure resource types across compute, storage, networking, database, and application service categories
+
 ### Fixed
 - **Go Version Alignment**: Resolved conflicting Go version declarations in go.mod
   - Changed from conflicting `go 1.23.0` and `toolchain go1.24.4` to unified `go 1.24`
